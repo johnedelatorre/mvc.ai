@@ -6,13 +6,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar"
-import AutomatedInsights from "../automated-insights"
-import DataTable from "../data-table"
-import DataBarChart from "../bar-chart"
-import MultiMetricChart from "../multi-metric-chart"
-import ComparisonLineChart from "../line-chart"
 import {
   faTable,
   faChartColumn,
@@ -24,6 +17,13 @@ import {
   faChartLine,
   faLightbulb,
 } from "@fortawesome/free-solid-svg-icons"
+import { format } from "date-fns"
+import AutomatedInsights from "../automated-insights"
+import DataTable from "../data-table"
+import DataBarChart from "../bar-chart"
+import MultiMetricChart from "../multi-metric-chart"
+import ComparisonLineChart from "../line-chart"
+import { Calendar } from "@/components/ui/calendar"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
