@@ -1,5 +1,3 @@
-console.log("Card component loaded"); // <-- Add this for testing
-
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
