@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 91% 95%;
+    --secondary-foreground: 217 91% 60%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 217 91% 60%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217 91% 60%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-roboto), "Roboto", sans-serif;
+  }
+}
+
+@layer components {
+  /* Base button styles */
+  .btn-base {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium;
+    @apply ring-offset-background transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply h-10 px-4 py-2;
+  }
+
+  /* Primary Button Styles */
+  .btn-primary {
+    @apply btn-base;
+    background-color: #4f8ef7;
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: #3b7bf6;
+  }
+
+  .btn-primary:active:not(:disabled) {
+    background-color: #2968f5;
+  }
+
+  .btn-primary:focus:not(:disabled) {
+    background-color: #3b7bf6;
+    @apply ring-2 ring-offset-2;
+    box-shadow: 0 0 0 2px #4f8ef7;
+  }
+
+  .btn-primary:disabled {
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+  }
+
+  /* Secondary Button Styles */
+  .btn-secondary {
+    @apply btn-base;
+    background-color: #f0f7ff;
+    color: #4f8ef7;
+    border: 1px solid #4f8ef7;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: #e6f3ff;
+  }
+
+  .btn-secondary:active:not(:disabled) {
+    background-color: #d9edff;
+  }
+
+  .btn-secondary:focus:not(:disabled) {
+    background-color: #e6f3ff;
+    @apply ring-2 ring-offset-2;
+    box-shadow: 0 0 0 2px #4f8ef7;
+  }
+
+  .btn-secondary:disabled {
+    @apply bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed;
+  }
+
+  /* Tertiary Button Styles */
+  .btn-tertiary {
+    @apply btn-base;
+    background-color: transparent;
+    color: #4f8ef7;
+  }
+
+  .btn-tertiary:hover:not(:disabled) {
+    background-color: #f0f7ff;
+  }
+
+  .btn-tertiary:active:not(:disabled) {
+    background-color: #e6f3ff;
+  }
+
+  .btn-tertiary:focus:not(:disabled) {
+    background-color: #f0f7ff;
+    @apply ring-2 ring-offset-2;
+    box-shadow: 0 0 0 2px #4f8ef7;
+  }
+
+  .btn-tertiary:disabled {
+    @apply text-gray-400 cursor-not-allowed;
+    background-color: transparent;
+  }
+
+  /* Utility Button Styles */
+  .btn-utility {
+    @apply btn-base;
+    @apply bg-black text-white;
+  }
+
+  .btn-utility:hover:not(:disabled) {
+    @apply bg-gray-800;
+  }
+
+  .btn-utility:active:not(:disabled) {
+    @apply bg-gray-900;
+  }
+
+  .btn-utility:focus:not(:disabled) {
+    @apply bg-gray-800 ring-2 ring-gray-400 ring-offset-2;
+  }
+
+  .btn-utility:disabled {
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+  }
+
+  /* Link Button Styles */
+  .btn-link {
+    @apply inline-flex items-center justify-center whitespace-nowrap text-sm font-medium;
+    @apply ring-offset-background transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply h-auto px-0 py-0;
+    color: #4f8ef7;
+    @apply underline-offset-4;
+  }
+
+  .btn-link:hover:not(:disabled) {
+    @apply underline;
+  }
+
+  .btn-link:active:not(:disabled) {
+    color: #2968f5;
+  }
+
+  .btn-link:focus:not(:disabled) {
+    color: #3b7bf6;
+    @apply ring-2 ring-offset-2;
+    box-shadow: 0 0 0 2px #4f8ef7;
+  }
+
+  .btn-link:disabled {
+    @apply text-gray-400 cursor-not-allowed no-underline;
+  }
+
+  /* Size Variants */
+  .btn-sm {
+    @apply h-9 rounded-md px-3 text-xs;
+  }
+
+  .btn-lg {
+    @apply h-11 rounded-md px-8;
+  }
+
+  .btn-icon {
+    @apply h-10 w-10 p-0;
+  }
+
+  .btn-icon.btn-sm {
+    @apply h-9 w-9;
+  }
+
+  .btn-icon.btn-lg {
+    @apply h-11 w-11;
+  }
+}
