@@ -693,7 +693,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   }
 
   return (
-    <>
+    <TooltipProvider>
       <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -712,23 +712,21 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                 <FontAwesomeIcon icon={faFileText} className="h-4 w-4" />
                 Generate Report
               </Button>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={handleBookmarkInsights}
-                      variant={isBookmarked ? "default" : "outline"}
-                      size="sm"
-                      className={`p-2 ${isBookmarked ? "bg-blue-600 text-white" : ""}`}
-                    >
-                      <FontAwesomeIcon icon={isBookmarked ? faBookmark : faBookmarkRegular} className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleBookmarkInsights}
+                    variant={isBookmarked ? "default" : "outline"}
+                    size="sm"
+                    className={`p-2 ${isBookmarked ? "bg-blue-600 text-white" : ""}`}
+                  >
+                    <FontAwesomeIcon icon={isBookmarked ? faBookmark : faBookmarkRegular} className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
+                </TooltipContent>
+              </Tooltip>
               <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
                 <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
               </Button>
@@ -1426,59 +1424,53 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <div className="flex items-center justify-end gap-2">
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-2"
-                                            onClick={() => handleLoadSavedInsight(insight)}
-                                          >
-                                            <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>View Insight</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="p-2"
+                                          onClick={() => handleLoadSavedInsight(insight)}
+                                        >
+                                          <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>View Insight</p>
+                                      </TooltipContent>
+                                    </Tooltip>
 
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-2"
-                                            onClick={() => setEditingInsight(insight.id)}
-                                          >
-                                            <FontAwesomeIcon icon={faEdit} className="h-4 w-4 text-gray-600" />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Edit Insight</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="p-2"
+                                          onClick={() => setEditingInsight(insight.id)}
+                                        >
+                                          <FontAwesomeIcon icon={faEdit} className="h-4 w-4 text-gray-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Edit Insight</p>
+                                      </TooltipContent>
+                                    </Tooltip>
 
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-2"
-                                            onClick={() => handleDeleteSavedInsight(insight.id)}
-                                          >
-                                            <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
-                                          </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Delete Insight</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="p-2"
+                                          onClick={() => handleDeleteSavedInsight(insight.id)}
+                                        >
+                                          <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Delete Insight</p>
+                                      </TooltipContent>
+                                    </Tooltip>
                                   </div>
                                 </TableCell>
                               </TableRow>
@@ -1529,6 +1521,6 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
           </div>
         </div>
       )}
-    </>
+    </TooltipProvider>
   )
 }
