@@ -13,7 +13,10 @@ import {
   faChevronRight,
   faDownload,
   faCog,
-} from "@fortawesome/free-solid-svg-icons"
+  faSort,
+  faSortUp,
+  faSortDown
+} from "@fortawesome/free-solid-svg-icons",
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
