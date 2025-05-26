@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -16,7 +16,7 @@ import {
   faSort,
   faSortUp,
   faSortDown
-} from "@fortawesome/free-solid-svg-icons",
+} from "@fortawesome/free-solid-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
@@ -53,7 +53,7 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
 type SortConfig = {
   key: string;
   direction: "asc" | "desc";
-} | null
+} | null;
 
 type SearchFilters = {
   [key: string]: string
@@ -108,17 +108,17 @@ export default function DataTable({ data }: DataTableProps) {
 
   // Apply sorting and filtering
   const filteredAndSortedData = useMemo(() => {
-    let processedData = [...baseData]
+    let processedData = [...baseData];
 
     // Apply search filters
     Object.entries(searchFilters).forEach(([column, searchTerm]) => {
       if (searchTerm) {
         processedData = processedData.filter((item) => {
-          const value = item[column as keyof typeof item]
-          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        })
+          const value = item[column as keyof typeof item];
+          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        });
       }
-    })
+    });
 
     // Apply sorting
     if (sortConfig) {
