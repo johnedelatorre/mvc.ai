@@ -25,8 +25,10 @@ import {
   faChartColumn,
   faEdit,
   faHistory,
+  faStar,
+  faThumbsUp,
 } from "@fortawesome/free-solid-svg-icons"
-import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
+import { faBookmark as faBookmarkRegular, faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
@@ -34,6 +36,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Textarea } from "@/components/ui/textarea"
 
 interface AutomatedInsightsProps {
   data: Array<{
@@ -104,6 +108,13 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   >([])
   const [activeTab, setActiveTab] = useState("automated")
   const [chartType, setChartType] = useState<"line" | "bar">("line")
+  const [showRatingDrawer, setShowRatingDrawer] = useState(false)
+  const [currentRatingType, setCurrentRatingType] = useState<"automated" | "generated">("automated")
+  const [automatedRating, setAutomatedRating] = useState<number>(0)
+  const [generatedRating, setGeneratedRating] = useState<number>(0)
+  const [automatedFeedback, setAutomatedFeedback] = useState("")
+  const [generatedFeedback, setGeneratedFeedback] = useState("")
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false)
 
   // Sort by date (most recent first) - handle empty data
   const sortedData = useMemo(() => {
@@ -441,6 +452,60 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     "Compare current vs previous season performance",
   ]
 
+  const handleRateInsights = (type: "automated" | "generated") => {
+    setCurrentRatingType(type)
+    setShowRatingDrawer(true)
+  }
+
+  const handleRatingChange = (rating: number) => {
+    if (currentRatingType === "automated") {
+      setAutomatedRating(rating)
+    } else {
+      setGeneratedRating(rating)
+    }
+  }
+
+  const handleFeedbackChange = (feedback: string) => {
+    if (currentRatingType === "automated") {
+      setAutomatedFeedback(feedback)
+    } else {
+      setGeneratedFeedback(feedback)
+    }
+  }
+
+  const handleSubmitRating = async () => {
+    setIsSubmittingRating(true)
+
+    const rating = currentRatingType === "automated" ? automatedRating : generatedRating
+    const feedback = currentRatingType === "automated" ? automatedFeedback : generatedFeedback
+
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    console.log(`${currentRatingType} insights rated:`, { rating, feedback })
+
+    setIsSubmittingRating(false)
+    setShowRatingDrawer(false)
+
+    // Show success message or toast
+    console.log("Rating submitted successfully!")
+  }
+
+  const getRatingLabel = (rating: number) => {
+    switch (rating) {
+      case 1:
+        return "Least Impactful"
+      case 2:
+        return "Sort of Impactful"
+      case 3:
+        return "Impactful"
+      case 4:
+        return "Very Impactful"
+      default:
+        return "Rate this insight"
+    }
+  }
+
   // Chart component that adapts to current context
   const InsightsChart = () => {
     const chartTitle =
@@ -723,6 +788,15 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
               <Button onClick={handleGenerateReport} className="flex items-center gap-2" size="sm">
                 <FontAwesomeIcon icon={faFileText} className="h-4 w-4" />
                 Generate Report
+              </Button>
+              <Button
+                onClick={() => handleRateInsights("automated")}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                Rate Insights
               </Button>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -1240,7 +1314,17 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                         </div>
                         Generated Insights
                       </h4>
-                      <div className="flex items-center gap-2"></div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => handleRateInsights("generated")}
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-2"
+                        >
+                          <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                          Rate Insights
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1447,6 +1531,145 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
           </CardContent>
         )}
       </Card>
+
+      {/* Rating Drawer */}
+      <Drawer open={showRatingDrawer} onOpenChange={setShowRatingDrawer}>
+        <DrawerContent className="max-w-md ml-auto h-full">
+          <DrawerHeader className="text-left">
+            <DrawerTitle className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faThumbsUp} className="h-5 w-5 text-blue-600" />
+              Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
+            </DrawerTitle>
+            <DrawerDescription>
+              Help us improve by rating the impact and usefulness of these insights.
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="p-6 space-y-6">
+            {/* Star Rating */}
+            <div className="space-y-4">
+              <div className="text-sm font-medium text-gray-700">How impactful were these insights?</div>
+
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((rating) => (
+                  <label
+                    key={rating}
+                    className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="rating"
+                      value={rating}
+                      checked={(currentRatingType === "automated" ? automatedRating : generatedRating) === rating}
+                      onChange={() => handleRatingChange(rating)}
+                      className="sr-only"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <FontAwesomeIcon
+                        icon={
+                          (currentRatingType === "automated" ? automatedRating : generatedRating) >= rating
+                            ? faStar
+                            : faStarRegular
+                        }
+                        className={`h-5 w-5 ${
+                          (currentRatingType === "automated" ? automatedRating : generatedRating) >= rating
+                            ? "text-yellow-500"
+                            : "text-gray-300"
+                        }`}
+                      />
+                      <span className="text-sm font-medium text-gray-900">{getRatingLabel(rating)}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Current Rating Display */}
+              {(currentRatingType === "automated" ? automatedRating : generatedRating) > 0 && (
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4].map((star) => (
+                        <FontAwesomeIcon
+                          key={star}
+                          icon={faStar}
+                          className={`h-4 w-4 ${
+                            star <= (currentRatingType === "automated" ? automatedRating : generatedRating)
+                              ? "text-yellow-500"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-medium text-blue-900">
+                      {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Feedback Text Area */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-gray-700">Additional Feedback (Optional)</label>
+              <Textarea
+                placeholder="Share any specific thoughts about these insights, suggestions for improvement, or how they helped your analysis..."
+                value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
+                onChange={(e) => handleFeedbackChange(e.target.value)}
+                rows={4}
+                className="resize-none"
+              />
+              <div className="text-xs text-gray-500">
+                Your feedback helps us improve the quality and relevance of insights.
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="space-y-3">
+              <Button
+                onClick={handleSubmitRating}
+                disabled={
+                  (currentRatingType === "automated" ? automatedRating : generatedRating) === 0 || isSubmittingRating
+                }
+                className="w-full flex items-center justify-center gap-2"
+              >
+                {isSubmittingRating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                    Submit Rating
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowRatingDrawer(false)}
+                className="w-full"
+                disabled={isSubmittingRating}
+              >
+                Cancel
+              </Button>
+            </div>
+
+            {/* Rating Summary */}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="text-xs text-gray-500 space-y-1">
+                <div>• Ratings help improve insight quality</div>
+                <div>• Feedback is used to enhance algorithms</div>
+                <div>• All submissions are anonymous</div>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </TooltipProvider>
   )
 }

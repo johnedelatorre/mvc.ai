@@ -6,6 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { format } from "date-fns"
+import { Calendar } from "@/components/ui/calendar"
+import AutomatedInsights from "../automated-insights"
+import DataTable from "../data-table"
+import DataBarChart from "../bar-chart"
+import MultiMetricChart from "../multi-metric-chart"
+import ComparisonLineChart from "../line-chart"
 import {
   faTable,
   faChartColumn,
@@ -17,13 +24,6 @@ import {
   faChartLine,
   faLightbulb,
 } from "@fortawesome/free-solid-svg-icons"
-import { format } from "date-fns"
-import AutomatedInsights from "../automated-insights"
-import DataTable from "../data-table"
-import DataBarChart from "../bar-chart"
-import MultiMetricChart from "../multi-metric-chart"
-import ComparisonLineChart from "../line-chart"
-import { Calendar } from "@/components/ui/calendar"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
@@ -1030,84 +1030,6 @@ export default function Page() {
                                       </button>
                                     )}
                                   </div>
-
-                                  {/* Selected Years Display */}
-                                  {selectedYears.length > 0 && (
-                                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                      <div className="text-sm font-medium text-blue-900 mb-2">
-                                        Selected Seasons ({selectedYears.length})
-                                      </div>
-                                      <div className="flex flex-wrap gap-2">
-                                        {selectedYears.map((year) => (
-                                          <Badge
-                                            key={year}
-                                            className="bg-blue-100 text-blue-800 border-blue-300 flex items-center gap-1"
-                                          >
-                                            {year} Season
-                                            <button
-                                              onClick={() => setSelectedYears((prev) => prev.filter((y) => y !== year))}
-                                              className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
-                                            >
-                                              <FontAwesomeIcon icon={faTimes} className="h-2.5 w-2.5" />
-                                            </button>
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Season Options */}
-                                  <div className="grid grid-cols-1 gap-2">
-                                    {availableYears.map((year) => (
-                                      <label
-                                        key={year}
-                                        className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                                          selectedYears.includes(year)
-                                            ? "border-blue-500 bg-blue-50"
-                                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                        }`}
-                                      >
-                                        <div className="flex items-center space-x-3">
-                                          <Checkbox
-                                            id={`year-${year}`}
-                                            checked={selectedYears.includes(year)}
-                                            onCheckedChange={() => handleYearToggle(year)}
-                                          />
-                                          <div>
-                                            <div className="font-medium text-gray-900">{year} Season</div>
-                                            <div className="text-sm text-gray-500">
-                                              {year === "2025"
-                                                ? "Current Season"
-                                                : year === "2024"
-                                                  ? "Previous Season"
-                                                  : "Historical Data"}
-                                            </div>
-                                          </div>
-                                        </div>
-                                        {selectedYears.includes(year) && (
-                                          <div className="text-blue-600">
-                                            <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 rotate-180" />
-                                          </div>
-                                        )}
-                                      </label>
-                                    ))}
-                                  </div>
-
-                                  {/* Quick Actions */}
-                                  <div className="flex gap-2 pt-2 border-t">
-                                    <button
-                                      onClick={() => setSelectedYears([availableYears[0]])}
-                                      className="flex-1 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                                    >
-                                      Current Season Only
-                                    </button>
-                                    <button
-                                      onClick={() => setSelectedYears(availableYears)}
-                                      className="flex-1 px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md transition-colors"
-                                    >
-                                      All Seasons
-                                    </button>
-                                  </div>
                                 </div>
                               ) : (
                                 <div className="space-y-4">
@@ -1481,6 +1403,7 @@ export default function Page() {
                                 <div className="space-y-4">
                                   <div className="flex items-center justify-between">
                                     <div className="font-medium text-sm">Add Handles</div>
+
                                     {selectedHandles.length > 0 && (
                                       <button onClick={() => setSelectedHandles([])} className="btn-tertiary btn-sm">
                                         Clear All
@@ -2187,84 +2110,6 @@ export default function Page() {
                                         Clear Selection
                                       </button>
                                     )}
-                                  </div>
-
-                                  {/* Selected Years Display */}
-                                  {selectedYears.length > 0 && (
-                                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                      <div className="text-sm font-medium text-blue-900 mb-2">
-                                        Selected Seasons ({selectedYears.length})
-                                      </div>
-                                      <div className="flex flex-wrap gap-2">
-                                        {selectedYears.map((year) => (
-                                          <Badge
-                                            key={year}
-                                            className="bg-blue-100 text-blue-800 border-blue-300 flex items-center gap-1"
-                                          >
-                                            {year} Season
-                                            <button
-                                              onClick={() => setSelectedYears((prev) => prev.filter((y) => y !== year))}
-                                              className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
-                                            >
-                                              <FontAwesomeIcon icon={faTimes} className="h-2.5 w-2.5" />
-                                            </button>
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Season Options */}
-                                  <div className="grid grid-cols-1 gap-2">
-                                    {availableYears.map((year) => (
-                                      <label
-                                        key={year}
-                                        className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                                          selectedYears.includes(year)
-                                            ? "border-blue-500 bg-blue-50"
-                                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                        }`}
-                                      >
-                                        <div className="flex items-center space-x-3">
-                                          <Checkbox
-                                            id={`insights-year-${year}`}
-                                            checked={selectedYears.includes(year)}
-                                            onCheckedChange={() => handleYearToggle(year)}
-                                          />
-                                          <div>
-                                            <div className="font-medium text-gray-900">{year} Season</div>
-                                            <div className="text-sm text-gray-500">
-                                              {year === "2025"
-                                                ? "Current Season"
-                                                : year === "2024"
-                                                  ? "Previous Season"
-                                                  : "Historical Data"}
-                                            </div>
-                                          </div>
-                                        </div>
-                                        {selectedYears.includes(year) && (
-                                          <div className="text-blue-600">
-                                            <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 rotate-180" />
-                                          </div>
-                                        )}
-                                      </label>
-                                    ))}
-                                  </div>
-
-                                  {/* Quick Actions */}
-                                  <div className="flex gap-2 pt-2 border-t">
-                                    <button
-                                      onClick={() => setSelectedYears([availableYears[0]])}
-                                      className="flex-1 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                                    >
-                                      Current Season Only
-                                    </button>
-                                    <button
-                                      onClick={() => setSelectedYears(availableYears)}
-                                      className="flex-1 px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md transition-colors"
-                                    >
-                                      All Seasons
-                                    </button>
                                   </div>
                                 </div>
                               ) : (
