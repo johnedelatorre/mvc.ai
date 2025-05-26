@@ -23,12 +23,15 @@ import {
   faTimes,
   faTrash,
   faChartColumn,
+  faEdit,
+  faHistory,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
 
@@ -105,6 +108,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   const [editingInsight, setEditingInsight] = useState<string | null>(null)
   const [showSavedInsights, setShowSavedInsights] = useState(false)
   const [chartType, setChartType] = useState<"line" | "bar">("line")
+  const [activeTab, setActiveTab] = useState("automated")
 
   // Sort by date (most recent first) - handle empty data
   const sortedData = useMemo(() => {
@@ -205,8 +209,8 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     }
   }, [sortedData])
 
-  // Prepare chart data for visualization
-  const chartData = useMemo(() => {
+  // Prepare chart data for automated insights
+  const automatedChartData = useMemo(() => {
     if (sortedData.length === 0) {
       return []
     }
@@ -233,6 +237,48 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
         placementType: item.placementTypes || "Unknown",
       }))
   }, [sortedData])
+
+  // Prepare chart data for generated insights
+  const generatedChartData = useMemo(() => {
+    if (!generatedInsights) {
+      return []
+    }
+
+    // Create mock time series data based on generated insights
+    const baseDate = new Date()
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(baseDate)
+      date.setDate(date.getDate() - (6 - index))
+
+      // Create trending data based on generated insights
+      const baseValue = 100
+      const trendMultiplier = 1 + (generatedInsights.trending.smv / 100) * (index / 6)
+
+      return {
+        date: date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" }),
+        fullDate: date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" }),
+        smv: Math.round(baseValue * trendMultiplier),
+        impressions: Math.round(baseValue * trendMultiplier * 2 + generatedInsights.trending.impressions * index),
+        views: Math.round(baseValue * trendMultiplier * 1.5 + generatedInsights.trending.views * index),
+        originalImpressions: Math.round(
+          (baseValue * trendMultiplier * 2 + generatedInsights.trending.impressions * index) * 10,
+        ),
+        originalViews: Math.round((baseValue * trendMultiplier * 1.5 + generatedInsights.trending.views * index) * 100),
+        platform: generatedInsights.topPerformers.platform,
+        placement: generatedInsights.topPerformers.placement,
+        placementType: "Generated",
+      }
+    })
+  }, [generatedInsights])
+
+  // Determine which chart data to use based on active tab and generated insights
+  const currentChartData = useMemo(() => {
+    if (activeTab === "generate") {
+      // Only return chart data if insights have been generated
+      return generatedInsights ? generatedChartData : []
+    }
+    return automatedChartData
+  }, [activeTab, generatedInsights, generatedChartData, automatedChartData])
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
@@ -299,7 +345,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
           views: Math.floor(Math.random() * 40) + 20,
         },
         topPerformers: {
-          placement: sortedData[0]?.placements || "N/A",
+          placement: sortedData[0]?.placements || "Billboard",
           platform: "Instagram",
           sponsor: "Nike",
         },
@@ -383,6 +429,269 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     "Compare current vs previous season performance",
   ]
 
+  // Chart component that adapts to current context
+  const InsightsChart = () => {
+    const chartTitle =
+      activeTab === "generate" && generatedInsights
+        ? `Insights Chart: ${chatHistory.length > 1 ? chatHistory[chatHistory.length - 2]?.content || "Custom Analysis" : "Custom Analysis"}`
+        : "Automated Insights Performance Chart"
+
+    const chartDescription =
+      activeTab === "generate" && generatedInsights
+        ? "Visual representation of your generated insights and trends"
+        : "Visual representation of automated insights and key metrics"
+
+    return (
+      <div className="mt-6">
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
+                  {chartTitle}
+                </CardTitle>
+                <p className="text-sm text-gray-500 mt-1">{chartDescription}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={chartType === "line" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setChartType("line")}
+                  className="flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
+                  Line Chart
+                </Button>
+                <Button
+                  variant={chartType === "bar" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setChartType("bar")}
+                  className="flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4" />
+                  Bar Chart
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {currentChartData.length > 0 ? (
+              <>
+                <div className="w-full h-[400px]">
+                  <ChartContainer
+                    config={{
+                      smv: {
+                        label: "SMV ($k)",
+                        color: "#4F8EF7",
+                      },
+                      impressions: {
+                        label: "Impressions (scaled)",
+                        color: "#6BA3F8",
+                      },
+                      views: {
+                        label: "Views (scaled)",
+                        color: "#87B8F9",
+                      },
+                    }}
+                    className="h-full w-full"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chartType === "line" ? (
+                        <LineChart data={currentChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis
+                            dataKey="date"
+                            tick={{ fontSize: 11 }}
+                            interval={0}
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            label={{
+                              value: "Values",
+                              angle: -90,
+                              position: "insideLeft",
+                            }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload
+                                return (
+                                  <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-md min-w-[180px]">
+                                    <div className="space-y-1.5">
+                                      <div className="font-semibold text-gray-800 text-sm border-b border-gray-200 pb-1.5">
+                                        {data.fullDate}
+                                      </div>
+                                      <div className="grid grid-cols-1 gap-1 text-xs">
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">SMV:</span>
+                                          <span className="font-medium text-gray-800">${data.smv}k</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Impressions:</span>
+                                          <span className="font-medium text-gray-800">{data.originalImpressions}M</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Views:</span>
+                                          <span className="font-medium text-gray-800">{data.originalViews}k</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Platform:</span>
+                                          <span className="font-medium text-gray-800">{data.platform}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                              return null
+                            }}
+                          />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="smv"
+                            stroke="#4F8EF7"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            name="SMV ($k)"
+                            connectNulls={false}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="impressions"
+                            stroke="#6BA3F8"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            name="Impressions (scaled)"
+                            connectNulls={false}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="views"
+                            stroke="#87B8F9"
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            name="Views (scaled)"
+                            connectNulls={false}
+                          />
+                        </LineChart>
+                      ) : (
+                        <BarChart
+                          data={currentChartData}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                          barCategoryGap="20%"
+                        >
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis
+                            dataKey="date"
+                            tick={{ fontSize: 11 }}
+                            interval={0}
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            label={{
+                              value: "Values",
+                              angle: -90,
+                              position: "insideLeft",
+                            }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload
+                                return (
+                                  <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-md min-w-[180px]">
+                                    <div className="space-y-1.5">
+                                      <div className="font-semibold text-gray-800 text-sm border-b border-gray-200 pb-1.5">
+                                        {data.fullDate}
+                                      </div>
+                                      <div className="grid grid-cols-1 gap-1 text-xs">
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">SMV:</span>
+                                          <span className="font-medium text-gray-800">${data.smv}k</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Impressions:</span>
+                                          <span className="font-medium text-gray-800">{data.originalImpressions}M</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Views:</span>
+                                          <span className="font-medium text-gray-800">{data.originalViews}k</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-gray-600">Platform:</span>
+                                          <span className="font-medium text-gray-800">{data.platform}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                              return null
+                            }}
+                          />
+                          <Legend />
+                          <Bar dataKey="smv" fill="#4F8EF7" name="SMV ($k)" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="impressions" fill="#6BA3F8" name="Impressions (scaled)" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="views" fill="#87B8F9" name="Views (scaled)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      )}
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+
+                {/* Chart Legend and Info */}
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-2">
+                    <strong>Chart Information:</strong>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-500">
+                    <div>
+                      <span className="font-medium">SMV:</span> Social Media Value in thousands ($k)
+                    </div>
+                    <div>
+                      <span className="font-medium">Impressions:</span> Scaled down by 10x for visualization
+                    </div>
+                    <div>
+                      <span className="font-medium">Views:</span> Scaled down by 100x for visualization
+                    </div>
+                  </div>
+                  {activeTab === "generate" && generatedInsights && (
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className="text-xs text-blue-600">
+                        <strong>Generated Insights:</strong> Chart reflects trends from your custom analysis query
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-[400px] text-gray-500">
+                <div className="text-center">
+                  <FontAwesomeIcon icon={faChartColumn} className="h-12 w-12 mb-4 text-gray-300" />
+                  <h4 className="font-medium text-gray-600 mb-2">No Chart Data Available</h4>
+                  <p className="text-sm text-gray-500">
+                    {activeTab === "generate"
+                      ? "Generate insights to see chart visualization"
+                      : "No data available for chart visualization"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <>
       <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
@@ -429,7 +738,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
         {isExpanded && (
           <CardContent className="transition-all duration-300 ease-in-out">
-            <Tabs defaultValue="automated" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="automated" className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
@@ -559,240 +868,8 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                   )}
                 </div>
 
-                {/* Insights Chart Component */}
-                <div className="mt-6">
-                  <Card className="w-full">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
-                            Insights Performance Chart
-                          </CardTitle>
-                          <p className="text-sm text-gray-500 mt-1">Visual representation of key metrics and trends</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant={chartType === "line" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setChartType("line")}
-                            className="flex items-center gap-2"
-                          >
-                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
-                            Line Chart
-                          </Button>
-                          <Button
-                            variant={chartType === "bar" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setChartType("bar")}
-                            className="flex items-center gap-2"
-                          >
-                            <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4" />
-                            Bar Chart
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="w-full h-[400px]">
-                        <ChartContainer
-                          config={{
-                            smv: {
-                              label: "SMV ($k)",
-                              color: "#4F8EF7",
-                            },
-                            impressions: {
-                              label: "Impressions (scaled)",
-                              color: "#6BA3F8",
-                            },
-                            views: {
-                              label: "Views (scaled)",
-                              color: "#87B8F9",
-                            },
-                          }}
-                          className="h-full w-full"
-                        >
-                          <ResponsiveContainer width="100%" height="100%">
-                            {chartType === "line" ? (
-                              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis
-                                  dataKey="date"
-                                  tick={{ fontSize: 11 }}
-                                  interval={0}
-                                  angle={-45}
-                                  textAnchor="end"
-                                  height={60}
-                                />
-                                <YAxis
-                                  tick={{ fontSize: 12 }}
-                                  label={{
-                                    value: "Values",
-                                    angle: -90,
-                                    position: "insideLeft",
-                                  }}
-                                />
-                                <Tooltip
-                                  content={({ active, payload, label }) => {
-                                    if (active && payload && payload.length) {
-                                      const data = payload[0].payload
-                                      return (
-                                        <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-md min-w-[180px]">
-                                          <div className="space-y-1.5">
-                                            <div className="font-semibold text-gray-800 text-sm border-b border-gray-200 pb-1.5">
-                                              {data.fullDate}
-                                            </div>
-                                            <div className="grid grid-cols-1 gap-1 text-xs">
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">SMV:</span>
-                                                <span className="font-medium text-gray-800">${data.smv}k</span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Impressions:</span>
-                                                <span className="font-medium text-gray-800">
-                                                  {data.originalImpressions}M
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Views:</span>
-                                                <span className="font-medium text-gray-800">{data.originalViews}k</span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Platform:</span>
-                                                <span className="font-medium text-gray-800">{data.platform}</span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )
-                                    }
-                                    return null
-                                  }}
-                                />
-                                <Legend />
-                                <Line
-                                  type="monotone"
-                                  dataKey="smv"
-                                  stroke="#4F8EF7"
-                                  strokeWidth={2}
-                                  dot={{ r: 4 }}
-                                  name="SMV ($k)"
-                                  connectNulls={false}
-                                />
-                                <Line
-                                  type="monotone"
-                                  dataKey="impressions"
-                                  stroke="#6BA3F8"
-                                  strokeWidth={2}
-                                  dot={{ r: 4 }}
-                                  name="Impressions (scaled)"
-                                  connectNulls={false}
-                                />
-                                <Line
-                                  type="monotone"
-                                  dataKey="views"
-                                  stroke="#87B8F9"
-                                  strokeWidth={2}
-                                  dot={{ r: 4 }}
-                                  name="Views (scaled)"
-                                  connectNulls={false}
-                                />
-                              </LineChart>
-                            ) : (
-                              <BarChart
-                                data={chartData}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                                barCategoryGap="20%"
-                              >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis
-                                  dataKey="date"
-                                  tick={{ fontSize: 11 }}
-                                  interval={0}
-                                  angle={-45}
-                                  textAnchor="end"
-                                  height={60}
-                                />
-                                <YAxis
-                                  tick={{ fontSize: 12 }}
-                                  label={{
-                                    value: "Values",
-                                    angle: -90,
-                                    position: "insideLeft",
-                                  }}
-                                />
-                                <Tooltip
-                                  content={({ active, payload, label }) => {
-                                    if (active && payload && payload.length) {
-                                      const data = payload[0].payload
-                                      return (
-                                        <div className="bg-white p-3 rounded-lg border border-gray-300 shadow-md min-w-[180px]">
-                                          <div className="space-y-1.5">
-                                            <div className="font-semibold text-gray-800 text-sm border-b border-gray-200 pb-1.5">
-                                              {data.fullDate}
-                                            </div>
-                                            <div className="grid grid-cols-1 gap-1 text-xs">
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">SMV:</span>
-                                                <span className="font-medium text-gray-800">${data.smv}k</span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Impressions:</span>
-                                                <span className="font-medium text-gray-800">
-                                                  {data.originalImpressions}M
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Views:</span>
-                                                <span className="font-medium text-gray-800">{data.originalViews}k</span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-gray-600">Platform:</span>
-                                                <span className="font-medium text-gray-800">{data.platform}</span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )
-                                    }
-                                    return null
-                                  }}
-                                />
-                                <Legend />
-                                <Bar dataKey="smv" fill="#4F8EF7" name="SMV ($k)" radius={[4, 4, 0, 0]} />
-                                <Bar
-                                  dataKey="impressions"
-                                  fill="#6BA3F8"
-                                  name="Impressions (scaled)"
-                                  radius={[4, 4, 0, 0]}
-                                />
-                                <Bar dataKey="views" fill="#87B8F9" name="Views (scaled)" radius={[4, 4, 0, 0]} />
-                              </BarChart>
-                            )}
-                          </ResponsiveContainer>
-                        </ChartContainer>
-                      </div>
-
-                      {/* Chart Legend and Info */}
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600 mb-2">
-                          <strong>Chart Information:</strong>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-500">
-                          <div>
-                            <span className="font-medium">SMV:</span> Social Media Value in thousands ($k)
-                          </div>
-                          <div>
-                            <span className="font-medium">Impressions:</span> Scaled down by 10x for visualization
-                          </div>
-                          <div>
-                            <span className="font-medium">Views:</span> Scaled down by 100x for visualization
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                {/* Automated Insights Chart - Always show for automated tab */}
+                <InsightsChart />
               </TabsContent>
 
               <TabsContent value="generate" className="space-y-6">
@@ -1297,6 +1374,121 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                     </div>
                   </div>
                 )}
+
+                {/* Generated Insights Chart - Only show when insights exist */}
+                {generatedInsights && <InsightsChart />}
+
+                {/* Insights History Table - within Generate tab */}
+                <div className="mt-8">
+                  <Card className="w-full">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faHistory} className="h-5 w-5 text-gray-600" />
+                        Generated Insights History
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Insights Type</TableHead>
+                            <TableHead>Created By</TableHead>
+                            <TableHead>Insight Queries</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {savedInsights.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={5} className="text-center text-gray-500 py-8">
+                                No generated insights yet. Create and save insights to see them here.
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            savedInsights.map((insight) => (
+                              <TableRow key={insight.id}>
+                                <TableCell className="font-medium">
+                                  {new Date(insight.timestamp).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>Custom Analysis</TableCell>
+                                <TableCell>AI Assistant</TableCell>
+                                <TableCell>
+                                  <div className="max-w-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="bg-gray-100 text-gray-700 text-xs px-2 py-1 truncate block max-w-full"
+                                      title={insight.query}
+                                    >
+                                      {insight.query}
+                                    </Badge>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-2"
+                                            onClick={() => handleLoadSavedInsight(insight)}
+                                          >
+                                            <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>View Insight</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-2"
+                                            onClick={() => setEditingInsight(insight.id)}
+                                          >
+                                            <FontAwesomeIcon icon={faEdit} className="h-4 w-4 text-gray-600" />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Edit Insight</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-2"
+                                            onClick={() => handleDeleteSavedInsight(insight.id)}
+                                          >
+                                            <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Delete Insight</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -1304,36 +1496,39 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       </Card>
 
       {/* Save Insights Modal */}
-      <Popover open={showSaveModal} onOpenChange={setShowSaveModal}>
-        <PopoverTrigger asChild>
-          <div></div>
-        </PopoverTrigger>
-        <PopoverContent className="w-80">
-          <div className="space-y-4">
-            <h4 className="font-semibold text-sm">Save Generated Insights</h4>
-            <p className="text-sm text-gray-500">Give your insights a name to easily find them later.</p>
-            <div className="grid gap-2">
-              <div className="grid gap-1">
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">Save Generated Insights</h3>
+              <div className="mt-2 px-7 py-3">
                 <Input
-                  id="name"
+                  type="text"
+                  placeholder="Insight Name"
                   value={saveInsightName}
                   onChange={(e) => setSaveInsightName(e.target.value)}
-                  className="text-sm"
+                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 />
-                <p className="text-xs text-gray-500">This will be the title of your saved insight.</p>
+              </div>
+              <div className="items-center px-4 py-3">
+                <Button
+                  variant="ghost"
+                  className="px-4 py-2 bg-gray-50 text-gray-500 text-sm font-medium rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={() => setShowSaveModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="ml-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  onClick={confirmSaveInsights}
+                >
+                  Save
+                </Button>
               </div>
             </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" size="sm" onClick={() => setShowSaveModal(false)}>
-                Cancel
-              </Button>
-              <Button size="sm" onClick={confirmSaveInsights} disabled={!saveInsightName.trim()}>
-                Save Insights
-              </Button>
-            </div>
           </div>
-        </PopoverContent>
-      </Popover>
+        </div>
+      )}
     </>
   )
 }
