@@ -232,7 +232,7 @@ export default function Page() {
 
   const baseData = useMemo(() => generateBaseData(), [])
 
-  const availableYears = ["2023", "2024", "2025"]
+  const availableYears = ["2025", "2024", "2023", "2022", "2021"]
 
   const handleYearToggle = (year: string) => {
     setSelectedYears((prev) => (prev.includes(year) ? prev.filter((y) => y !== year) : [...prev, year]))
@@ -551,6 +551,7 @@ export default function Page() {
 
                   {/* Active Filter Tags */}
                   <div className="flex items-center gap-2 ml-4">
+                    {/* Time Period Tags */}
                     {filterType === "dateRange" && dateRange.from && dateRange.to && (
                       <>
                         <Badge className="bg-blue-100 text-blue-700 border-blue-300">
@@ -561,6 +562,94 @@ export default function Page() {
                         </Badge>
                       </>
                     )}
+                    {filterType === "years" && selectedYears.length > 0 && (
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                        Years: {selectedYears.join(", ")}
+                      </Badge>
+                    )}
+
+                    {/* Rightsholders Tag */}
+                    {selectedRightsholders.length > 0 && (
+                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                        {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                        Selected
+                      </Badge>
+                    )}
+
+                    {/* Sponsors Tag */}
+                    {selectedSponsors.length > 0 && (
+                      <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                        {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Placements Tag */}
+                    {selectedPlacements.length > 0 && (
+                      <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                        {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Placement Types Tag */}
+                    {selectedPlacementTypes.length > 0 && (
+                      <Badge className="bg-pink-100 text-pink-700 border-pink-300">
+                        {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
+                        Selected
+                      </Badge>
+                    )}
+
+                    {/* Platforms Tag */}
+                    {selectedPlatforms.length > 0 && (
+                      <Badge className="bg-cyan-100 text-cyan-700 border-cyan-300">
+                        {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Account Types Tag */}
+                    {selectedAccountTypes.length > 0 && (
+                      <Badge className="bg-indigo-100 text-indigo-700 border-indigo-300">
+                        {selectedAccountTypes.length} Account Type{selectedAccountTypes.length !== 1 ? "s" : ""}{" "}
+                        Selected
+                      </Badge>
+                    )}
+
+                    {/* Media Types Tag */}
+                    {selectedMediaTypes.length > 0 && (
+                      <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                        {selectedMediaTypes.length} Media Type{selectedMediaTypes.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Collections Tag */}
+                    {selectedCollections.length > 0 && (
+                      <Badge className="bg-red-100 text-red-700 border-red-300">
+                        {selectedCollections.length} Collection{selectedCollections.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Hashtags Tag */}
+                    {selectedHashtags.length > 0 && (
+                      <Badge className="bg-teal-100 text-teal-700 border-teal-300">
+                        {selectedHashtags.length} Hashtag{selectedHashtags.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Handles Tag */}
+                    {selectedHandles.length > 0 && (
+                      <Badge className="bg-lime-100 text-lime-700 border-lime-300">
+                        {selectedHandles.length} Handle{selectedHandles.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Comparison Dates Tag */}
+                    {selectedComparisonDates.length > 0 && (
+                      <Badge className="bg-amber-100 text-amber-700 border-amber-300">
+                        {selectedComparisonDates.length} Comparison Date
+                        {selectedComparisonDates.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Group By Tag - Keep as is */}
                     <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                   </div>
                 </div>
@@ -1029,6 +1118,56 @@ export default function Page() {
                                         Clear Selection
                                       </button>
                                     )}
+                                  </div>
+
+                                  {/* Selected Years Display */}
+                                  {selectedYears.length > 0 && (
+                                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                      <div className="text-sm font-medium text-green-900 mb-1">Selected Seasons</div>
+                                      <div className="text-green-800">
+                                        {selectedYears
+                                          .sort((a, b) => Number.parseInt(b) - Number.parseInt(a))
+                                          .join(", ")}
+                                      </div>
+                                      <div className="text-xs text-green-600 mt-1">
+                                        {selectedYears.length} season{selectedYears.length !== 1 ? "s" : ""} selected
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Year Selection Grid */}
+                                  <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-700">Select Seasons (up to 5)</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      {availableYears.map((year) => (
+                                        <div key={year} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`year-${year}`}
+                                            checked={selectedYears.includes(year)}
+                                            onCheckedChange={() => handleYearToggle(year)}
+                                            disabled={!selectedYears.includes(year) && selectedYears.length >= 5}
+                                          />
+                                          <label htmlFor={`year-${year}`} className="text-sm cursor-pointer flex-1">
+                                            {year} Season
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {selectedYears.length >= 5 && (
+                                      <div className="text-xs text-amber-600 mt-2">
+                                        Maximum of 5 seasons can be selected
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="pt-2 border-t">
+                                    <button
+                                      onClick={() => setSelectedYears([...availableYears])}
+                                      className="btn-secondary btn-sm w-full"
+                                      disabled={selectedYears.length >= 5}
+                                    >
+                                      Select All Available
+                                    </button>
                                   </div>
                                 </div>
                               ) : (
@@ -1640,8 +1779,9 @@ export default function Page() {
                     <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
                   </button>
 
-                  {/* Active Filter Tags */}
+                  {/* Active Filter Tags for Insights Tab */}
                   <div className="flex items-center gap-2 ml-4">
+                    {/* Time Period Tags */}
                     {filterType === "dateRange" && dateRange.from && dateRange.to && (
                       <>
                         <Badge className="bg-blue-100 text-blue-700 border-blue-300">
@@ -1657,10 +1797,41 @@ export default function Page() {
                         Years: {selectedYears.join(", ")}
                       </Badge>
                     )}
-                    <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
-                    {mainTab === "insights" && selectedInsightsTypes.length > 0 && (
+                    {/* Default to current year if no time period is selected */}
+                    {filterType === "years" && selectedYears.length === 0 && (
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Years: 2025</Badge>
+                    )}
+                    {filterType === "dateRange" && (!dateRange.from || !dateRange.to) && (
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Years: 2025</Badge>
+                    )}
+
+                    {/* Sponsors Tag */}
+                    {selectedSponsors.length > 0 && (
                       <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                        Insights: {selectedInsightsTypes.length} selected
+                        {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Rightsholders Tag */}
+                    {selectedRightsholders.length > 0 && (
+                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                        {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                        Selected
+                      </Badge>
+                    )}
+
+                    {/* Placements Tag */}
+                    {selectedPlacements.length > 0 && (
+                      <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                        {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                      </Badge>
+                    )}
+
+                    {/* Insights Types Tag */}
+                    {selectedInsightsTypes.length > 0 && (
+                      <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                        {selectedInsightsTypes.length} Insights Type{selectedInsightsTypes.length !== 1 ? "s" : ""}{" "}
+                        Selected
                       </Badge>
                     )}
                   </div>
@@ -2026,7 +2197,7 @@ export default function Page() {
                       </Popover>
                     </div>
 
-                    {/* Date Range/Year - Same as Analytics */}
+                    {/* Time Period */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Time Period
@@ -2058,7 +2229,6 @@ export default function Page() {
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[420px]" align="start">
-                          {/* Same date/year selection content as Analytics tab */}
                           <div className="space-y-6">
                             {/* Header */}
                             <div className="border-b pb-3">
@@ -2096,7 +2266,7 @@ export default function Page() {
                               </div>
                             </div>
 
-                            {/* Content Area - Same as Analytics */}
+                            {/* Content Area */}
                             <div className="min-h-[300px]">
                               {filterType === "years" ? (
                                 <div className="space-y-4">
@@ -2110,6 +2280,59 @@ export default function Page() {
                                         Clear Selection
                                       </button>
                                     )}
+                                  </div>
+
+                                  {/* Selected Years Display */}
+                                  {selectedYears.length > 0 && (
+                                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                      <div className="text-sm font-medium text-green-900 mb-1">Selected Seasons</div>
+                                      <div className="text-green-800">
+                                        {selectedYears
+                                          .sort((a, b) => Number.parseInt(b) - Number.parseInt(a))
+                                          .join(", ")}
+                                      </div>
+                                      <div className="text-xs text-green-600 mt-1">
+                                        {selectedYears.length} season{selectedYears.length !== 1 ? "s" : ""} selected
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Year Selection Grid */}
+                                  <div className="space-y-2">
+                                    <div className="text-sm font-medium text-gray-700">Select Seasons (up to 5)</div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      {availableYears.map((year) => (
+                                        <div key={year} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`insights-year-${year}`}
+                                            checked={selectedYears.includes(year)}
+                                            onCheckedChange={() => handleYearToggle(year)}
+                                            disabled={!selectedYears.includes(year) && selectedYears.length >= 5}
+                                          />
+                                          <label
+                                            htmlFor={`insights-year-${year}`}
+                                            className="text-sm cursor-pointer flex-1"
+                                          >
+                                            {year} Season
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {selectedYears.length >= 5 && (
+                                      <div className="text-xs text-amber-600 mt-2">
+                                        Maximum of 5 seasons can be selected
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="pt-2 border-t">
+                                    <button
+                                      onClick={() => setSelectedYears([...availableYears])}
+                                      className="btn-secondary btn-sm w-full"
+                                      disabled={selectedYears.length >= 5}
+                                    >
+                                      Select All Available
+                                    </button>
                                   </div>
                                 </div>
                               ) : (
