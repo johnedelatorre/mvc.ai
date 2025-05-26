@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -15,7 +15,7 @@ import {
   faCog,
   faSort,
   faSortUp,
-  faSortDown
+  faSortDown,
 } from "@fortawesome/free-solid-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 
@@ -46,14 +46,15 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
         <TooltipContent>
           <p>{platform}</p>
         </TooltipContent>
-      </TooltipProvider>
-  );
-};
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
 
 type SortConfig = {
-  key: string;
-  direction: "asc" | "desc";
-} | null;
+  key: string
+  direction: "asc" | "desc"
+} | null
 
 type SearchFilters = {
   [key: string]: string
@@ -108,17 +109,17 @@ export default function DataTable({ data }: DataTableProps) {
 
   // Apply sorting and filtering
   const filteredAndSortedData = useMemo(() => {
-    let processedData = [...baseData];
+    let processedData = [...baseData]
 
     // Apply search filters
     Object.entries(searchFilters).forEach(([column, searchTerm]) => {
       if (searchTerm) {
         processedData = processedData.filter((item) => {
-          const value = item[column as keyof typeof item];
-          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
-        });
+          const value = item[column as keyof typeof item]
+          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        })
       }
-    });
+    })
 
     // Apply sorting
     if (sortConfig) {
@@ -202,75 +203,79 @@ export default function DataTable({ data }: DataTableProps) {
   }
 
   const handleDownloadCSV = () => {
-  // Define CSV headers
-  const headers = [
-    'Date',
-    'Exposures', 
-    'Duration (Sec)',
-    'Impressions',
-    'Video Views',
-    'Engagements',
-    'FMV',
-    'MVP %',
-    'Post Count'
-  ];
+    // Define CSV headers
+    const headers = [
+      "Date",
+      "Exposures",
+      "Duration (Sec)",
+      "Impressions",
+      "Video Views",
+      "Engagements",
+      "FMV",
+      "MVP %",
+      "Post Count",
+    ]
 
-  // Convert data to CSV format
-  const csvData = filteredAndSortedData.map(row => [
-    row.date,
-    row.exposures,
-    row.duration,
-    row.impressions,
-    row.videoViews,
-    row.engagements,
-    row.fmv.toFixed(1) + 'k',
-    row.mvp,
-    row.postCount
-  ]);
+    // Convert data to CSV format
+    const csvData = filteredAndSortedData.map((row) => [
+      row.date,
+      row.exposures,
+      row.duration,
+      row.impressions,
+      row.videoViews,
+      row.engagements,
+      row.fmv.toFixed(1) + "k",
+      row.mvp,
+      row.postCount,
+    ])
 
-  // Add totals row
-  const totalsRow = [
-    'Total',
-    totals.exposures,
-    totals.duration,
-    totals.impressions,
-    totals.videoViews,
-    totals.engagements,
-    totals.fmv.toFixed(1) + 'k',
-    totals.mvp + '%',
-    totals.postCount
-  ];
+    // Add totals row
+    const totalsRow = [
+      "Total",
+      totals.exposures,
+      totals.duration,
+      totals.impressions,
+      totals.videoViews,
+      totals.engagements,
+      totals.fmv.toFixed(1) + "k",
+      totals.mvp + "%",
+      totals.postCount,
+    ]
 
-  // Combine headers, data, and totals
-  const allData = [headers, ...csvData, totalsRow];
+    // Combine headers, data, and totals
+    const allData = [headers, ...csvData, totalsRow]
 
-  // Convert to CSV string
-  const csvContent = allData.map(row => 
-    row.map(cell => {
-      // Handle cells that contain commas or quotes
-      const cellStr = String(cell);
-      if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
-        return `"${cellStr.replace(/"/g, '""')}"`;
-      }
-      return cellStr;
-    }).join(',')
-  ).join('\n');
+    // Convert to CSV string
+    const csvContent = allData
+      .map((row) =>
+        row
+          .map((cell) => {
+            // Handle cells that contain commas or quotes
+            const cellStr = String(cell)
+            if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
+              return `"${cellStr.replace(/"/g, '""')}"`
+            }
+            return cellStr
+          })
+          .join(","),
+      )
+      .join("\n")
 
-  // Create and download the file
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `measures-breakdown-${new Date().toISOString().split('T')[0]}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  URL.revokeObjectURL(url);
-};
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+
+    link.setAttribute("href", url)
+    link.setAttribute("download", `measures-breakdown-${new Date().toISOString().split("T")[0]}.csv`)
+    link.style.visibility = "hidden"
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    URL.revokeObjectURL(url)
+  }
 
   const columns = [
     { key: "date", label: "Date" },
