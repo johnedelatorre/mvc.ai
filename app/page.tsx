@@ -591,7 +591,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-96">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Rightsholders</div>
@@ -688,7 +688,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-96">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Sponsors</div>
@@ -781,7 +781,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-96">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Placement Types</div>
@@ -885,7 +885,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Placements</div>
@@ -977,7 +977,7 @@ export default function Page() {
                             />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[420px]" align="start">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[420px]" align="start">
                           <div className="space-y-6">
                             {/* Header */}
                             <div className="border-b pb-3">
@@ -1257,7 +1257,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {PLATFORMS_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1285,7 +1285,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {ACCOUNT_TYPES_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1313,7 +1313,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {MEDIA_TYPES_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1344,7 +1344,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {COLLECTIONS_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1376,7 +1376,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-4">
                                   <div className="flex items-center justify-between">
                                     <div className="font-medium text-sm">Add Hashtags</div>
@@ -1477,7 +1477,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-4">
                                   <div className="flex items-center justify-between">
                                     <div className="font-medium text-sm">Add Handles</div>
@@ -1576,7 +1576,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {COMPARISON_DATES_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1614,7 +1614,7 @@ export default function Page() {
                                   <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80">
+                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                                 <div className="space-y-2">
                                   {GROUP_BY_OPTIONS.map((option) => (
                                     <div key={option} className="flex items-center space-x-2">
@@ -1769,7 +1769,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-96">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Sponsors</div>
@@ -1865,7 +1865,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-96">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Rightsholders</div>
@@ -1965,7 +1965,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Placements</div>
@@ -2039,7 +2039,7 @@ export default function Page() {
                             <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-sm">Select Insights Type</div>
@@ -2134,7 +2134,7 @@ export default function Page() {
                             />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[420px]" align="start">
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[420px]" align="start">
                           {/* Same date/year selection content as Analytics tab */}
                           <div className="space-y-6">
                             {/* Header */}
