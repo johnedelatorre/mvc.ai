@@ -67,18 +67,16 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
-            <FontAwesomeIcon icon={getIcon()} className="h-4 w-4" />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{platform}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+          <FontAwesomeIcon icon={getIcon()} className="h-4 w-4" />
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{platform}</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -94,21 +92,18 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   >([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedInsights, setGeneratedInsights] = useState<any>(null)
-  const [savedInsights, setSavedInsights] = useState<
+  const [insightsHistory, setInsightsHistory] = useState<
     Array<{
       id: string
       name: string
       content: any
       timestamp: Date
       query: string
+      prompt: string
     }>
   >([])
-  const [showSaveModal, setShowSaveModal] = useState(false)
-  const [saveInsightName, setSaveInsightName] = useState("")
-  const [editingInsight, setEditingInsight] = useState<string | null>(null)
-  const [showSavedInsights, setShowSavedInsights] = useState(false)
-  const [chartType, setChartType] = useState<"line" | "bar">("line")
   const [activeTab, setActiveTab] = useState("automated")
+  const [chartType, setChartType] = useState<"line" | "bar">("line")
 
   // Sort by date (most recent first) - handle empty data
   const sortedData = useMemo(() => {
@@ -355,6 +350,34 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
           growthRate: Math.floor(Math.random() * 20) + 5,
         },
       })
+
+      // Auto-save to history
+      const newHistoryItem = {
+        id: Date.now().toString(),
+        name: `Insights - ${new Date().toLocaleDateString()}`,
+        content: {
+          trending: {
+            smv: Math.floor(Math.random() * 50) + 10,
+            impressions: Math.floor(Math.random() * 30) + 15,
+            views: Math.floor(Math.random() * 40) + 20,
+          },
+          topPerformers: {
+            placement: sortedData[0]?.placements || "Billboard",
+            platform: "Instagram",
+            sponsor: "Nike",
+          },
+          keyMetrics: {
+            totalSMV: Math.floor(Math.random() * 1000) + 500,
+            avgEngagement: Math.floor(Math.random() * 50) + 25,
+            growthRate: Math.floor(Math.random() * 20) + 5,
+          },
+        },
+        timestamp: new Date(),
+        query: chatInput,
+        prompt: chatInput,
+      }
+      setInsightsHistory((prev) => [newHistoryItem, ...prev])
+
       setIsGenerating(false)
 
       // Scroll to generated insights after they appear
@@ -379,39 +402,28 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     setIsGenerating(false)
   }
 
-  const handleSaveInsights = () => {
-    if (!generatedInsights) return
-
-    const defaultName = `Insights - ${new Date().toLocaleDateString()}`
-    setSaveInsightName(defaultName)
-    setShowSaveModal(true)
-  }
-
-  const confirmSaveInsights = () => {
-    if (!generatedInsights || !saveInsightName.trim()) return
-
-    const newInsight = {
-      id: Date.now().toString(),
-      name: saveInsightName.trim(),
-      content: generatedInsights,
-      timestamp: new Date(),
-      query: chatHistory[chatHistory.length - 2]?.content || "Custom Analysis",
-    }
-
-    setSavedInsights((prev) => [newInsight, ...prev])
-    setShowSaveModal(false)
-    setSaveInsightName("")
-
-    console.log("Insights saved successfully!")
-  }
-
-  const handleDeleteSavedInsight = (id: string) => {
-    setSavedInsights((prev) => prev.filter((insight) => insight.id !== id))
-  }
-
-  const handleLoadSavedInsight = (insight: any) => {
+  const handleViewInsight = (insight: any) => {
     setGeneratedInsights(insight.content)
-    setShowSavedInsights(false)
+    // Scroll to insights display
+    setTimeout(() => {
+      const insightsElement = document.getElementById("generated-insights-display")
+      if (insightsElement) {
+        insightsElement.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
+  }
+
+  const handleEditPrompt = (insight: any) => {
+    setChatInput(insight.prompt)
+    // Focus on input
+    const inputElement = document.querySelector('input[placeholder*="Ask about your data"]') as HTMLInputElement
+    if (inputElement) {
+      inputElement.focus()
+    }
+  }
+
+  const handleDeleteInsight = (id: string) => {
+    setInsightsHistory((prev) => prev.filter((insight) => insight.id !== id))
   }
 
   const recentQueries = [
@@ -880,68 +892,26 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {savedInsights.length > 0 && (
-                      <Popover open={showSavedInsights} onOpenChange={setShowSavedInsights}>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" size="sm" className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
-                            Saved ({savedInsights.length})
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" align="end">
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-semibold text-sm">Saved Insights</h4>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowSavedInsights(false)}
-                                className="p-1"
-                              >
-                                <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
-                              </Button>
-                            </div>
-
-                            <div className="space-y-2 max-h-64 overflow-y-auto">
-                              {savedInsights.map((insight) => (
-                                <div
-                                  key={insight.id}
-                                  className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex-1 min-w-0">
-                                      <h5 className="font-medium text-sm text-gray-900 truncate">{insight.name}</h5>
-                                      <p className="text-xs text-gray-500 mt-1 truncate">{insight.query}</p>
-                                      <p className="text-xs text-gray-400 mt-1">
-                                        {insight.timestamp.toLocaleDateString()}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-center gap-1 ml-2">
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleLoadSavedInsight(insight)}
-                                        className="p-1 h-6 w-6"
-                                      >
-                                        <FontAwesomeIcon icon={faEye} className="h-3 w-3" />
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleDeleteSavedInsight(insight.id)}
-                                        className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
-                                      >
-                                        <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                    <Popover open={false} onOpenChange={() => {}}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
+                          Saved ({insightsHistory.length})
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80" align="end">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-sm">Saved Insights</h4>
+                            <Button variant="ghost" size="sm" onClick={() => {}} className="p-1">
+                              <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
+                            </Button>
                           </div>
-                        </PopoverContent>
-                      </Popover>
-                    )}
+
+                          <div className="space-y-2 max-h-64 overflow-y-auto"></div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
 
                     {(chatHistory.length > 0 || generatedInsights) && (
                       <Button
@@ -1270,16 +1240,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                         </div>
                         Generated Insights
                       </h4>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          onClick={handleSaveInsights}
-                          className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-                          size="sm"
-                        >
-                          <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
-                          Save Insights
-                        </Button>
-                      </div>
+                      <div className="flex items-center gap-2"></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1397,14 +1358,14 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {savedInsights.length === 0 ? (
+                          {insightsHistory.length === 0 ? (
                             <TableRow>
                               <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                                No generated insights yet. Create and save insights to see them here.
+                                No generated insights yet. Generate insights to see them here.
                               </TableCell>
                             </TableRow>
                           ) : (
-                            savedInsights.map((insight) => (
+                            insightsHistory.map((insight) => (
                               <TableRow key={insight.id}>
                                 <TableCell className="font-medium">
                                   {new Date(insight.timestamp).toLocaleDateString()}
@@ -1430,7 +1391,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => handleLoadSavedInsight(insight)}
+                                          onClick={() => handleViewInsight(insight)}
                                         >
                                           <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
                                         </Button>
@@ -1446,13 +1407,13 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => setEditingInsight(insight.id)}
+                                          onClick={() => handleEditPrompt(insight)}
                                         >
                                           <FontAwesomeIcon icon={faEdit} className="h-4 w-4 text-gray-600" />
                                         </Button>
                                       </TooltipTrigger>
                                       <TooltipContent>
-                                        <p>Edit Insight</p>
+                                        <p>Edit Prompt</p>
                                       </TooltipContent>
                                     </Tooltip>
 
@@ -1462,7 +1423,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => handleDeleteSavedInsight(insight.id)}
+                                          onClick={() => handleDeleteInsight(insight.id)}
                                         >
                                           <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
                                         </Button>
@@ -1486,41 +1447,6 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
           </CardContent>
         )}
       </Card>
-
-      {/* Save Insights Modal */}
-      {showSaveModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Save Generated Insights</h3>
-              <div className="mt-2 px-7 py-3">
-                <Input
-                  type="text"
-                  placeholder="Insight Name"
-                  value={saveInsightName}
-                  onChange={(e) => setSaveInsightName(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                />
-              </div>
-              <div className="items-center px-4 py-3">
-                <Button
-                  variant="ghost"
-                  className="px-4 py-2 bg-gray-50 text-gray-500 text-sm font-medium rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={() => setShowSaveModal(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="ml-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  onClick={confirmSaveInsights}
-                >
-                  Save
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </TooltipProvider>
   )
 }
