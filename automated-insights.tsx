@@ -1,5 +1,5 @@
 "use client"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +27,7 @@ import {
   faHistory,
   faStar,
   faThumbsUp,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular, faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
@@ -38,6 +39,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Responsive
 import { ChartContainer } from "@/components/ui/chart"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Textarea } from "@/components/ui/textarea"
+import html2canvas from "html2canvas"
 
 interface AutomatedInsightsProps {
   data: Array<{
@@ -115,6 +117,8 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   const [automatedFeedback, setAutomatedFeedback] = useState("")
   const [generatedFeedback, setGeneratedFeedback] = useState("")
   const [isSubmittingRating, setIsSubmittingRating] = useState(false)
+
+  const insightsChartRef = useRef<HTMLDivElement>(null)
 
   // Sort by date (most recent first) - handle empty data
   const sortedData = useMemo(() => {
@@ -491,6 +495,29 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     console.log("Rating submitted successfully!")
   }
 
+  const downloadInsightsChart = async () => {
+    if (insightsChartRef.current) {
+      try {
+        const canvas = await html2canvas(insightsChartRef.current, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          logging: false,
+          useCORS: true,
+        })
+
+        const chartName =
+          activeTab === "generate" && generatedInsights ? "generated-insights-chart" : "automated-insights-chart"
+
+        const link = document.createElement("a")
+        link.download = `${chartName}-${new Date().toISOString().split("T")[0]}.png`
+        link.href = canvas.toDataURL("image/png")
+        link.click()
+      } catch (error) {
+        console.error("Error downloading chart:", error)
+      }
+    }
+  }
+
   const getRatingLabel = (rating: number) => {
     switch (rating) {
       case 1:
@@ -520,7 +547,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
     return (
       <div className="mt-6">
-        <Card className="w-full">
+        <Card className="w-full" ref={insightsChartRef}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -531,6 +558,10 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                 <p className="text-sm text-gray-500 mt-1">{chartDescription}</p>
               </div>
               <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={downloadInsightsChart} className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
+                  Download PNG
+                </Button>
                 <Button
                   variant={chartType === "line" ? "default" : "outline"}
                   size="sm"

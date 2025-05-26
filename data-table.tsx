@@ -1,6 +1,5 @@
 "use client"
-
-import { useState, useMemo } from "react"
+import React, { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -12,11 +11,8 @@ import {
   faTrash,
   faChevronLeft,
   faChevronRight,
-  faSort,
   faDownload,
   faCog,
-  faSortUp,
-  faSortDown,
 } from "@fortawesome/free-solid-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 
@@ -47,14 +43,13 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
         <TooltipContent>
           <p>{platform}</p>
         </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-}
+      </TooltipProvider>
+  );
+};
 
 type SortConfig = {
-  key: string
-  direction: "asc" | "desc"
+  key: string;
+  direction: "asc" | "desc";
 } | null
 
 type SearchFilters = {
@@ -126,7 +121,7 @@ export default function DataTable({ data }: DataTableProps) {
     if (sortConfig) {
       processedData.sort((a, b) => {
         const aValue = a[sortConfig.key as keyof typeof a]
-        const bValue = b[sortConfig.key as keyof typeof b]
+        const bValue = b[sortConfig.key as keyof typeof a]
 
         // Handle different data types
         if (sortConfig.key === "date") {
@@ -204,9 +199,75 @@ export default function DataTable({ data }: DataTableProps) {
   }
 
   const handleDownloadCSV = () => {
-    console.log("Downloading CSV...")
-    // Add CSV download logic here
-  }
+  // Define CSV headers
+  const headers = [
+    'Date',
+    'Exposures', 
+    'Duration (Sec)',
+    'Impressions',
+    'Video Views',
+    'Engagements',
+    'FMV',
+    'MVP %',
+    'Post Count'
+  ];
+
+  // Convert data to CSV format
+  const csvData = filteredAndSortedData.map(row => [
+    row.date,
+    row.exposures,
+    row.duration,
+    row.impressions,
+    row.videoViews,
+    row.engagements,
+    row.fmv.toFixed(1) + 'k',
+    row.mvp,
+    row.postCount
+  ]);
+
+  // Add totals row
+  const totalsRow = [
+    'Total',
+    totals.exposures,
+    totals.duration,
+    totals.impressions,
+    totals.videoViews,
+    totals.engagements,
+    totals.fmv.toFixed(1) + 'k',
+    totals.mvp + '%',
+    totals.postCount
+  ];
+
+  // Combine headers, data, and totals
+  const allData = [headers, ...csvData, totalsRow];
+
+  // Convert to CSV string
+  const csvContent = allData.map(row => 
+    row.map(cell => {
+      // Handle cells that contain commas or quotes
+      const cellStr = String(cell);
+      if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+        return `"${cellStr.replace(/"/g, '""')}"`;
+      }
+      return cellStr;
+    }).join(',')
+  ).join('\n');
+
+  // Create and download the file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `measures-breakdown-${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  URL.revokeObjectURL(url);
+};
 
   const columns = [
     { key: "date", label: "Date" },

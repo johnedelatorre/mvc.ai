@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer } from "@/components/ui/chart"
 import { Button } from "@/components/ui/button"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons"
+import { faChevronUp, faChevronDown, faDownload } from "@fortawesome/free-solid-svg-icons"
+import html2canvas from "html2canvas"
 
 interface ComparisonLineChartProps {
   data: Array<{
@@ -50,9 +51,30 @@ export default function ComparisonLineChart({ data }: ComparisonLineChartProps) 
   }, [data])
 
   const [isExpanded, setIsExpanded] = useState(true)
+  const chartRef = useRef<HTMLDivElement>(null)
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
+  }
+
+  const downloadChart = async () => {
+    if (chartRef.current) {
+      try {
+        const canvas = await html2canvas(chartRef.current, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          logging: false,
+          useCORS: true,
+        })
+
+        const link = document.createElement("a")
+        link.download = `performance-trends-comparison-${new Date().toISOString().split("T")[0]}.png`
+        link.href = canvas.toDataURL("image/png")
+        link.click()
+      } catch (error) {
+        console.error("Error downloading chart:", error)
+      }
+    }
   }
 
   // Custom tooltip component
@@ -93,13 +115,19 @@ export default function ComparisonLineChart({ data }: ComparisonLineChartProps) 
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Performance Trends Comparison</CardTitle>
-          <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
-            <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={downloadChart} className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
+              Download PNG
+            </Button>
+            <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
+              <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       {isExpanded && (
-        <CardContent className="transition-all duration-300 ease-in-out">
+        <CardContent className="transition-all duration-300 ease-in-out" ref={chartRef}>
           <div className="w-full overflow-x-auto">
             <div className="min-w-[1400px] h-[400px]">
               <ChartContainer

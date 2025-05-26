@@ -1254,33 +1254,18 @@ export default function Page() {
                                     ? "Date range selected"
                                     : "No dates selected"}
                               </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => {
-                                    if (filterType === "years") {
-                                      setSelectedYears([])
-                                    } else {
-                                      setDateRange({ from: undefined, to: undefined })
-                                    }
-                                  }}
-                                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                                >
-                                  Clear
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    // Close popover - this would typically be handled by the popover component
-                                    console.log("Apply filters")
-                                  }}
-                                  disabled={
-                                    (filterType === "years" && selectedYears.length === 0) ||
-                                    (filterType === "dateRange" && (!dateRange.from || !dateRange.to))
+                              <button
+                                onClick={() => {
+                                  if (filterType === "years") {
+                                    setSelectedYears([])
+                                  } else {
+                                    setDateRange({ from: undefined, to: undefined })
                                   }
-                                  className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                >
-                                  Apply
-                                </button>
-                              </div>
+                                }}
+                                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                              >
+                                Clear All
+                              </button>
                             </div>
                           </div>
                         </PopoverContent>
@@ -1509,108 +1494,6 @@ export default function Page() {
                                             }}
                                             className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                                             disabled={selectedHashtags.includes(suggestion)}
-                                          >
-                                            {suggestion}
-                                          </button>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-
-                          {/* Handles */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Handles
-                              <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                            </label>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                  <span className="text-gray-500">
-                                    {selectedHandles.length > 0
-                                      ? `${selectedHandles.length} handles selected`
-                                      : "Enter handles"}
-                                  </span>
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                <div className="space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="font-medium text-sm">Add Handles</div>
-
-                                    {selectedHandles.length > 0 && (
-                                      <button onClick={() => setSelectedHandles([])} className="btn-tertiary btn-sm">
-                                        Clear All
-                                      </button>
-                                    )}
-                                  </div>
-
-                                  {/* Input for adding handles */}
-                                  <div className="space-y-2">
-                                    <input
-                                      type="text"
-                                      placeholder="Enter handle (e.g., @NBA, @ESPN)"
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                          const value = e.currentTarget.value.trim()
-                                          if (value && !selectedHandles.includes(value)) {
-                                            const handle = value.startsWith("@") ? value : `@${value}`
-                                            setSelectedHandles((prev) => [...prev, handle])
-                                            e.currentTarget.value = ""
-                                          }
-                                        }
-                                      }}
-                                    />
-                                    <div className="text-xs text-gray-500">Press Enter to add handle</div>
-                                  </div>
-
-                                  {/* Selected Handles */}
-                                  {selectedHandles.length > 0 && (
-                                    <div className="space-y-2">
-                                      <div className="text-sm font-medium">Selected Handles:</div>
-                                      <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
-                                        {selectedHandles.map((handle, index) => (
-                                          <Badge
-                                            key={index}
-                                            variant="secondary"
-                                            className="flex items-center gap-1 text-xs"
-                                          >
-                                            {handle}
-                                            <button
-                                              onClick={() =>
-                                                setSelectedHandles((prev) => prev.filter((_, i) => i !== index))
-                                              }
-                                              className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                            >
-                                              <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
-                                            </button>
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* Suggested handles */}
-                                  <div className="space-y-2">
-                                    <div className="text-sm font-medium">Suggested:</div>
-                                    <div className="flex flex-wrap gap-1">
-                                      {["@NBA", "@ESPN", "@SportsCenter", "@Bleacher", "@TheAthletic"].map(
-                                        (suggestion) => (
-                                          <button
-                                            key={suggestion}
-                                            onClick={() => {
-                                              if (!selectedHandles.includes(suggestion)) {
-                                                setSelectedHandles((prev) => [...prev, suggestion])
-                                              }
-                                            }}
-                                            className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                                            disabled={selectedHandles.includes(suggestion)}
                                           >
                                             {suggestion}
                                           </button>
@@ -2419,33 +2302,18 @@ export default function Page() {
                                     ? "Date range selected"
                                     : "No dates selected"}
                               </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => {
-                                    if (filterType === "years") {
-                                      setSelectedYears([])
-                                    } else {
-                                      setDateRange({ from: undefined, to: undefined })
-                                    }
-                                  }}
-                                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                                >
-                                  Clear
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    // Close popover - this would typically be handled by the popover component
-                                    console.log("Apply filters")
-                                  }}
-                                  disabled={
-                                    (filterType === "years" && selectedYears.length === 0) ||
-                                    (filterType === "dateRange" && (!dateRange.from || !dateRange.to))
+                              <button
+                                onClick={() => {
+                                  if (filterType === "years") {
+                                    setSelectedYears([])
+                                  } else {
+                                    setDateRange({ from: undefined, to: undefined })
                                   }
-                                  className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                >
-                                  Apply
-                                </button>
-                              </div>
+                                }}
+                                className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                              >
+                                Clear All
+                              </button>
                             </div>
                           </div>
                         </PopoverContent>
