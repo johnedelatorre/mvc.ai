@@ -1,1136 +1,253 @@
 "use client"
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowTrendUp,
-  faArrowTrendDown,
-  faFileText,
-  faBookmark,
-  faChevronUp,
-  faChevronDown,
-  faEye,
-  faEyeSlash,
-  faMicrophone,
-  faPaperPlane,
-  faRobot,
-  faLightbulb,
-  faClock,
-  faSearch,
-  faTimes,
-  faTrash
-} from "@fortawesome/free-solid-svg-icons";
-import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons";
-import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { jsPDF } from "jspdf";
+import { useState, useMemo } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils"
+import { CalendarIcon } from "@radix-ui/react-icons"
+import { format } from "date-fns"
+import { PopoverClose } from "@radix-ui/react-popover"
 
 interface AutomatedInsightsProps {
-  data: Array<{
-    id: number;
-    dateObj: Date;
-    placements: string;
-    placementTypes: string;
-    platforms: string;
-    smv: number;
-    fmv: number;
-    impressions: number;
-    views: number;
-    videoViews: number;
-  }>;
+  data: any
 }
 
-const PlatformIcon = ({ platform }: { platform: string }) => {
-  const getIcon = () => {
-    switch (platform) {
-      case "TikTok":
-        return faTiktok;
-      case "Instagram":
-        return faInstagram;
-      case "YouTube":
-        return faYoutube;
-      case "Twitter":
-        return faTwitter;
-      default:
-        return faTwitter;
-    }
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
-            <FontAwesomeIcon icon={getIcon()} className="h-4 w-4" />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{platform}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
 export default function AutomatedInsights({ data }: AutomatedInsightsProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [showRecommendations, setShowRecommendations] = useState(true);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [hasSeen, setHasSeen] = useState(false);
-  const [chatInput, setChatInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const [chatHistory, setChatHistory] = useState<
-    Array<{ id: string; type: "user" | "assistant"; content: string; timestamp: Date }>
-  >([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedInsights, setGeneratedInsights] = useState<any>(null);
-  const [savedInsights, setSavedInsights] = useState<
-    Array<{
-      id: string;
-      name: string;
-      content: any;
-      timestamp: Date;
-      query: string;
-    }>
-  >([]);
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [saveInsightName, setSaveInsightName] = useState("");
-  const [editingInsight, setEditingInsight] = useState<string | null>(null);
-  const [showSavedInsights, setShowSavedInsights] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(new Date())
 
-  // Sort by date (most recent first)
-  const sortedData = useMemo(() => {
-    return data.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-  }, [data]);
+  const dailyData = useMemo(() => {
+    if (!data || !data.length) return []
 
-  // Calculate trending amounts
-  const calculateTrending = () => {
-    if (sortedData.length < 2) {
-      return { smv: 0, impressions: 0, views: 0 };
-    }
+    const formattedDate = date ? format(date, "yyyy-MM-dd") : null
 
-    const midPoint = Math.floor(sortedData.length / 2);
-    const firstHalf = sortedData.slice(0, midPoint);
-    const secondHalf = sortedData.slice(midPoint);
-
-    const firstHalfAvg = {
-      smv: firstHalf.reduce((sum, item) => sum + item.smv, 0) / firstHalf.length,
-      impressions: firstHalf.reduce((sum, item) => sum + item.impressions, 0) / firstHalf.length,
-      views: firstHalf.reduce((sum, item) => sum + item.views, 0) / firstHalf.length,
-    };
-
-    const secondHalfAvg = {
-      smv: secondHalf.reduce((sum, item) => sum + item.smv, 0) / secondHalf.length,
-      impressions: secondHalf.reduce((sum, item) => sum + item.impressions, 0) / secondHalf.length,
-      views: secondHalf.reduce((sum, item) => sum + item.views, 0) / secondHalf.length,
-    };
-
-    return {
-      smv: Math.round(((firstHalfAvg.smv - secondHalfAvg.smv) / secondHalfAvg.smv) * 100),
-      impressions: Math.round(
-        ((firstHalfAvg.impressions - secondHalfAvg.impressions) / secondHalfAvg.impressions) * 100,
-      ),
-      views: Math.round(((firstHalfAvg.views - secondHalfAvg.views) / secondHalfAvg.views) * 100),
-    };
-  };
-
-  const trendingAmounts = calculateTrending();
-
-  // Calculate insights
-  const insights = useMemo(() => {
-    if (sortedData.length === 0) {
-      return {
-        topPlacement: "N/A",
-        topPlacementTypeBySMV: "N/A",
-        topPlatformByImpressions: "N/A",
-        totalSMV: 0,
-        totalImpressions: 0,
-        avgSMV: 0,
-      };
-    }
-
-    return {
-      topPlacement: sortedData.reduce((prev, current) => (prev.smv > current.smv ? prev : current)).placements,
-      topPlacementTypeBySMV: (() => {
-        const placementTypesSMV = sortedData.reduce(
-          (acc, item) => {
-            acc[item.placementTypes] = (acc[item.placementTypes] || 0) + item.smv;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-        const entries = Object.entries(placementTypesSMV);
-        return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A";
-      })(),
-      topPlatformByImpressions: (() => {
-        const platformImpressions = sortedData.reduce(
-          (acc, item) => {
-            acc[item.platforms] = (acc[item.platforms] || 0) + item.impressions;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-        const entries = Object.entries(platformImpressions);
-        return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A";
-      })(),
-      totalSMV: sortedData.reduce((sum, item) => sum + item.smv, 0),
-      totalImpressions: sortedData.reduce((sum, item) => sum + item.impressions, 0),
-      avgSMV: Math.round(sortedData.reduce((sum, item) => sum + item.smv, 0) / sortedData.length),
-    };
-  }, [sortedData]);
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-    if (!isExpanded && !hasSeen) {
-      setHasSeen(true); // Mark as seen when expanding
-    }
-  };
-
-  const toggleRecommendations = () => {
-    setShowRecommendations(!showRecommendations);
-  };
-
-  const handleGenerateReport = () => {
-    console.log("Generating automated insights report...")
-    
-    // Create new PDF document
-    const doc = new jsPDF()
-    
-    // Set up document properties
-    doc.setProperties({
-      title: 'Automated Insights Report',
-      subject: 'Media Analytics Dashboard Report',
-      author: 'Automated Insights System',
-      creator: 'Media Analytics Dashboard'
+    return data.filter((item: any) => {
+      const itemDate = item.date.split("T")[0]
+      return itemDate === formattedDate
     })
-    
-    // Add title
-    
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Data Summary', 20, 65)
-    
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`Total Records Analyzed: ${sortedData.length}`, 20, 80)
-    doc.text(`Date Range: ${sortedData.length > 0 ? 
-      `${sortedData[sortedData.length - 1].dateObj.toLocaleDateString()} - ${sortedData[0].dateObj.toLocaleDateString()}` : 
-      'No data available'}`, 20, 95)
-    
-    // Add trending metrics section
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Trending Metrics', 20, 120)
-    
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    let yPos = 135
-    doc.text(`• SMV Growth: +${trendingAmounts.smv}%`, 25, yPos)
-    yPos += 15
-    doc.text(`• Impressions Growth: +${trendingAmounts.impressions}%`, 25, yPos)
-    yPos += 15
-    doc.text(`• Views Growth: +${trendingAmounts.views}%`, 25, yPos)
-    yPos += 20
-    
-    // Add top performers section
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Top Performers', 20, yPos)
-    yPos += 15
-    
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`• Highest Performing Placement: ${insights.topPlacement}`, 25, yPos)
-    yPos += 15
-    doc.text(`• Top Placement Type by SMV: ${insights.topPlacementTypeBySMV}`, 25, yPos)
-    yPos += 15
-    doc.text(`• Top Platform by Impressions: ${insights.topPlatformByImpressions}`, 25, yPos)
-    yPos += 20
-    
-    // Add key metrics section
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Key Metrics', 20, yPos)
-    yPos += 15
-    
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`• Total SMV: $${insights.totalSMV.toLocaleString()}k`, 25, yPos)
-    yPos += 15
-    doc.text(`• Total Impressions: ${insights.totalImpressions.toLocaleString()}MM`, 25, yPos)
-    yPos += 15
-    doc.text(`• Average SMV: $${insights.avgSMV}k`, 25, yPos)
-    yPos += 20
-    
-    // Add recommendations section
-    if (showRecommendations) {
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
-      doc.text('Actionable Recommendations', 20, yPos)
-      yPos += 15
-      
-      doc.setFontSize(11)
-      doc.setFont('helvetica', 'normal')
-      const recommendations = [
-        `Focus more budget on ${insights.topPlacementTypeBySMV} placements for higher SMV returns`,
-        `Leverage ${insights.topPlatformByImpressions} platform for maximum impression reach`,
-        'Continue current strategy as all key metrics are trending upward',
-        `Consider expanding ${insights.topPlacement} placements based on performance`,
-        'Review and optimize Entrance placement strategy to address declining performance',
-        'Investigate YouTube platform performance decline and adjust content strategy'
-      ]
-      
-      recommendations.forEach((rec, index) => {
-        // Handle text wrapping for long recommendations
-        const lines = doc.splitTextToSize(`• ${rec}`, 170)
-        lines.forEach((line: string, lineIndex: number) => {
-          if (yPos > 270) { // Check if we need a new page
-            doc.addPage()
-            yPos = 30
-          }
-          doc.text(line, lineIndex === 0 ? 25 : 27, yPos)
-          yPos += 12
-        })
-        yPos += 3 // Extra space between recommendations
-      })
-    }
-    
-    // Add footer
-    const pageCount = doc.getNumberOfPages()
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i)
-      doc.setFontSize(8)
-      doc.setFont('helvetica', 'normal')
-      doc.text(`Page ${i} of ${pageCount}`, 20, 285)
-      doc.text('Generated by Media Analytics Dashboard', 120, 285)
-    }
-    
-    // Save the PDF
-    const fileName = `insights-report-${new Date().toISOString().split('T')[0]}.pdf`
-    doc.save(fileName)
-    
-    console.log(`Report generated and saved as: ${fileName}`)
-  }
+  }, [data, date])
 
-  const handleBookmarkInsights = () => {
-    setIsBookmarked(!isBookmarked)
-    console.log(isBookmarked ? "Removing bookmark from insights..." : "Bookmarking insights...")
-    // Add bookmark logic here
-  }
+  const totalImpressions = useMemo(() => {
+    return dailyData.reduce((sum: number, item: any) => sum + item.impressions, 0)
+  }, [dailyData])
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim()) return
+  const totalClicks = useMemo(() => {
+    return dailyData.reduce((sum: number, item: any) => sum + item.clicks, 0)
+  }, [dailyData])
 
-    const userMessage = {
-      id: Date.now().toString(),
-      type: "user" as const,
-      content: chatInput,
-      timestamp: new Date(),
-    }
+  const totalCost = useMemo(() => {
+    return dailyData.reduce((sum: number, item: any) => sum + item.cost, 0)
+  }, [dailyData])
 
-    setChatHistory((prev) => [...prev, userMessage])
-    setChatInput("")
-    setIsGenerating(true)
+  const totalConversions = useMemo(() => {
+    return dailyData.reduce((sum: number, item: any) => sum + item.conversions, 0)
+  }, [dailyData])
 
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage = {
-        id: (Date.now() + 1).toString(),
-        type: "assistant" as const,
-        content: `Based on your query "${chatInput}", I've analyzed the data and generated insights.`,
-        timestamp: new Date(),
-      }
-      setChatHistory((prev) => [...prev, assistantMessage])
+  const campaignPerformanceData = useMemo(() => {
+    if (!dailyData || !dailyData.length) return []
 
-      // Generate mock insights
-      setGeneratedInsights({
-        trending: {
-          smv: Math.floor(Math.random() * 50) + 10,
-          impressions: Math.floor(Math.random() * 30) + 15,
-          views: Math.floor(Math.random() * 40) + 20,
-        },
-        topPerformers: {
-          placement: sortedData[0]?.placements || "N/A",
-          platform: "Instagram",
-          sponsor: "Nike",
-        },
-        keyMetrics: {
-          totalSMV: Math.floor(Math.random() * 1000) + 500,
-          avgEngagement: Math.floor(Math.random() * 50) + 25,
-          growthRate: Math.floor(Math.random() * 20) + 5,
-        },
-      })
-      setIsGenerating(false)
+    const campaignData: { [key: string]: any } = {}
 
-      // Scroll to generated insights after they appear
-      setTimeout(() => {
-        const insightsElement = document.getElementById('generated-insights-display');
-        if (insightsElement) {
-          insightsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    dailyData.forEach((item: any) => {
+      const campaignName = item.campaign
+      if (!campaignData[campaignName]) {
+        campaignData[campaignName] = {
+          impressions: 0,
+          clicks: 0,
+          cost: 0,
+          conversions: 0,
         }
-      }, 100);
-    }, 2000)
-  }
+      }
+      campaignData[campaignName].impressions += item.impressions
+      campaignData[campaignName].clicks += item.clicks
+      campaignData[campaignName].cost += item.cost
+      campaignData[campaignName].conversions += item.conversions
+    })
 
-  const handleVoiceInput = () => {
-    setIsListening(!isListening)
-    // Voice recognition would be implemented here
-    console.log("Voice input toggled")
-  }
+    return Object.entries(campaignData).map(([campaign, values]) => ({
+      campaign,
+      ...values,
+    }))
+  }, [dailyData])
 
-  const handleClearAll = () => {
-    setChatHistory([])
-    setGeneratedInsights(null)
-    setChatInput("")
-    setIsGenerating(false)
-  }
-
-  const handleSaveInsights = () => {
-    if (!generatedInsights) return
-
-    const defaultName = `Insights - ${new Date().toLocaleDateString()}`
-    setSaveInsightName(defaultName)
-    setShowSaveModal(true)
-  }
-
-  const confirmSaveInsights = () => {
-    if (!generatedInsights || !saveInsightName.trim()) return
-
-    const newInsight = {
-      id: Date.now().toString(),
-      name: saveInsightName.trim(),
-      content: generatedInsights,
-      timestamp: new Date(),
-      query: chatHistory[chatHistory.length - 2]?.content || "Custom Analysis",
+  const topCampaign = useMemo(() => {
+    if (!campaignPerformanceData || campaignPerformanceData.length === 0) {
+      return null
     }
 
-    setSavedInsights((prev) => [newInsight, ...prev])
-    setShowSaveModal(false)
-    setSaveInsightName("")
+    return campaignPerformanceData.reduce((maxCampaign, currentCampaign) => {
+      return currentCampaign.impressions > maxCampaign.impressions ? currentCampaign : maxCampaign
+    }, campaignPerformanceData[0])
+  }, [campaignPerformanceData])
 
-    // Show success feedback
-    console.log("Insights saved successfully!")
-  }
+  const chartData = useMemo(() => {
+    if (!dailyData || dailyData.length === 0) {
+      return []
+    }
 
-  const handleDeleteSavedInsight = (id: string) => {
-    setSavedInsights((prev) => prev.filter((insight) => insight.id !== id))
-  }
-
-  const handleLoadSavedInsight = (insight: any) => {
-    setGeneratedInsights(insight.content)
-    setShowSavedInsights(false)
-  }
-
-  const recentQueries = [
-    "Show me Nike performance in Q4",
-    "Compare Instagram vs TikTok engagement",
-    "Top performing placements this month",
-  ]
-
-  const topSearches = ["SMV trends", "Platform comparison", "Sponsor performance", "Engagement rates"]
-
-  const recommendedQueries = [
-    "What are the trending sponsors this season?",
-    "Which platforms have the highest ROI?",
-    "Show me the best performing placement types",
-    "Compare current vs previous season performance",
-  ]
+    return dailyData.map((item: any) => ({
+      time: item.time,
+      impressions: item.impressions,
+    }))
+  }, [dailyData])
 
   return (
-    <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
-            Insights ({sortedData.length} records)
-            {hasSeen && (
-              <span className="flex items-center gap-1 text-xs italic text-gray-500 font-normal">
-                <FontAwesomeIcon icon={faEye} className="h-3 w-3" />
-                Seen
-              </span>
-            )}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button onClick={handleGenerateReport} className="flex items-center gap-2" size="sm">
-              <FontAwesomeIcon icon={faFileText} className="h-4 w-4" />
-              Generate Report
-            </Button>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleBookmarkInsights}
-                    variant={isBookmarked ? "default" : "outline"}
-                    size="sm"
-                    className={`p-2 ${isBookmarked ? "bg-blue-600 text-white" : ""}`}
-                  >
-                    <FontAwesomeIcon icon={isBookmarked ? faBookmark : faBookmarkRegular} className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
-                </TooltipContent>
-              </TooltipProvider>
-            <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
-              <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-
-      {isExpanded && (
-        <CardContent className="transition-all duration-300 ease-in-out">
-          <Tabs defaultValue="automated" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="automated" className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
-                Automated Insights
-              </TabsTrigger>
-              <TabsTrigger value="generate" className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faRobot} className="h-4 w-4" />
-                Generate Insights
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="automated" className="space-y-6">
-              {/* Original automated insights content */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
-                {/* Trending Metrics */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700">Trending Metrics</h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">SMV</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.smv}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">Impressions</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.impressions}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">Views</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.views}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                      <span className="text-sm">Placement Type (Entrance)</span>
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendDown} className="h-3 w-3" />
-                        -$200
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Platform</span>
-                        <PlatformIcon platform="YouTube" />
-                      </div>
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendDown} className="h-3 w-3" />
-                        -$125
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Top Performers */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700">Top Performers</h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Highest Performing Placement</div>
-                      <div className="font-semibold text-blue-700">{insights.topPlacement}</div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Top Placement Type by SMV</div>
-                      <div className="font-semibold text-purple-700">{insights.topPlacementTypeBySMV}</div>
-                    </div>
-                    <div className="p-3 bg-orange-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Top Platform by Impressions</div>
-                      <div className="font-semibold text-orange-700 flex items-center gap-2">
-                        {insights.topPlatformByImpressions !== "N/A" && (
-                          <PlatformIcon platform={insights.topPlatformByImpressions} />
-                        )}
-                        <span>{insights.topPlatformByImpressions}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Key Metrics Summary */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700">Key Metrics</h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Total SMV</div>
-                      <div className="font-semibold text-gray-700">${insights.totalSMV.toLocaleString()}k</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Total Impressions</div>
-                      <div className="font-semibold text-gray-700">{insights.totalImpressions.toLocaleString()}MM</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Average SMV</div>
-                      <div className="font-semibold text-gray-700">${insights.avgSMV}k</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actionable Recommendations */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-sm text-blue-800 flex items-center gap-2">
-                    💡 Actionable Recommendations
-                  </h4>
-                  <Button variant="ghost" size="sm" onClick={toggleRecommendations} className="p-2">
-                    <FontAwesomeIcon icon={showRecommendations ? faEyeSlash : faEye} className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {showRecommendations && (
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 transition-all duration-300 ease-in-out">
-                    <ul className="text-sm text-blue-700 space-y-1">
-                      <li>• Focus more budget on {insights.topPlacementTypeBySMV} placements for higher SMV returns</li>
-                      <li>• Leverage {insights.topPlatformByImpressions} platform for maximum impression reach</li>
-                      <li>• Continue current strategy as all key metrics are trending upward</li>
-                      <li>• Consider expanding {insights.topPlacement} placements based on performance</li>
-                      <li>• Review and optimize Entrance placement strategy to address declining performance</li>
-                      <li>• Investigate YouTube platform performance decline and adjust content strategy</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="generate" className="space-y-6">
-              {/* Header with Actions */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Generate Custom Insights</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Ask questions about your data to generate personalized insights
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {savedInsights.length > 0 && (
-                    <Popover open={showSavedInsights} onOpenChange={setShowSavedInsights}>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="flex items-center gap-2">
-                          <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
-                          Saved ({savedInsights.length})
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80" align="end">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-sm">Saved Insights</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setShowSavedInsights(false)}
-                              className="p-1"
-                            >
-                              <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
-                            </Button>
-                          </div>
-
-                          <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {savedInsights.map((insight) => (
-                              <div
-                                key={insight.id}
-                                className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1 min-w-0">
-                                    <h5 className="font-medium text-sm text-gray-900 truncate">{insight.name}</h5>
-                                    <p className="text-xs text-gray-500 mt-1 truncate">{insight.query}</p>
-                                    <p className="text-xs text-gray-400 mt-1">
-                                      {insight.timestamp.toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                  <div className="flex items-center gap-1 ml-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleLoadSavedInsight(insight)}
-                                      className="p-1 h-6 w-6"
-                                    >
-                                      <FontAwesomeIcon icon={faEye} className="h-3 w-3" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleDeleteSavedInsight(insight.id)}
-                                      className="p-1 h-6 w-6 text-red-500 hover:text-red-700"
-                                    >
-                                      <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-
-                  {(chatHistory.length > 0 || generatedInsights) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClearAll}
-                      className="flex items-center gap-2 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
-                    >
-                      <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
-                      Clear All
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column - Chat Interface */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Chat History */}
-                  <div className="border rounded-lg bg-gray-50 h-[calc(100vh-20rem)] min-h-[600px] overflow-y-auto p-4 space-y-3">
-                    {chatHistory.length === 0 ? (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        <div className="text-center">
-                          <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-400" />
-                          <h4 className="font-medium text-gray-700 mb-2">AI-Powered Insights Generator</h4>
-                          <p className="text-sm text-gray-500 mb-4 max-w-md">
-                            Ask questions about your data and get instant, personalized insights with visualizations and
-                            recommendations.
-                          </p>
-                          <div className="flex flex-wrap gap-2 justify-center">
-                            {["Show trends", "Compare platforms", "Top performers"].map((suggestion) => (
-                              <button
-                                key={suggestion}
-                                onClick={() => setChatInput(suggestion)}
-                                className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors"
-                              >
-                                {suggestion}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      chatHistory.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div
-                            className={`max-w-[85%] p-3 rounded-lg ${
-                              message.type === "user"
-                                ? "bg-blue-600 text-white rounded-br-sm"
-                                : "bg-white border border-gray-200 rounded-bl-sm shadow-sm"
-                            }`}
-                          >
-                            <p className="text-sm leading-relaxed">{message.content}</p>
-                            <p
-                              className={`text-xs mt-2 ${message.type === "user" ? "text-blue-100" : "text-gray-500"}`}
-                            >
-                              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                    {isGenerating && (
-                      <div className="flex justify-start">
-                        <div className="bg-white border border-gray-200 p-4 rounded-lg rounded-bl-sm shadow-sm">
-                          <div className="flex items-center gap-3">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                              <div
-                                className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.1s" }}
-                              ></div>
-                              <div
-                                className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                style={{ animationDelay: "0.2s" }}
-                              ></div>
-                            </div>
-                            <p className="text-sm text-gray-600">Analyzing your data and generating insights...</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Input Area */}
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1 relative">
-                        <Input
-                          value={chatInput}
-                          onChange={(e) => setChatInput(e.target.value)}
-                          placeholder="Ask about your data insights... (e.g., 'Show me top performing sponsors this quarter')"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                              e.preventDefault()
-                              handleSendMessage()
-                            }
-                          }}
-                          className="pr-12 py-3 text-sm"
-                          disabled={isGenerating}
-                        />
-                        <Button
-                          onClick={handleVoiceInput}
-                          variant="ghost"
-                          size="sm"
-                          className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 ${
-                            isListening ? "text-red-500 bg-red-50" : "text-gray-400 hover:text-gray-600"
-                          }`}
-                          disabled={isGenerating}
-                        >
-                          <FontAwesomeIcon icon={faMicrophone} className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <Button
-                        onClick={handleSendMessage}
-                        disabled={!chatInput.trim() || isGenerating}
-                        className="px-6 py-3"
-                      >
-                        {isGenerating ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : (
-                          <FontAwesomeIcon icon={faPaperPlane} className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>Quick actions:</span>
-                      <button
-                        onClick={() => setChatInput("What are the trending metrics this month?")}
-                        className="text-blue-600 hover:text-blue-700 underline"
-                        disabled={isGenerating}
-                      >
-                        Trending metrics
-                      </button>
-                      <span>•</span>
-                      <button
-                        onClick={() => setChatInput("Compare platform performance")}
-                        className="text-blue-600 hover:text-blue-700 underline"
-                        disabled={isGenerating}
-                      >
-                        Platform comparison
-                      </button>
-                      <span>•</span>
-                      <button
-                        onClick={() => setChatInput("Show top performing sponsors")}
-                        className="text-blue-600 hover:text-blue-700 underline"
-                        disabled={isGenerating}
-                      >
-                        Top sponsors
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column - Suggestions */}
-                <div className="space-y-4">
-                  {/* Recent Queries */}
-                  <div className="border rounded-lg p-4 bg-white">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-500" />
-                      Recent Queries
-                    </h4>
-                    <div className="space-y-2">
-                      {recentQueries.map((query, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setChatInput(query)}
-                          disabled={isGenerating}
-                          className="w-full text-left p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors border border-transparent hover:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <div className="flex items-start gap-2">
-                            <FontAwesomeIcon icon={faSearch} className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <span className="leading-relaxed">{query}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Top Searches */}
-                  <div className="border rounded-lg p-4 bg-white">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
-                      Popular Searches
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {topSearches.map((search, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setChatInput(search)}
-                          disabled={isGenerating}
-                          className="px-3 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full transition-colors border border-blue-200 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {search}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Evaluation Searches */}
-                  <div className="border rounded-lg p-4 bg-white">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
-                      Evaluation Searches
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {["MVP% Evaluation", "YoY Benchmarking", "Top Performing Sponsors", "Top Performing Rightsholders", "Top Broadcasts", "Top Social Media Posts"].map(
-                        (search, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setChatInput(search)}
-                            disabled={isGenerating}
-                            className="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-full transition-colors border border-purple-200 hover:border-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {search}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Recommended Queries */}
-                  <div className="border rounded-lg p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                      AI Recommendations
-                    </h4>
-                    <div className="space-y-2">
-                      {recommendedQueries.map((query, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setChatInput(query)}
-                          disabled={isGenerating}
-                          className="w-full text-left p-3 text-sm bg-white hover:bg-yellow-50 rounded-md transition-colors border border-yellow-200 hover:border-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <div className="flex items-start gap-2">
-                            <FontAwesomeIcon
-                              icon={faLightbulb}
-                              className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0"
-                            />
-                            <span className="leading-relaxed">{query}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Generated Insights Preview Area */}
-              {!generatedInsights && !isGenerating && (
-                <div className="mt-6 p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px] flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-                      <FontAwesomeIcon icon={faLightbulb} className="h-8 w-8 text-gray-400" />
-                    </div>
-                    <h4 className="text-lg font-medium text-gray-700 mb-2">Generated Insights Will Appear Here</h4>
-                    <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
-                      Ask a question about your data using the chat interface above, and AI-powered insights with visualizations and recommendations will be displayed in this area.
-                    </p>
-                    <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-                      <div className="flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                        <span>Trending Metrics</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                        <span>Top Performers</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3" />
-                        <span>Recommendations</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {isGenerating && (
-                <div className="mt-6 p-12 border-2 border-blue-300 rounded-xl bg-blue-50 min-h-[400px] flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    </div>
-                    <h4 className="text-lg font-medium text-blue-700 mb-2">Generating Your Insights...</h4>
-                    <p className="text-sm text-blue-600 mb-4">
-                      Our AI is analyzing your data and preparing personalized insights with actionable recommendations.
-                    </p>
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Generated Insights Display */}
-              {generatedInsights && (
-                <div id="generated-insights-display" className="mt-8 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200 shadow-sm">
-                  <div className="flex items-center justify-between mb-6">
-                    <h4 className="font-semibold text-xl text-gray-800 flex items-center gap-3">
-                      <div className="p-2 bg-yellow-100 rounded-lg">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-6 w-6 text-yellow-600" />
-                      </div>
-                      Generated Insights
-                    </h4>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        onClick={handleSaveInsights}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-                        size="sm"
-                      >
-                        <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
-                        Save Insights
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Trending Metrics */}
-                    <div className="space-y-3">
-                      <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
-                        Trending Metrics
-                      </h5>
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">SMV Growth</span>
-                            <span className="font-medium text-green-700">+{generatedInsights.trending.smv}%</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Impressions Growth</span>
-                            <span className="font-medium text-green-700">+{generatedInsights.trending.impressions}%</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Views Growth</span>
-                            <span className="font-medium text-green-700">+{generatedInsights.trending.views}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Top Performers */}
-                    <div className="space-y-3">
-                      <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-blue-600" />
-                        Top Performers
-                      </h5>
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Placement</span>
-                            <span className="font-medium text-blue-700">{generatedInsights.topPerformers.placement}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Platform</span>
-                            <span className="font-medium text-blue-700">{generatedInsights.topPerformers.platform}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Sponsor</span>
-                            <span className="font-medium text-blue-700">{generatedInsights.topPerformers.sponsor}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Key Metrics */}
-                    <div className="space-y-3">
-                      <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                        Key Metrics
-                      </h5>
-                      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Total SMV</span>
-                            <span className="font-medium text-yellow-700">${generatedInsights.keyMetrics.totalSMV}k</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Avg Engagement</span>
-                            <span className="font-medium text-yellow-700">{generatedInsights.keyMetrics.avgEngagement}%</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Growth Rate</span>
-                            <span className="font-medium text-yellow-700">+{generatedInsights.keyMetrics.growthRate}%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actionable Recommendations */}
-                  <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                    <h5 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                      Actionable Recommendations
-                    </h5>
-                    <ul className="list-disc list-inside text-sm text-gray-600 space-y-2">
-                      <li>Focus on replicating the success of {generatedInsights.topPerformers.placement} placements.</li>
-                      <li>Increase investment in {generatedInsights.topPerformers.platform} platform to capitalize on high engagement.</li>
-                      <li>Explore partnership opportunities with {generatedInsights.topPerformers.sponsor} for future campaigns.</li>
-                      <li>Consider increasing budget for placements with similar characteristics to {generatedInsights.topPerformers.placement}.</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
+    <div className="w-full space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Automated Insights</CardTitle>
+          <CardDescription>Key metrics and insights from your marketing data.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Impressions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalImpressions}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Clicks</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalClicks}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Cost</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${totalCost.toFixed(2)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Conversions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalConversions}</div>
+            </CardContent>
+          </Card>
         </CardContent>
-      )}
+      </Card>
 
-      {showSaveModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Save Generated Insights</h3>
-              <div className="mt-2 px-7 py-3">
-                <Input
-                  type="text"
-                  placeholder="Insight Name"
-                  value={saveInsightName}
-                  onChange={(e) => setSaveInsightName(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                />
-              </div>
-              <div className="items-center px-4 py-3">
-                <Button variant="ghost" className="px-4 py-2 bg-gray-50 text-gray-500 text-sm font-medium rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={() => setShowSaveModal(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  className="ml-4 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                  onClick={confirmSaveInsights}
-                >
-                  Save
-                </Button>
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Daily Performance Chart</CardTitle>
+          <CardDescription>Impressions over time.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis />
+              <Tooltip />
+              <Area type="monotone" dataKey="impressions" stroke="#8884d8" fill="#8884d8" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Campaign Performance</CardTitle>
+          <CardDescription>Performance metrics for each campaign.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">Campaign</TableHead>
+                <TableHead>Impressions</TableHead>
+                <TableHead>Clicks</TableHead>
+                <TableHead>Cost</TableHead>
+                <TableHead>Conversions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaignPerformanceData.map((campaign: any) => (
+                <TableRow key={campaign.campaign}>
+                  <TableCell className="font-medium">{campaign.campaign}</TableCell>
+                  <TableCell>{campaign.impressions}</TableCell>
+                  <TableCell>{campaign.clicks}</TableCell>
+                  <TableCell>${campaign.cost.toFixed(2)}</TableCell>
+                  <TableCell>{campaign.conversions}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Performing Campaign</CardTitle>
+          <CardDescription>Details of the campaign with the most impressions.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {topCampaign ? (
+            <div>
+              <p>
+                <strong>Campaign:</strong> {topCampaign.campaign}
+              </p>
+              <p>
+                <strong>Impressions:</strong> {topCampaign.impressions}
+              </p>
+              <p>
+                <strong>Clicks:</strong> {topCampaign.clicks}
+              </p>
+              <p>
+                <strong>Cost:</strong> ${topCampaign.cost.toFixed(2)}
+              </p>
+              <p>
+                <strong>Conversions:</strong> {topCampaign.conversions}
+              </p>
             </div>
-          </div>
-        </div>
-      )}
-    </Card>
-  );
+          ) : (
+            <p>No campaign data available for the selected date.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Select Date</CardTitle>
+          <CardDescription>Choose a date to view insights for.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                disabled={(date) => date > new Date() || date < new Date("2023-01-01")}
+                initialFocus
+              />
+              <PopoverClose>
+                <Button className="w-full" variant={"secondary"}>
+                  Close
+                </Button>
+              </PopoverClose>
+            </PopoverContent>
+          </Popover>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
