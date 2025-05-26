@@ -511,7 +511,7 @@ export default function Page() {
     <div className="w-full p-6">
       {/* Page Header - Always Visible */}
       <div className="mb-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge AI</h1>
       </div>
 
       {/* Main Tabs Section */}
