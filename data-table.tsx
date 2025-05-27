@@ -67,6 +67,7 @@ interface DataTableProps {
     placements: string
     placementTypes: string
     platforms: string
+    sponsors: string
     smv: number
     fmv: number
     impressions: number
@@ -206,6 +207,7 @@ export default function DataTable({ data }: DataTableProps) {
     // Define CSV headers
     const headers = [
       "Date",
+      "Sponsors",
       "Exposures",
       "Duration (Sec)",
       "Impressions",
@@ -219,6 +221,7 @@ export default function DataTable({ data }: DataTableProps) {
     // Convert data to CSV format
     const csvData = filteredAndSortedData.map((row) => [
       row.date,
+      row.sponsors,
       row.exposures,
       row.duration,
       row.impressions,
@@ -232,6 +235,7 @@ export default function DataTable({ data }: DataTableProps) {
     // Add totals row
     const totalsRow = [
       "Total",
+      "-", // No total for sponsors
       totals.exposures,
       totals.duration,
       totals.impressions,
@@ -279,6 +283,7 @@ export default function DataTable({ data }: DataTableProps) {
 
   const columns = [
     { key: "date", label: "Date" },
+    { key: "sponsors", label: "Sponsors" },
     { key: "exposures", label: "Exposures" },
     { key: "duration", label: "Duration (Sec)" },
     { key: "impressions", label: "Impressions" },
@@ -350,6 +355,9 @@ export default function DataTable({ data }: DataTableProps) {
                       {row.date}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
+                      {row.sponsors}
+                    </TableCell>
+                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
                       {row.exposures.toLocaleString()}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
@@ -400,6 +408,7 @@ export default function DataTable({ data }: DataTableProps) {
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
                     Total
                   </TableCell>
+                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
                     {totals.exposures.toLocaleString()}
                   </TableCell>
