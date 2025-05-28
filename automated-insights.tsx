@@ -1,5 +1,5 @@
 "use client"
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -54,6 +54,58 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import html2canvas from "html2canvas"
+
+// Web Speech API type declarations
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition
+    webkitSpeechRecognition: typeof SpeechRecognition
+  }
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  start(): void
+  stop(): void
+  abort(): void
+  onstart: ((this: SpeechRecognition, ev: Event) => any) | null
+  onend: ((this: SpeechRecognition, ev: Event) => any) | null
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string
+}
+
+interface SpeechRecognitionResultList {
+  length: number
+  item(index: number): SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionResult {
+  length: number
+  item(index: number): SpeechRecognitionAlternative
+  [index: number]: SpeechRecognitionAlternative
+  isFinal: boolean
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string
+  confidence: number
+}
+
+declare var SpeechRecognition: {
+  prototype: SpeechRecognition
+  new (): SpeechRecognition
+}
 
 interface AutomatedInsightsProps {
   data: Array<{
@@ -191,6 +243,8 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   const [expandedInsightId, setExpandedInsightId] = useState<string | null>(null)
   const [showAllGeneratedInsights, setShowAllGeneratedInsights] = useState(false)
   const [expandedGeneratedInsightId, setExpandedGeneratedInsightId] = useState<string | null>(null)
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
+  const [isRecognitionSupported, setIsRecognitionSupported] = useState(false)
 
   const insightsChartRef = useRef<HTMLDivElement>(null)
 
@@ -205,6 +259,42 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       return dateB.getTime() - dateA.getTime()
     })
   }, [data])
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition()
+        recognitionInstance.continuous = false
+        recognitionInstance.interimResults = false
+        recognitionInstance.lang = "en-US"
+
+        recognitionInstance.onstart = () => {
+          setIsListening(true)
+        }
+
+        recognitionInstance.onresult = (event) => {
+          const transcript = event.results[0][0].transcript
+          setChatInput((prev) => prev + (prev ? " " : "") + transcript)
+        }
+
+        recognitionInstance.onerror = (event) => {
+          console.error("Speech recognition error:", event.error)
+          setIsListening(false)
+        }
+
+        recognitionInstance.onend = () => {
+          setIsListening(false)
+        }
+
+        setRecognition(recognitionInstance)
+        setIsRecognitionSupported(true)
+      } else {
+        setIsRecognitionSupported(false)
+      }
+    }
+  }, [])
 
   // Calculate trending amounts with refresh key dependency
   const calculateTrending = () => {
@@ -623,8 +713,21 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   }
 
   const handleVoiceInput = () => {
-    setIsListening(!isListening)
-    console.log("Voice input toggled")
+    if (!recognition || !isRecognitionSupported) {
+      alert("Speech recognition is not supported in your browser. Please try Chrome, Edge, or Safari.")
+      return
+    }
+
+    if (isListening) {
+      recognition.stop()
+    } else {
+      try {
+        recognition.start()
+      } catch (error) {
+        console.error("Error starting speech recognition:", error)
+        setIsListening(false)
+      }
+    }
   }
 
   const handleClearAll = () => {
@@ -1900,17 +2003,37 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                             className="pr-12 py-3 text-sm"
                             disabled={isGenerating}
                           />
-                          <Button
-                            onClick={handleVoiceInput}
-                            variant="ghost"
-                            size="sm"
-                            className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 ${
-                              isListening ? "text-red-500 bg-red-50" : "text-gray-400 hover:text-gray-600"
-                            }`}
-                            disabled={isGenerating}
-                          >
-                            <FontAwesomeIcon icon={faMicrophone} className="h-4 w-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={handleVoiceInput}
+                                variant="ghost"
+                                size="sm"
+                                className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 transition-colors ${
+                                  isListening
+                                    ? "text-red-500 bg-red-50 hover:bg-red-100"
+                                    : isRecognitionSupported
+                                      ? "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                                      : "text-gray-300 cursor-not-allowed"
+                                }`}
+                                disabled={isGenerating || !isRecognitionSupported}
+                              >
+                                <FontAwesomeIcon
+                                  icon={faMicrophone}
+                                  className={`h-4 w-4 ${isListening ? "animate-pulse" : ""}`}
+                                />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {!isRecognitionSupported
+                                  ? "Speech recognition not supported"
+                                  : isListening
+                                    ? "Click to stop recording"
+                                    : "Click to start voice input"}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                         <Button
                           onClick={handleSendMessage}
