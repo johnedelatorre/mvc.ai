@@ -23,7 +23,6 @@ import {
   faTimes,
   faTrash,
   faChartColumn,
-  faEdit,
   faHistory,
   faStar,
   faThumbsUp,
@@ -33,8 +32,9 @@ import {
   faCalendarAlt,
   faExpand,
   faCompress,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons"
-import { faBookmark as faBookmarkRegular, faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
+import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
@@ -1296,7 +1296,10 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                 >
                   {/* Trending Metrics */}
                   <div className="space-y-3 flex flex-col h-full">
-                    <h4 className="font-semibold text-sm text-gray-700">Trending Metrics</h4>
+                    <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                      <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
+                      Trending Metrics
+                    </h4>
                     <div className="flex flex-col justify-between h-full space-y-2">
                       <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
                         <span className="text-sm">SMV</span>
@@ -1338,7 +1341,10 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
                   {/* Top Performers */}
                   <div className="space-y-3 flex flex-col h-full">
-                    <h4 className="font-semibold text-sm text-gray-700">Top Performers</h4>
+                    <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                      <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
+                      Top Performers
+                    </h4>
                     <div className="flex flex-col justify-between h-full space-y-2">
                       <div className="p-3 bg-blue-50 rounded-lg">
                         <div className="text-xs text-gray-600 mb-1">Highest Performing Placement</div>
@@ -1362,7 +1368,10 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
                   {/* Key Metrics Summary */}
                   <div className="space-y-3 flex flex-col h-full">
-                    <h4 className="font-semibold text-sm text-gray-700">Key Metrics</h4>
+                    <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                      <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                      Key Metrics
+                    </h4>
                     <div className="flex flex-col justify-between h-full space-y-2">
                       <div className="p-3 bg-gray-50 rounded-lg">
                         <div className="text-xs text-gray-600 mb-1">Total SMV</div>
@@ -1872,79 +1881,9 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column - Chat Interface */}
-                  <div className="lg:col-span-2 space-y-4">
-                    {/* Chat History */}
-                    <div className="border rounded-lg bg-gray-50 h-[calc(100vh-20rem)] min-h-[600px] overflow-y-auto p-4 space-y-3">
-                      {chatHistory.length === 0 ? (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                          <div className="text-center">
-                            <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-400" />
-                            <h4 className="font-medium text-gray-700 mb-2">AI-Powered Insights Generator</h4>
-                            <p className="text-sm text-gray-500 mb-4 max-w-md">
-                              Ask questions about your data and get instant, personalized insights with visualizations
-                              and recommendations.
-                            </p>
-                            <div className="flex flex-wrap gap-2 justify-center">
-                              {["Show trends", "Compare platforms", "Top performers"].map((suggestion) => (
-                                <button
-                                  key={suggestion}
-                                  onClick={() => setChatInput(suggestion)}
-                                  className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors"
-                                >
-                                  {suggestion}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        chatHistory.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
-                          >
-                            <div
-                              className={`max-w-[85%] p-3 rounded-lg ${
-                                message.type === "user"
-                                  ? "bg-blue-600 text-white rounded-br-sm"
-                                  : "bg-white border border-gray-200 rounded-bl-sm shadow-sm"
-                              }`}
-                            >
-                              <p className="text-sm leading-relaxed">{message.content}</p>
-                              <p
-                                className={`text-xs mt-2 ${message.type === "user" ? "text-blue-100" : "text-gray-500"}`}
-                              >
-                                {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                      {isGenerating && (
-                        <div className="flex justify-start">
-                          <div className="bg-white border border-gray-200 p-4 rounded-lg rounded-bl-sm shadow-sm">
-                            <div className="flex items-center gap-3">
-                              <div className="flex space-x-1">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                                <div
-                                  className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                  style={{ animationDelay: "0.1s" }}
-                                ></div>
-                                <div
-                                  className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                  style={{ animationDelay: "0.2s" }}
-                                ></div>
-                              </div>
-                              <p className="text-sm text-gray-600">Analyzing your data and generating insights...</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Input Area */}
+                <div className="flex flex-col h-[calc(100vh-16rem)]">
+                  {/* Fixed Input Area at Top */}
+                  <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-4 mb-4">
                     <div className="space-y-3">
                       <div className="flex gap-2">
                         <div className="flex-1 relative">
@@ -2016,101 +1955,184 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                     </div>
                   </div>
 
-                  {/* Right Column - Suggestions */}
-                  <div className="space-y-4">
-                    {/* Recent Queries */}
-                    <div className="border rounded-lg p-4 bg-white">
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-500" />
-                        Recent Queries
-                      </h4>
-                      <div className="space-y-2">
-                        {recentQueries.map((query, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setChatInput(query)}
-                            disabled={isGenerating}
-                            className="w-full text-left p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors border border-transparent hover:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <div className="flex items-start gap-2">
-                              <FontAwesomeIcon icon={faSearch} className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                              <span className="leading-relaxed">{query}</span>
+                  {/* Main Content Area */}
+                  <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-hidden">
+                    {/* Left Column - Chat Interface */}
+                    <div className="lg:col-span-2 flex flex-col h-full">
+                      {/* Chat History */}
+                      <div className="flex-1 border rounded-lg bg-gray-50 overflow-y-auto p-4 space-y-3 min-h-0">
+                        {chatHistory.length === 0 ? (
+                          <div className="flex items-center justify-center h-full text-gray-500">
+                            <div className="text-center">
+                              <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-400" />
+                              <h4 className="font-medium text-gray-700 mb-2">AI-Powered Insights Generator</h4>
+                              <p className="text-sm text-gray-500 mb-4 max-w-md">
+                                Ask questions about your data and get instant, personalized insights with visualizations
+                                and recommendations.
+                              </p>
+                              <div className="flex flex-wrap gap-2 justify-center">
+                                {["Show trends", "Compare platforms", "Top performers"].map((suggestion) => (
+                                  <button
+                                    key={suggestion}
+                                    onClick={() => setChatInput(suggestion)}
+                                    className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors"
+                                  >
+                                    {suggestion}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Top Searches */}
-                    <div className="border rounded-lg p-4 bg-white">
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
-                        Popular Searches
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {topSearches.map((search, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setChatInput(search)}
-                            disabled={isGenerating}
-                            className="px-3 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full transition-colors border border-blue-200 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {search}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Evaluation Searches */}
-                    <div className="border rounded-lg p-4 bg-white">
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
-                        Evaluation Searches
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "MVP% Evaluation",
-                          "YoY Benchmarking",
-                          "Top Performing Sponsors",
-                          "Top Performing Rightsholders",
-                          "Top Broadcasts",
-                          "Top Social Media Posts",
-                        ].map((search, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setChatInput(search)}
-                            disabled={isGenerating}
-                            className="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-full transition-colors border border-purple-200 hover:border-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {search}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Recommended Queries */}
-                    <div className="border rounded-lg p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                        AI Recommendations
-                      </h4>
-                      <div className="space-y-2">
-                        {recommendedQueries.map((query, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setChatInput(query)}
-                            disabled={isGenerating}
-                            className="w-full text-left p-3 text-sm bg-white hover:bg-yellow-50 rounded-md transition-colors border border-yellow-200 hover:border-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <div className="flex items-start gap-2">
-                              <FontAwesomeIcon
-                                icon={faLightbulb}
-                                className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0"
-                              />
-                              <span className="leading-relaxed">{query}</span>
+                          </div>
+                        ) : (
+                          chatHistory.map((message) => (
+                            <div
+                              key={message.id}
+                              className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                            >
+                              <div
+                                className={`max-w-[85%] p-3 rounded-lg ${
+                                  message.type === "user"
+                                    ? "bg-blue-600 text-white rounded-br-sm"
+                                    : "bg-white border border-gray-200 rounded-bl-sm shadow-sm"
+                                }`}
+                              >
+                                <p className="text-sm leading-relaxed">{message.content}</p>
+                                <p
+                                  className={`text-xs mt-2 ${
+                                    message.type === "user" ? "text-blue-100" : "text-gray-500"
+                                  }`}
+                                >
+                                  {message.timestamp.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </p>
+                              </div>
                             </div>
-                          </button>
-                        ))}
+                          ))
+                        )}
+                        {isGenerating && (
+                          <div className="flex justify-start">
+                            <div className="bg-white border border-gray-200 p-4 rounded-lg rounded-bl-sm shadow-sm">
+                              <div className="flex items-center gap-3">
+                                <div className="flex space-x-1">
+                                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                  <div
+                                    className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                    style={{ animationDelay: "0.1s" }}
+                                  ></div>
+                                  <div
+                                    className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                    style={{ animationDelay: "0.2s" }}
+                                  ></div>
+                                </div>
+                                <p className="text-sm text-gray-600">Analyzing your data and generating insights...</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right Column - Suggestions */}
+                    <div className="space-y-4 overflow-y-auto min-h-0">
+                      {/* Recent Queries */}
+                      <div className="border rounded-lg p-4 bg-white">
+                        <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-500" />
+                          Recent Queries
+                        </h4>
+                        <div className="space-y-2">
+                          {recentQueries.map((query, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setChatInput(query)}
+                              disabled={isGenerating}
+                              className="w-full text-left p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors border border-transparent hover:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <div className="flex items-start gap-2">
+                                <FontAwesomeIcon
+                                  icon={faSearch}
+                                  className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0"
+                                />
+                                <span className="leading-relaxed">{query}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Top Searches */}
+                      <div className="border rounded-lg p-4 bg-white">
+                        <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
+                          Popular Searches
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {topSearches.map((search, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setChatInput(search)}
+                              disabled={isGenerating}
+                              className="px-3 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full transition-colors border border-blue-200 hover:border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {search}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Evaluation Searches */}
+                      <div className="border rounded-lg p-4 bg-white">
+                        <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
+                          Evaluation Searches
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            "MVP% Evaluation",
+                            "YoY Benchmarking",
+                            "Top Performing Sponsors",
+                            "Top Performing Rightsholders",
+                            "Top Broadcasts",
+                            "Top Social Media Posts",
+                          ].map((search, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setChatInput(search)}
+                              disabled={isGenerating}
+                              className="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-full transition-colors border border-purple-200 hover:border-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {search}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Recommended Queries */}
+                      <div className="border rounded-lg p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
+                        <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                          AI Recommendations
+                        </h4>
+                        <div className="space-y-2">
+                          {recommendedQueries.map((query, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setChatInput(query)}
+                              disabled={isGenerating}
+                              className="w-full text-left p-3 text-sm bg-white hover:bg-yellow-50 rounded-md transition-colors border border-yellow-200 hover:border-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <div className="flex items-start gap-2">
+                                <FontAwesomeIcon
+                                  icon={faLightbulb}
+                                  className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0"
+                                />
+                                <span className="leading-relaxed">{query}</span>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2174,117 +2196,123 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
                 {/* Generated Insights Display */}
                 {generatedInsights && (
-                  <div
-                    id="generated-insights-display"
-                    className="mt-8 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200 shadow-sm"
-                  >
-                    <div className="flex items-center justify-between mb-6">
-                      <h4 className="font-semibold text-xl text-gray-800 flex items-center gap-3">
-                        <div className="p-2 bg-yellow-100 rounded-lg">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-6 w-6 text-yellow-600" />
-                        </div>
-                        Generated Insights
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          onClick={() => handleRateInsights("generated")}
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center gap-2"
-                        >
-                          <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                          Rate Insights
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Trending Metrics */}
-                      <div className="space-y-3">
-                        <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
-                          Trending Metrics
-                        </h5>
-                        <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-600">SMV</span>
-                            <span className="font-medium text-green-700">+{generatedInsights.trending.smv}%</span>
+                  <div className="mt-4">
+                    <div
+                      id="generated-insights-display"
+                      className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200 shadow-sm"
+                    >
+                      <div className="flex items-center justify-between mb-6">
+                        <h4 className="font-semibold text-xl text-gray-800 flex items-center gap-3">
+                          <div className="p-2 bg-yellow-100 rounded-lg">
+                            <FontAwesomeIcon icon={faLightbulb} className="h-6 w-6 text-yellow-600" />
                           </div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-600">Impressions</span>
-                            <span className="font-medium text-green-700">
-                              +{generatedInsights.trending.impressions}%
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-600">Views</span>
-                            <span className="font-medium text-green-700">+{generatedInsights.trending.views}%</span>
-                          </div>
+                          Generated Insights
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => handleRateInsights("generated")}
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-2"
+                          >
+                            <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                            Rate Insights
+                          </Button>
                         </div>
                       </div>
 
-                      {/* Top Performers */}
-                      <div className="space-y-3">
-                        <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
-                          Top Performers
-                        </h5>
-                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                          <div className="mb-2">
-                            <span className="text-xs text-gray-600">Placement</span>
-                            <div className="font-medium text-blue-700">{generatedInsights.topPerformers.placement}</div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Trending Metrics */}
+                        <div className="space-y-3">
+                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
+                            Trending Metrics
+                          </h5>
+                          <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-gray-600">SMV</span>
+                              <span className="font-medium text-green-700">+{generatedInsights.trending.smv}%</span>
+                            </div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-gray-600">Impressions</span>
+                              <span className="font-medium text-green-700">
+                                +{generatedInsights.trending.impressions}%
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-600">Views</span>
+                              <span className="font-medium text-green-700">+{generatedInsights.trending.views}%</span>
+                            </div>
                           </div>
-                          <div className="mb-2">
-                            <span className="text-xs text-gray-600">Platform</span>
-                            <div className="font-medium text-blue-700">{generatedInsights.topPerformers.platform}</div>
+                        </div>
+
+                        {/* Top Performers */}
+                        <div className="space-y-3">
+                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
+                            Top Performers
+                          </h5>
+                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="mb-2">
+                              <span className="text-xs text-gray-600">Placement</span>
+                              <div className="font-medium text-blue-700">
+                                {generatedInsights.topPerformers.placement}
+                              </div>
+                            </div>
+                            <div className="mb-2">
+                              <span className="text-xs text-gray-600">Platform</span>
+                              <div className="font-medium text-blue-700">
+                                {generatedInsights.topPerformers.platform}
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-xs text-gray-600">Sponsor</span>
+                              <div className="font-medium text-blue-700">{generatedInsights.topPerformers.sponsor}</div>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-xs text-gray-600">Sponsor</span>
-                            <div className="font-medium text-blue-700">{generatedInsights.topPerformers.sponsor}</div>
+                        </div>
+
+                        {/* Key Metrics */}
+                        <div className="space-y-3">
+                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                            Key Metrics
+                          </h5>
+                          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-gray-600">Total SMV</span>
+                              <span className="font-medium text-yellow-700">
+                                ${generatedInsights.keyMetrics.totalSMV}k
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-gray-600">Avg Engagement</span>
+                              <span className="font-medium text-yellow-700">
+                                {generatedInsights.keyMetrics.avgEngagement}%
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-600">Growth Rate</span>
+                              <span className="font-medium text-yellow-700">
+                                {generatedInsights.keyMetrics.growthRate}%
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      {/* Key Metrics */}
-                      <div className="space-y-3">
-                        <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                      {/* Actionable Recommendations */}
+                      <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                        <h5 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
                           <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                          Key Metrics
+                          Actionable Recommendations
                         </h5>
-                        <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-600">Total SMV</span>
-                            <span className="font-medium text-yellow-700">
-                              ${generatedInsights.keyMetrics.totalSMV}k
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-gray-600">Avg Engagement</span>
-                            <span className="font-medium text-yellow-700">
-                              {generatedInsights.keyMetrics.avgEngagement}%
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-600">Growth Rate</span>
-                            <span className="font-medium text-yellow-700">
-                              {generatedInsights.keyMetrics.growthRate}%
-                            </span>
-                          </div>
-                        </div>
+                        <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                          <li>Focus on {generatedInsights.topPerformers.platform} for higher engagement</li>
+                          <li>Increase investment in {generatedInsights.topPerformers.sponsor} sponsorships</li>
+                          <li>Optimize placement strategy based on {generatedInsights.topPerformers.placement}</li>
+                        </ul>
                       </div>
-                    </div>
-
-                    {/* Actionable Recommendations */}
-                    <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                      <h5 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                        Actionable Recommendations
-                      </h5>
-                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        <li>Focus on {generatedInsights.topPerformers.platform} for higher engagement</li>
-                        <li>Increase investment in {generatedInsights.topPerformers.sponsor} sponsorships</li>
-                        <li>Optimize placement strategy based on {generatedInsights.topPerformers.placement}</li>
-                      </ul>
                     </div>
                   </div>
                 )}
@@ -2709,7 +2737,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => handleDeleteInsight(insight)}
+                                          onClick={() => handleDeleteInsight(insight.id)}
                                         >
                                           <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
                                         </Button>
@@ -2730,148 +2758,62 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                 </div>
               </TabsContent>
             </Tabs>
+
+            {/* Rating Drawer */}
+            <Drawer open={showRatingDrawer} onOpenChange={setShowRatingDrawer}>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>
+                    Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
+                  </DrawerTitle>
+                  <DrawerDescription>Your feedback helps us improve the quality of our insights.</DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Impactfulness</h4>
+                    <div className="flex items-center gap-4">
+                      {[1, 2, 3, 4].map((rating) => (
+                        <button
+                          key={rating}
+                          onClick={() => handleRatingChange(rating)}
+                          className={`p-3 rounded-lg border ${
+                            (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-500" />
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Feedback</h4>
+                    <Textarea
+                      placeholder="Share any additional feedback..."
+                      value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
+                      onChange={(e) => handleFeedbackChange(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+
+                  <Button onClick={handleSubmitRating} disabled={isSubmittingRating} className="w-full">
+                    {isSubmittingRating ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      "Submit Rating"
+                    )}
+                  </Button>
+                </div>
+              </DrawerContent>
+            </Drawer>
           </CardContent>
         )}
       </Card>
-
-      {/* Rating Drawer */}
-      <Drawer open={showRatingDrawer} onOpenChange={setShowRatingDrawer}>
-        <DrawerContent className="max-w-md ml-auto h-full">
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faThumbsUp} className="h-5 w-5 text-blue-600" />
-              Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
-            </DrawerTitle>
-            <DrawerDescription>
-              Help us improve by rating the impact and usefulness of these insights.
-            </DrawerDescription>
-          </DrawerHeader>
-
-          <div className="p-6 space-y-6">
-            {/* Star Rating */}
-            <div className="space-y-4">
-              <div className="text-sm font-medium text-gray-700">How impactful were these insights?</div>
-
-              <div className="space-y-3">
-                {[1, 2, 3, 4].map((rating) => (
-                  <label
-                    key={rating}
-                    className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="rating"
-                      value={rating}
-                      checked={(currentRatingType === "automated" ? automatedRating : generatedRating) === rating}
-                      onChange={() => handleRatingChange(rating)}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center space-x-2">
-                      <FontAwesomeIcon
-                        icon={
-                          (currentRatingType === "automated" ? automatedRating : generatedRating) >= rating
-                            ? faStar
-                            : faStarRegular
-                        }
-                        className={`h-5 w-5 ${
-                          (currentRatingType === "automated" ? automatedRating : generatedRating) >= rating
-                            ? "text-yellow-500"
-                            : "text-gray-300"
-                        }`}
-                      />
-                      <span className="text-sm font-medium text-gray-900">{getRatingLabel(rating)}</span>
-                    </div>
-                  </label>
-                ))}
-              </div>
-
-              {/* Current Rating Display */}
-              {(currentRatingType === "automated" ? automatedRating : generatedRating) > 0 && (
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4].map((star) => (
-                        <FontAwesomeIcon
-                          key={star}
-                          icon={faStar}
-                          className={`h-4 w-4 ${
-                            star <= (currentRatingType === "automated" ? automatedRating : generatedRating)
-                              ? "text-yellow-500"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm font-medium text-blue-900">
-                      {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Feedback Text Area */}
-            <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">Additional Feedback (Optional)</label>
-              <Textarea
-                placeholder="Share any specific thoughts about these insights, suggestions for improvement, or how they helped your analysis..."
-                value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
-                onChange={(e) => handleFeedbackChange(e.target.value)}
-                rows={4}
-                className="resize-none"
-              />
-              <div className="text-xs text-gray-500">
-                Your feedback helps us improve the quality and relevance of insights.
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleSubmitRating}
-                disabled={
-                  (currentRatingType === "automated" ? automatedRating : generatedRating) === 0 || isSubmittingRating
-                }
-                className="w-full flex items-center justify-center gap-2"
-              >
-                {isSubmittingRating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                    Submit Rating
-                  </>
-                )}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => setShowRatingDrawer(false)}
-                className="w-full"
-                disabled={isSubmittingRating}
-              >
-                Cancel
-              </Button>
-            </div>
-
-            {/* Rating Summary */}
-            <div className="pt-4 border-t border-gray-200">
-              <div className="text-xs text-gray-500 space-y-1">
-                <div>• Ratings help improve insight quality</div>
-                <div>• Feedback is used to enhance algorithms</div>
-                <div>• All submissions are anonymous</div>
-              </div>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </TooltipProvider>
   )
 }
