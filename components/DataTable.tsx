@@ -117,7 +117,7 @@ export default function DataTable({ data }: DataTableProps) {
       if (searchTerm) {
         processedData = processedData.filter((item) => {
           const value = item[column as keyof typeof item]
-          return value?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())
+          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
         })
       }
     })
