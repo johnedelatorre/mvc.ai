@@ -23,7 +23,13 @@ import {
   faBookmark,
   faChartLine,
   faLightbulb,
+  faEdit,
+  faEllipsisV,
+  faTrash,
+  faSave,
+  faFolderOpen,
 } from "@fortawesome/free-solid-svg-icons"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
@@ -229,6 +235,36 @@ export default function Page() {
   const [showPageSpecificMetrics, setShowPageSpecificMetrics] = useState(false)
   const [mainTab, setMainTab] = useState("analytics")
   const [selectedInsightsTypes, setSelectedInsightsTypes] = useState<string[]>([])
+  const [savedFilters, setSavedFilters] = useState<
+    Array<{
+      id: string
+      name: string
+      description?: string
+      createdAt: Date
+      filters: {
+        filterType: "dateRange" | "years"
+        dateRange: { from: Date | undefined; to: Date | undefined }
+        selectedYears: string[]
+        selectedSponsors: string[]
+        selectedPlacements: string[]
+        selectedPlacementTypes: string[]
+        selectedRightsholders: string[]
+        selectedPlatforms: string[]
+        selectedAccountTypes: string[]
+        selectedMediaTypes: string[]
+        selectedCollections: string[]
+        selectedHashtags: string[]
+        selectedHandles: string[]
+        selectedComparisonDates: string[]
+        groupBy: string
+      }
+    }>
+  >([])
+  const [showSaveFilterDrawer, setShowSaveFilterDrawer] = useState(false)
+  const [showSavedFiltersDrawer, setShowSavedFiltersDrawer] = useState(false)
+  const [filterNameToSave, setFilterNameToSave] = useState("")
+  const [filterDescriptionToSave, setFilterDescriptionToSave] = useState("")
+  const [editingFilterId, setEditingFilterId] = useState<string | null>(null)
 
   const baseData = useMemo(() => generateBaseData(), [])
 
@@ -464,7 +500,6 @@ export default function Page() {
     "MVP % Evaluation",
   ]
 
-  // Add this function after the other handler functions (around line 200)
   const clearAllFilters = () => {
     setFilterType("dateRange")
     setDateRange({ from: undefined, to: undefined })
@@ -505,6 +540,87 @@ export default function Page() {
 
   const clearAllInsightsTypes = () => {
     setSelectedInsightsTypes([])
+  }
+
+  const saveCurrentFilters = () => {
+    if (!filterNameToSave.trim()) return
+
+    const newFilter = {
+      id: editingFilterId || `filter_${Date.now()}`,
+      name: filterNameToSave.trim(),
+      description: filterDescriptionToSave.trim(),
+      createdAt: editingFilterId
+        ? savedFilters.find((f) => f.id === editingFilterId)?.createdAt || new Date()
+        : new Date(),
+      filters: {
+        filterType,
+        dateRange,
+        selectedYears,
+        selectedSponsors,
+        selectedPlacements,
+        selectedPlacementTypes,
+        selectedRightsholders,
+        selectedPlatforms,
+        selectedAccountTypes,
+        selectedMediaTypes,
+        selectedCollections,
+        selectedHashtags,
+        selectedHandles,
+        selectedComparisonDates,
+        groupBy,
+      },
+    }
+
+    if (editingFilterId) {
+      setSavedFilters((prev) => prev.map((f) => (f.id === editingFilterId ? newFilter : f)))
+    } else {
+      setSavedFilters((prev) => [...prev, newFilter])
+    }
+
+    // Reset form
+    setFilterNameToSave("")
+    setFilterDescriptionToSave("")
+    setEditingFilterId(null)
+    setShowSaveFilterDrawer(false)
+  }
+
+  const applySavedFilter = (savedFilter: (typeof savedFilters)[0]) => {
+    const { filters } = savedFilter
+    setFilterType(filters.filterType)
+    setDateRange(filters.dateRange)
+    setSelectedYears(filters.selectedYears)
+    setSelectedSponsors(filters.selectedSponsors)
+    setSelectedPlacements(filters.selectedPlacements)
+    setSelectedPlacementTypes(filters.selectedPlacementTypes)
+    setSelectedRightsholders(filters.selectedRightsholders)
+    setSelectedPlatforms(filters.selectedPlatforms)
+    setSelectedAccountTypes(filters.selectedAccountTypes)
+    setSelectedMediaTypes(filters.selectedMediaTypes)
+    setSelectedCollections(filters.selectedCollections)
+    setSelectedHashtags(filters.selectedHashtags)
+    setSelectedHandles(filters.selectedHandles)
+    setSelectedComparisonDates(filters.selectedComparisonDates)
+    setGroupBy(filters.groupBy)
+    setShowSavedFiltersDrawer(false)
+  }
+
+  const deleteSavedFilter = (filterId: string) => {
+    setSavedFilters((prev) => prev.filter((f) => f.id !== filterId))
+  }
+
+  const editSavedFilter = (savedFilter: (typeof savedFilters)[0]) => {
+    setFilterNameToSave(savedFilter.name)
+    setFilterDescriptionToSave(savedFilter.description || "")
+    setEditingFilterId(savedFilter.id)
+    setShowSavedFiltersDrawer(false)
+    setShowSaveFilterDrawer(true)
+  }
+
+  const openSaveFilterDrawer = () => {
+    setFilterNameToSave("")
+    setFilterDescriptionToSave("")
+    setEditingFilterId(null)
+    setShowSaveFilterDrawer(true)
   }
 
   return (
@@ -1608,9 +1724,16 @@ export default function Page() {
 
                     {/* Action Buttons */}
                     <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                      <button className="btn-secondary flex items-center gap-2">
-                        <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
+                      <button onClick={openSaveFilterDrawer} className="btn-secondary flex items-center gap-2">
+                        <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                         Save Filter
+                      </button>
+                      <button
+                        onClick={() => setShowSavedFiltersDrawer(true)}
+                        className="btn-secondary flex items-center gap-2"
+                      >
+                        <FontAwesomeIcon icon={faFolderOpen} className="h-4 w-4" />
+                        Saved Filters ({savedFilters.length})
                       </button>
                       <button onClick={clearAllFilters} className="btn-utility flex items-center gap-2">
                         <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
@@ -2322,8 +2445,6 @@ export default function Page() {
           </Tabs>
         </div>
       </div>
-
-      {/* Main Content Area */}
       <div className="p-6 pt-0">
         <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
           {/* Content based on selected tab */}
@@ -2366,6 +2487,254 @@ export default function Page() {
             <AutomatedInsights data={filteredData} />
           </TabsContent>
         </Tabs>
+      </div>
+
+      {/* Save Filter Drawer */}
+      <div
+        className={`fixed inset-0 z-50 overflow-hidden ${showSaveFilterDrawer || showSavedFiltersDrawer ? "pointer-events-auto" : "pointer-events-none"}`}
+      >
+        <div
+          className={`absolute inset-0 bg-black transition-opacity duration-300 ease-in-out ${
+            showSaveFilterDrawer || showSavedFiltersDrawer ? "opacity-50" : "opacity-0"
+          }`}
+          onClick={() => {
+            setShowSaveFilterDrawer(false)
+            setShowSavedFiltersDrawer(false)
+          }}
+        />
+        <div
+          className={`absolute right-0 top-0 h-full w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+            showSaveFilterDrawer || showSavedFiltersDrawer ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {showSaveFilterDrawer && (
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between border-b p-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {editingFilterId ? "Edit Filter" : "Save Filter"}
+                </h2>
+                <button
+                  onClick={() => setShowSaveFilterDrawer(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Filter Name *</label>
+                    <input
+                      type="text"
+                      value={filterNameToSave}
+                      onChange={(e) => setFilterNameToSave(e.target.value)}
+                      placeholder="Enter filter name"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                    <textarea
+                      value={filterDescriptionToSave}
+                      onChange={(e) => setFilterDescriptionToSave(e.target.value)}
+                      placeholder="Enter filter description"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200"
+                    />
+                  </div>
+
+                  {/* Filter Summary */}
+                  <div className="border-t pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3">Filter Summary</h3>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div>
+                        <span className="font-medium">Time Period:</span>{" "}
+                        {filterType === "dateRange" && dateRange.from && dateRange.to
+                          ? `${format(dateRange.from, "MMM dd")} → ${format(dateRange.to, "MMM dd, yyyy")}`
+                          : filterType === "years" && selectedYears.length > 0
+                            ? `${selectedYears.join(", ")} Season${selectedYears.length > 1 ? "s" : ""}`
+                            : "2025 Season (Default)"}
+                      </div>
+                      {selectedRightsholders.length > 0 && (
+                        <div>
+                          <span className="font-medium">Rightsholders:</span> {selectedRightsholders.length} selected
+                        </div>
+                      )}
+                      {selectedSponsors.length > 0 && (
+                        <div>
+                          <span className="font-medium">Sponsors:</span> {selectedSponsors.length} selected
+                        </div>
+                      )}
+                      {selectedPlacements.length > 0 && (
+                        <div>
+                          <span className="font-medium">Placements:</span> {selectedPlacements.length} selected
+                        </div>
+                      )}
+                      {selectedPlacementTypes.length > 0 && (
+                        <div>
+                          <span className="font-medium">Placement Types:</span> {selectedPlacementTypes.length} selected
+                        </div>
+                      )}
+                      <div>
+                        <span className="font-medium">Group By:</span> {groupBy}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t p-4">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowSaveFilterDrawer(false)}
+                    className="flex-1 btn-secondary transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveCurrentFilters}
+                    disabled={!filterNameToSave.trim()}
+                    className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    {editingFilterId ? "Update Filter" : "Save Filter"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showSavedFiltersDrawer && (
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between border-b p-4">
+                <h2 className="text-lg font-semibold text-gray-900">Saved Filters ({savedFilters.length})</h2>
+                <button
+                  onClick={() => setShowSavedFiltersDrawer(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {savedFilters.length === 0 ? (
+                  <div className="text-center py-8">
+                    <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 text-gray-300 mb-4" />
+                    <p className="text-gray-500">No saved filters yet</p>
+                    <p className="text-sm text-gray-400 mt-1">Save your current filters to quickly access them later</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {savedFilters
+                      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                      .map((savedFilter) => (
+                        <div
+                          key={savedFilter.id}
+                          className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors duration-200"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <h3 className="font-medium text-gray-900">{savedFilter.name}</h3>
+                              {savedFilter.description && (
+                                <p className="text-sm text-gray-600 mt-1">{savedFilter.description}</p>
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-1 hover:bg-gray-100 rounded transition-colors duration-200">
+                                  <FontAwesomeIcon icon={faEllipsisV} className="h-4 w-4 text-gray-400" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => applySavedFilter(savedFilter)}>
+                                  <FontAwesomeIcon icon={faFilter} className="mr-2 h-4 w-4" />
+                                  Apply Filter
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => editSavedFilter(savedFilter)}>
+                                  <FontAwesomeIcon icon={faEdit} className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => deleteSavedFilter(savedFilter.id)}
+                                  className="text-red-600"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+
+                          <div className="text-xs text-gray-500 mb-3">
+                            Created: {savedFilter.createdAt.toLocaleDateString()} at{" "}
+                            {savedFilter.createdAt.toLocaleTimeString()}
+                          </div>
+
+                          {/* Filter Preview */}
+                          <div className="space-y-1 text-xs text-gray-600">
+                            <div>
+                              <span className="font-medium">Time:</span>{" "}
+                              {savedFilter.filters.filterType === "dateRange" &&
+                              savedFilter.filters.dateRange.from &&
+                              savedFilter.filters.dateRange.to
+                                ? `${format(savedFilter.filters.dateRange.from, "MMM dd")} → ${format(savedFilter.filters.dateRange.to, "MMM dd, yyyy")}`
+                                : savedFilter.filters.filterType === "years" &&
+                                    savedFilter.filters.selectedYears.length > 0
+                                  ? `${savedFilter.filters.selectedYears.join(", ")} Season${savedFilter.filters.selectedYears.length > 1 ? "s" : ""}`
+                                  : "2025 Season"}
+                            </div>
+                            {savedFilter.filters.selectedRightsholders.length > 0 && (
+                              <div>
+                                <span className="font-medium">Rightsholders:</span>{" "}
+                                {savedFilter.filters.selectedRightsholders.length}
+                              </div>
+                            )}
+                            {savedFilter.filters.selectedSponsors.length > 0 && (
+                              <div>
+                                <span className="font-medium">Sponsors:</span>{" "}
+                                {savedFilter.filters.selectedSponsors.length}
+                              </div>
+                            )}
+                            {savedFilter.filters.selectedPlacements.length > 0 && (
+                              <div>
+                                <span className="font-medium">Placements:</span>{" "}
+                                {savedFilter.filters.selectedPlacements.length}
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-medium">Group By:</span> {savedFilter.filters.groupBy}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => applySavedFilter(savedFilter)}
+                            className="w-full mt-3 btn-primary btn-sm transition-colors duration-200"
+                          >
+                            Apply This Filter
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              {savedFilters.length > 0 && (
+                <div className="border-t p-4">
+                  <button
+                    onClick={() => {
+                      setSavedFilters([])
+                      setShowSavedFiltersDrawer(false)
+                    }}
+                    className="w-full btn-utility text-red-600 hover:bg-red-50 transition-colors duration-200"
+                  >
+                    Clear All Saved Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
