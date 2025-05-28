@@ -1774,7 +1774,7 @@ export default function Page() {
             {/* Filter Bar for Insights Tab */}
             <TabsContent value="insights" className="mt-6 mb-0">
               <div className="p-5">
-                {/* Active Filters Row */}
+                {/* Sort Filters Header with Active Tags */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
@@ -1807,36 +1807,6 @@ export default function Page() {
                       {filterType === "dateRange" && (!dateRange.from || !dateRange.to) && (
                         <Badge className="bg-blue-100 text-blue-700 border-blue-300">Years: 2025</Badge>
                       )}
-
-                      {/* Sponsors Tag */}
-                      {selectedSponsors.length > 0 && (
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Rightsholders Tag */}
-                      {selectedRightsholders.length > 0 && (
-                        <Badge className="bg-green-100 text-green-700 border-green-300">
-                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
-                          Selected
-                        </Badge>
-                      )}
-
-                      {/* Placements Tag */}
-                      {selectedPlacements.length > 0 && (
-                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
-                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Insights Types Tag */}
-                      {selectedInsightsTypes.length > 0 && (
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                          {selectedInsightsTypes.length} Insights Type{selectedInsightsTypes.length !== 1 ? "s" : ""}{" "}
-                          Selected
-                        </Badge>
-                      )}
                     </div>
                   </div>
 
@@ -1851,8 +1821,7 @@ export default function Page() {
                 {/* Main Filters Grid - Collapsible */}
                 {isFilterExpanded && (
                   <div className="space-y-4">
-                    {/* All the existing insights filter content remains the same */}
-                    {/* Row 1: Insights Specific Filters */}
+                    {/* Main Filter Row - 5 Filters */}
                     <div className="grid grid-cols-5 gap-4">
                       {/* Sponsors */}
                       <div>
@@ -2104,11 +2073,14 @@ export default function Page() {
                                 {PLACEMENT_OPTIONS.map((placement) => (
                                   <div key={placement} className="flex items-center space-x-2">
                                     <Checkbox
-                                      id={placement}
+                                      id={`insights-placement-${placement}`}
                                       checked={selectedPlacements.includes(placement)}
                                       onCheckedChange={() => handlePlacementToggle(placement)}
                                     />
-                                    <label htmlFor={placement} className="text-sm cursor-pointer flex-1">
+                                    <label
+                                      htmlFor={`insights-placement-${placement}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
                                       {placement}
                                     </label>
                                   </div>
@@ -2118,6 +2090,83 @@ export default function Page() {
                               <div className="pt-2 border-t">
                                 <button
                                   onClick={() => setSelectedPlacements([...PLACEMENT_OPTIONS])}
+                                  className="btn-secondary btn-sm w-full"
+                                >
+                                  Select All
+                                </button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Insights Type */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Insights Type
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Insights Type</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Insights Type</div>
+                                {selectedInsightsTypes.length > 0 && (
+                                  <button onClick={clearAllInsightsTypes} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Insights Types Tags */}
+                              {selectedInsightsTypes.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                  {selectedInsightsTypes.map((insightsType) => (
+                                    <Badge
+                                      key={insightsType}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {insightsType}
+                                      <button
+                                        onClick={() => removeInsightsType(insightsType)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Insights Type Options */}
+                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {INSIGHTS_TYPE_OPTIONS.map((insightsType) => (
+                                  <div key={insightsType} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`insights-type-${insightsType}`}
+                                      checked={selectedInsightsTypes.includes(insightsType)}
+                                      onCheckedChange={() => handleInsightsTypeToggle(insightsType)}
+                                    />
+                                    <label
+                                      htmlFor={`insights-type-${insightsType}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
+                                      {insightsType}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="pt-2 border-t">
+                                <button
+                                  onClick={() => setSelectedInsightsTypes([...INSIGHTS_TYPE_OPTIONS])}
                                   className="btn-secondary btn-sm w-full"
                                 >
                                   Select All
@@ -2372,343 +2421,8 @@ export default function Page() {
                       </div>
                     </div>
 
-                    {/* Page Specific Metrics - Collapsible */}
-                    <div className="border-t pt-4">
-                      <button
-                        onClick={() => setShowPageSpecificMetrics(!showPageSpecificMetrics)}
-                        className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3"
-                      >
-                        <FontAwesomeIcon
-                          icon={showPageSpecificMetrics ? faChevronDown : faChevronUp}
-                          className="h-3 w-3"
-                        />
-                        Page Specific Metrics
-                      </button>
-
-                      {showPageSpecificMetrics && (
-                        <div className="space-y-4">
-                          {/* Row 2: Page Specific Metrics */}
-                          <div className="grid grid-cols-3 gap-4">
-                            {/* Platforms */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Platforms
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">Select Platforms</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {PLATFORMS_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox id={option} />
-                                        <label htmlFor={option} className="text-sm">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-
-                            {/* Account Types */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Account Types
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">Select Account Types</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {ACCOUNT_TYPES_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox id={option} />
-                                        <label htmlFor={option} className="text-sm">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-
-                            {/* Media Types */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Media Types
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">Select Media Types</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {MEDIA_TYPES_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox id={option} />
-                                        <label htmlFor={option} className="text-sm">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-                          </div>
-
-                          {/* Row 3: Additional Filters */}
-                          <div className="grid grid-cols-3 gap-4">
-                            {/* Collections */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Collections
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">Select Collections</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {COLLECTIONS_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox id={option} />
-                                        <label htmlFor={option} className="text-sm">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-
-                            {/* Hashtags */}
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Hashtags
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">
-                                      {selectedHashtags.length > 0
-                                        ? `${selectedHashtags.length} hashtags selected`
-                                        : "Enter hashtags"}
-                                    </span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                      <div className="font-medium text-sm">Add Hashtags</div>
-                                      {selectedHashtags.length > 0 && (
-                                        <button onClick={() => setSelectedHashtags([])} className="btn-tertiary btn-sm">
-                                          Clear All
-                                        </button>
-                                      )}
-                                    </div>
-
-                                    {/* Input for adding hashtags */}
-                                    <div className="space-y-2">
-                                      <input
-                                        type="text"
-                                        placeholder="Enter hashtag (e.g., #NBA, #Basketball)"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            const value = e.currentTarget.value.trim()
-                                            if (value && !selectedHashtags.includes(value)) {
-                                              const hashtag = value.startsWith("#") ? value : `#${value}`
-                                              setSelectedHashtags((prev) => [...prev, hashtag])
-                                              e.currentTarget.value = ""
-                                            }
-                                          }
-                                        }}
-                                      />
-                                      <div className="text-xs text-gray-500">Press Enter to add hashtag</div>
-                                    </div>
-
-                                    {/* Selected Hashtags */}
-                                    {selectedHashtags.length > 0 && (
-                                      <div className="space-y-2">
-                                        <div className="text-sm font-medium">Selected Hashtags:</div>
-                                        <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
-                                          {selectedHashtags.map((hashtag, index) => (
-                                            <Badge
-                                              key={index}
-                                              variant="secondary"
-                                              className="flex items-center gap-1 text-xs"
-                                            >
-                                              {hashtag}
-                                              <button
-                                                onClick={() =>
-                                                  setSelectedHashtags((prev) => prev.filter((_, i) => i !== index))
-                                                }
-                                                className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                              >
-                                                <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
-                                              </button>
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {/* Suggested hashtags */}
-                                    <div className="space-y-2">
-                                      <div className="text-sm font-medium">Suggested:</div>
-                                      <div className="flex flex-wrap gap-1">
-                                        {["#NBA", "#Basketball", "#Sports", "#GameDay", "#Playoffs", "#Finals"].map(
-                                          (suggestion) => (
-                                            <button
-                                              key={suggestion}
-                                              onClick={() => {
-                                                if (!selectedHashtags.includes(suggestion)) {
-                                                  setSelectedHashtags((prev) => [...prev, suggestion])
-                                                }
-                                              }}
-                                              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                                              disabled={selectedHashtags.includes(suggestion)}
-                                            >
-                                              {suggestion}
-                                            </button>
-                                          ),
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-                          </div>
-
-                          {/* Row 4: Comparison Dates */}
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Comparison Dates
-                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                              </label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-500">Select Comparison Dates</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {COMPARISON_DATES_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox id={option} />
-                                        <label htmlFor={option} className="text-sm">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-
-                            <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                  Group By
-                                  <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                                </label>
-                                <button
-                                  onClick={() => {
-                                    // Set current groupBy as default
-                                    console.log(`Setting ${groupBy} as default Group By`)
-                                  }}
-                                  className="text-xs text-blue-500 hover:text-blue-700 underline"
-                                >
-                                  Set as default Group By
-                                </button>
-                              </div>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-700">{groupBy}</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                  <div className="space-y-2">
-                                    {GROUP_BY_OPTIONS.map((option) => (
-                                      <div key={option} className="flex items-center space-x-2">
-                                        <Checkbox
-                                          id={`groupby-${option}`}
-                                          checked={groupBy === option}
-                                          onCheckedChange={() => setGroupBy(option)}
-                                        />
-                                        <label htmlFor={`groupby-${option}`} className="text-sm cursor-pointer flex-1">
-                                          {option}
-                                        </label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-
-                              {/* Group By Tag Display */}
-                              {groupBy && (
-                                <div className="mt-2">
-                                  <Badge variant="secondary" className="flex items-center gap-1 text-xs w-fit">
-                                    Group By {groupBy}
-                                    <button
-                                      onClick={() => setGroupBy("Date")}
-                                      className="ml-1 hover:bg-gray-300 rounded-full p-1 flex items-center justify-center"
-                                    >
-                                      <FontAwesomeIcon icon={faTimes} className="h-2.5 w-2.5" />
-                                    </button>
-                                  </Badge>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
                     {/* Action Buttons */}
                     <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                      <button onClick={openSaveFilterDrawer} className="btn-secondary flex items-center gap-2">
-                        <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
-                        Save Filter
-                      </button>
-                      <button
-                        onClick={() => setShowSavedFiltersDrawer(true)}
-                        className="btn-secondary flex items-center gap-2"
-                      >
-                        <FontAwesomeIcon icon={faFolderOpen} className="h-4 w-4" />
-                        Saved Filters ({savedFilters.length})
-                      </button>
                       <button onClick={clearAllFilters} className="btn-utility flex items-center gap-2">
                         <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
                         Clear All Filters
