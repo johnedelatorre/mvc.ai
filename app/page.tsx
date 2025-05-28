@@ -510,7 +510,7 @@ export default function Page() {
   return (
     <div className="w-full">
       {/* Sticky Header Section */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="p-6 pb-0">
           {/* Page Header */}
           <div className="mb-6">
