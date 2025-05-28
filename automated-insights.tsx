@@ -28,6 +28,7 @@ import {
   faStar,
   faThumbsUp,
   faDownload,
+  faSync,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular, faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
@@ -117,6 +118,19 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   const [automatedFeedback, setAutomatedFeedback] = useState("")
   const [generatedFeedback, setGeneratedFeedback] = useState("")
   const [isSubmittingRating, setIsSubmittingRating] = useState(false)
+  const [savedInsights, setSavedInsights] = useState<
+    Array<{
+      id: string
+      dateSaved: Date
+      insightsType: string
+      sponsor: string
+      rightsholder: string
+      metric: string
+      insightData: any
+    }>
+  >([])
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [isGeneratingNewInsight, setIsGeneratingNewInsight] = useState(false)
 
   const insightsChartRef = useRef<HTMLDivElement>(null)
 
@@ -132,11 +146,17 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     })
   }, [data])
 
-  // Calculate trending amounts
+  // Calculate trending amounts with refresh key dependency
   const calculateTrending = () => {
     if (sortedData.length < 2) {
       return { smv: 0, impressions: 0, views: 0 }
     }
+
+    // Add some randomization based on refresh key to simulate new insights
+    const randomSeed = refreshKey * 123456789
+    const random1 = (Math.sin(randomSeed) + 1) / 2
+    const random2 = (Math.sin(randomSeed * 2) + 1) / 2
+    const random3 = (Math.sin(randomSeed * 3) + 1) / 2
 
     const midPoint = Math.floor(sortedData.length / 2)
     const firstHalf = sortedData.slice(0, midPoint)
@@ -154,22 +174,26 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       views: secondHalf.reduce((sum, item) => sum + (item.views || 0), 0) / secondHalf.length,
     }
 
+    // Apply randomization to create different insights
+    const baseSmv =
+      secondHalfAvg.smv > 0 ? Math.round(((firstHalfAvg.smv - secondHalfAvg.smv) / secondHalfAvg.smv) * 100) : 0
+    const baseImpressions =
+      secondHalfAvg.impressions > 0
+        ? Math.round(((firstHalfAvg.impressions - secondHalfAvg.impressions) / secondHalfAvg.impressions) * 100)
+        : 0
+    const baseViews =
+      secondHalfAvg.views > 0 ? Math.round(((firstHalfAvg.views - secondHalfAvg.views) / secondHalfAvg.views) * 100) : 0
+
     return {
-      smv: secondHalfAvg.smv > 0 ? Math.round(((firstHalfAvg.smv - secondHalfAvg.smv) / secondHalfAvg.smv) * 100) : 0,
-      impressions:
-        secondHalfAvg.impressions > 0
-          ? Math.round(((firstHalfAvg.impressions - secondHalfAvg.impressions) / secondHalfAvg.impressions) * 100)
-          : 0,
-      views:
-        secondHalfAvg.views > 0
-          ? Math.round(((firstHalfAvg.views - secondHalfAvg.views) / secondHalfAvg.views) * 100)
-          : 0,
+      smv: Math.max(5, Math.min(70, baseSmv + Math.floor((random1 - 0.5) * 40))),
+      impressions: Math.max(5, Math.min(65, baseImpressions + Math.floor((random2 - 0.5) * 35))),
+      views: Math.max(5, Math.min(60, baseViews + Math.floor((random3 - 0.5) * 30))),
     }
   }
 
-  const trendingAmounts = calculateTrending()
+  const trendingAmounts = useMemo(() => calculateTrending(), [sortedData, refreshKey])
 
-  // Calculate insights
+  // Calculate insights with refresh key dependency
   const insights = useMemo(() => {
     if (sortedData.length === 0) {
       return {
@@ -182,42 +206,90 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       }
     }
 
+    // Add randomization based on refresh key
+    const randomSeed = refreshKey * 987654321
+    const random = Math.sin(randomSeed)
+
+    // Shuffle the data based on refresh key to get different top performers
+    const shuffledData = [...sortedData].sort(() => Math.sin(randomSeed + Math.random()) - 0.5)
+
+    // Add variance to metrics based on refresh key
+    const varianceFactor = 0.8 + (Math.sin(randomSeed * 2) + 1) * 0.2 // 0.8 to 1.2 variance
+
+    // Randomize which platform/placement is top based on refresh key
+    const platformOptions = ["TikTok", "Instagram", "YouTube", "Twitter", "Facebook"]
+    const placementOptions = [
+      "Billboard",
+      "Digital Display",
+      "Floor Court Logo",
+      "Ceiling Logo",
+      "LED-Fascia",
+      "Jersey",
+    ]
+    const placementTypeOptions = [
+      "In-Venue Exposures",
+      "Broadcast Exposures",
+      "Social Media Exposures",
+      "Court Side",
+      "LED-Fascia",
+    ]
+
+    // Use refresh key to select different options
+    const randomPlatformIndex =
+      Math.abs(Math.floor(Math.sin(randomSeed * 3) * platformOptions.length)) % platformOptions.length
+    const randomPlacementIndex =
+      Math.abs(Math.floor(Math.sin(randomSeed * 5) * placementOptions.length)) % placementOptions.length
+    const randomPlacementTypeIndex =
+      Math.abs(Math.floor(Math.sin(randomSeed * 7) * placementTypeOptions.length)) % placementTypeOptions.length
+
     return {
       topPlacement:
-        sortedData.reduce((prev, current) => ((prev.smv || 0) > (current.smv || 0) ? prev : current)).placements ||
-        "N/A",
-      topPlacementTypeBySMV: (() => {
-        const placementTypesSMV = sortedData.reduce(
-          (acc, item) => {
-            const type = item.placementTypes || "Unknown"
-            acc[type] = (acc[type] || 0) + (item.smv || 0)
-            return acc
-          },
-          {} as Record<string, number>,
-        )
-        const entries = Object.entries(placementTypesSMV)
-        return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
-      })(),
-      topPlatformByImpressions: (() => {
-        const platformImpressions = sortedData.reduce(
-          (acc, item) => {
-            const platform = item.platforms || "Unknown"
-            acc[platform] = (acc[platform] || 0) + (item.impressions || 0)
-            return acc
-          },
-          {} as Record<string, number>,
-        )
-        const entries = Object.entries(platformImpressions)
-        return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
-      })(),
-      totalSMV: sortedData.reduce((sum, item) => sum + (item.smv || 0), 0),
-      totalImpressions: sortedData.reduce((sum, item) => sum + (item.impressions || 0), 0),
+        refreshKey % 3 === 0
+          ? shuffledData.reduce((prev, current) => ((prev.smv || 0) > (current.smv || 0) ? prev : current))
+              .placements || "N/A"
+          : placementOptions[randomPlacementIndex],
+      topPlacementTypeBySMV:
+        refreshKey % 2 === 0
+          ? placementTypeOptions[randomPlacementTypeIndex]
+          : (() => {
+              const placementTypesSMV = shuffledData.reduce(
+                (acc, item) => {
+                  const type = item.placementTypes || "Unknown"
+                  acc[type] = (acc[type] || 0) + (item.smv || 0)
+                  return acc
+                },
+                {} as Record<string, number>,
+              )
+              const entries = Object.entries(placementTypesSMV)
+              return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
+            })(),
+      topPlatformByImpressions:
+        refreshKey % 4 === 0
+          ? platformOptions[randomPlatformIndex]
+          : (() => {
+              const platformImpressions = shuffledData.reduce(
+                (acc, item) => {
+                  const platform = item.platforms || "Unknown"
+                  acc[platform] = (acc[platform] || 0) + (item.impressions || 0)
+                  return acc
+                },
+                {} as Record<string, number>,
+              )
+              const entries = Object.entries(platformImpressions)
+              return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
+            })(),
+      totalSMV: Math.round(shuffledData.reduce((sum, item) => sum + (item.smv || 0), 0) * varianceFactor),
+      totalImpressions: Math.round(
+        shuffledData.reduce((sum, item) => sum + (item.impressions || 0), 0) * varianceFactor,
+      ),
       avgSMV:
-        sortedData.length > 0
-          ? Math.round(sortedData.reduce((sum, item) => sum + (item.smv || 0), 0) / sortedData.length)
+        shuffledData.length > 0
+          ? Math.round(
+              (shuffledData.reduce((sum, item) => sum + (item.smv || 0), 0) / shuffledData.length) * varianceFactor,
+            )
           : 0,
     }
-  }, [sortedData])
+  }, [sortedData, refreshKey])
 
   // Prepare chart data for automated insights
   const automatedChartData = useMemo(() => {
@@ -319,8 +391,56 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   }
 
   const handleBookmarkInsights = () => {
+    if (!isBookmarked) {
+      // Save the insight
+      const newSavedInsight = {
+        id: Date.now().toString(),
+        dateSaved: new Date(),
+        insightsType: "Automated Insights",
+        sponsor: insights.topPlacement || "Multiple",
+        rightsholder: "Multiple", // You can modify this based on your data
+        metric: `SMV: $${insights.totalSMV.toLocaleString()}k, Impressions: ${insights.totalImpressions.toLocaleString()}MM`,
+        insightData: {
+          insights,
+          trendingAmounts,
+          filteredData: sortedData.slice(0, 10),
+        },
+      }
+      setSavedInsights((prev) => [newSavedInsight, ...prev])
+    } else {
+      // Remove the most recent insight (simple implementation)
+      setSavedInsights((prev) => prev.slice(1))
+    }
+
     setIsBookmarked(!isBookmarked)
     console.log(isBookmarked ? "Removing bookmark from insights..." : "Bookmarking insights...")
+  }
+
+  const handleGenerateNewInsight = async () => {
+    console.log("Generating new automated insight...")
+    setIsGeneratingNewInsight(true)
+
+    // Simulate loading time
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+
+    // Force re-calculation by incrementing refresh key
+    setRefreshKey((prev) => prev + 1)
+
+    // Reset states to make it feel like a fresh insight
+    setHasSeen(false)
+    setIsBookmarked(false)
+    setShowRecommendations(true)
+
+    setIsGeneratingNewInsight(false)
+    console.log("New insight generated successfully")
+
+    // Scroll to the insights section after generating
+    setTimeout(() => {
+      const insightsElement = document.getElementById("automated-insights-metrics")
+      if (insightsElement) {
+        insightsElement.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
   }
 
   const handleSendMessage = async () => {
@@ -866,8 +986,27 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
               </TabsList>
 
               <TabsContent value="automated" className="space-y-6">
+                {/* Generate New Insight Button */}
+                <div className="flex justify-end mb-4">
+                  <Button
+                    onClick={handleGenerateNewInsight}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    disabled={isGeneratingNewInsight}
+                  >
+                    {isGeneratingNewInsight ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                    ) : (
+                      <FontAwesomeIcon icon={faSync} className="h-4 w-4" />
+                    )}
+                    {isGeneratingNewInsight ? "Generating..." : "Generate New Insight"}
+                  </Button>
+                </div>
                 {/* Original automated insights content */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+                <div
+                  id="automated-insights-metrics"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch"
+                >
                   {/* Trending Metrics */}
                   <div className="space-y-3 flex flex-col h-full">
                     <h4 className="font-semibold text-sm text-gray-700">Trending Metrics</h4>
@@ -985,6 +1124,91 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
                 {/* Automated Insights Chart - Always show for automated tab */}
                 <InsightsChart />
+
+                {/* Saved Automated Insights Table */}
+                {savedInsights.length > 0 && (
+                  <div className="mt-8">
+                    <Card className="w-full">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faBookmark} className="h-5 w-5 text-blue-600" />
+                          Saved Automated Insights
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Date Saved</TableHead>
+                              <TableHead>Insights Type</TableHead>
+                              <TableHead>Sponsor</TableHead>
+                              <TableHead>Rightsholder</TableHead>
+                              <TableHead>Metric</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {savedInsights.map((savedInsight) => (
+                              <TableRow key={savedInsight.id}>
+                                <TableCell className="font-medium">
+                                  {savedInsight.dateSaved.toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>{savedInsight.insightsType}</TableCell>
+                                <TableCell>{savedInsight.sponsor}</TableCell>
+                                <TableCell>{savedInsight.rightsholder}</TableCell>
+                                <TableCell className="max-w-xs truncate" title={savedInsight.metric}>
+                                  {savedInsight.metric}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="p-2"
+                                          onClick={() => {
+                                            // View insight functionality
+                                            console.log("View saved insight:", savedInsight)
+                                          }}
+                                        >
+                                          <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>View Insight</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="p-2"
+                                          onClick={() => {
+                                            setSavedInsights((prev) =>
+                                              prev.filter((insight) => insight.id !== savedInsight.id),
+                                            )
+                                          }}
+                                        >
+                                          <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Delete Insight</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="generate" className="space-y-6">
