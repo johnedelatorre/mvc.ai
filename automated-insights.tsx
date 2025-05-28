@@ -29,6 +29,10 @@ import {
   faThumbsUp,
   faDownload,
   faSync,
+  faDatabase,
+  faCalendarAlt,
+  faExpand,
+  faCompress,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular, faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
@@ -40,6 +44,15 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Responsive
 import { ChartContainer } from "@/components/ui/chart"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import html2canvas from "html2canvas"
 
 interface AutomatedInsightsProps {
@@ -88,6 +101,48 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
 }
 
 export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps) {
+  // Arrays of possible values for more variety
+  const placementOptions = [
+    "Billboard",
+    "Digital Display",
+    "Floor Court Logo",
+    "Ceiling Logo",
+    "LED-Fascia",
+    "Jersey",
+    "Sneakers",
+    "Entrance Logo",
+    "Courtside Banner",
+    "Tunnel Entrance",
+    "Locker Room",
+    "Press Conference",
+    "Team Bench",
+  ]
+
+  const placementTypeOptions = [
+    "In-Venue Exposures",
+    "Broadcast Exposures",
+    "Social Media Exposures",
+    "Court Side",
+    "LED-Fascia",
+    "Virtual Signage",
+    "AR Overlay",
+    "Sponsored Segments",
+    "Half-time Show",
+    "Pre-game Show",
+  ]
+
+  const platformOptions = [
+    "TikTok",
+    "Instagram",
+    "YouTube",
+    "Twitter",
+    "Facebook",
+    "LinkedIn",
+    "Snapchat",
+    "Twitch",
+    "Reddit",
+    "Pinterest",
+  ]
   const [isExpanded, setIsExpanded] = useState(true)
   const [showRecommendations, setShowRecommendations] = useState(true)
   const [isBookmarked, setIsBookmarked] = useState(false)
@@ -131,6 +186,11 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   >([])
   const [refreshKey, setRefreshKey] = useState(0)
   const [isGeneratingNewInsight, setIsGeneratingNewInsight] = useState(false)
+  const [viewingSavedInsight, setViewingSavedInsight] = useState<string | null>(null)
+  const [showAllSavedInsights, setShowAllSavedInsights] = useState(false)
+  const [expandedInsightId, setExpandedInsightId] = useState<string | null>(null)
+  const [showAllGeneratedInsights, setShowAllGeneratedInsights] = useState(false)
+  const [expandedGeneratedInsightId, setExpandedGeneratedInsightId] = useState<string | null>(null)
 
   const insightsChartRef = useRef<HTMLDivElement>(null)
 
@@ -148,46 +208,22 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
   // Calculate trending amounts with refresh key dependency
   const calculateTrending = () => {
-    if (sortedData.length < 2) {
-      return { smv: 0, impressions: 0, views: 0 }
+    // If viewing a saved insight, return the saved trending data
+    if (refreshKey === -1 && window.tempSavedInsightData) {
+      return window.tempSavedInsightData.trendingAmounts
     }
 
-    // Add some randomization based on refresh key to simulate new insights
-    const randomSeed = refreshKey * 123456789
-    const random1 = (Math.sin(randomSeed) + 1) / 2
-    const random2 = (Math.sin(randomSeed * 2) + 1) / 2
-    const random3 = (Math.sin(randomSeed * 3) + 1) / 2
-
-    const midPoint = Math.floor(sortedData.length / 2)
-    const firstHalf = sortedData.slice(0, midPoint)
-    const secondHalf = sortedData.slice(midPoint)
-
-    const firstHalfAvg = {
-      smv: firstHalf.reduce((sum, item) => sum + (item.smv || 0), 0) / firstHalf.length,
-      impressions: firstHalf.reduce((sum, item) => sum + (item.impressions || 0), 0) / firstHalf.length,
-      views: firstHalf.reduce((sum, item) => sum + (item.views || 0), 0) / firstHalf.length,
-    }
-
-    const secondHalfAvg = {
-      smv: secondHalf.reduce((sum, item) => sum + (item.smv || 0), 0) / secondHalf.length,
-      impressions: secondHalf.reduce((sum, item) => sum + (item.impressions || 0), 0) / secondHalf.length,
-      views: secondHalf.reduce((sum, item) => sum + (item.views || 0), 0) / secondHalf.length,
-    }
-
-    // Apply randomization to create different insights
-    const baseSmv =
-      secondHalfAvg.smv > 0 ? Math.round(((firstHalfAvg.smv - secondHalfAvg.smv) / secondHalfAvg.smv) * 100) : 0
-    const baseImpressions =
-      secondHalfAvg.impressions > 0
-        ? Math.round(((firstHalfAvg.impressions - secondHalfAvg.impressions) / secondHalfAvg.impressions) * 100)
-        : 0
-    const baseViews =
-      secondHalfAvg.views > 0 ? Math.round(((firstHalfAvg.views - secondHalfAvg.views) / secondHalfAvg.views) * 100) : 0
+    // Generate completely random trending values each time
+    const randomSeed = refreshKey * Date.now() // Use current time to ensure different results
+    const random = () => Math.floor(Math.random() * 100) - 30 // Range from -30 to +70
 
     return {
-      smv: Math.max(5, Math.min(70, baseSmv + Math.floor((random1 - 0.5) * 40))),
-      impressions: Math.max(5, Math.min(65, baseImpressions + Math.floor((random2 - 0.5) * 35))),
-      views: Math.max(5, Math.min(60, baseViews + Math.floor((random3 - 0.5) * 30))),
+      smv: random(),
+      impressions: random(),
+      views: random(),
+      // Add random negative trends for variety
+      entrancePlacement: -Math.floor(Math.random() * 300),
+      youtubePlatform: -Math.floor(Math.random() * 250),
     }
   }
 
@@ -195,6 +231,18 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
   // Calculate insights with refresh key dependency
   const insights = useMemo(() => {
+    // If viewing a saved insight, return the saved data
+    if (refreshKey === -1 && window.tempSavedInsightData) {
+      return {
+        topPlacement: window.tempSavedInsightData.insights.topPlacement || "N/A",
+        topPlacementTypeBySMV: window.tempSavedInsightData.insights.topPlacementTypeBySMV || "N/A",
+        topPlatformByImpressions: window.tempSavedInsightData.insights.topPlatformByImpressions || "N/A",
+        totalSMV: window.tempSavedInsightData.insights.totalSMV || 0,
+        totalImpressions: window.tempSavedInsightData.insights.totalImpressions || 0,
+        avgSMV: window.tempSavedInsightData.insights.avgSMV || 0,
+      }
+    }
+
     if (sortedData.length === 0) {
       return {
         topPlacement: "N/A",
@@ -206,18 +254,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       }
     }
 
-    // Add randomization based on refresh key
-    const randomSeed = refreshKey * 987654321
-    const random = Math.sin(randomSeed)
-
-    // Shuffle the data based on refresh key to get different top performers
-    const shuffledData = [...sortedData].sort(() => Math.sin(randomSeed + Math.random()) - 0.5)
-
-    // Add variance to metrics based on refresh key
-    const varianceFactor = 0.8 + (Math.sin(randomSeed * 2) + 1) * 0.2 // 0.8 to 1.2 variance
-
-    // Randomize which platform/placement is top based on refresh key
-    const platformOptions = ["TikTok", "Instagram", "YouTube", "Twitter", "Facebook"]
+    // Create arrays of possible values for more variety
     const placementOptions = [
       "Billboard",
       "Digital Display",
@@ -225,100 +262,159 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
       "Ceiling Logo",
       "LED-Fascia",
       "Jersey",
+      "Sneakers",
+      "Entrance Logo",
+      "Courtside Banner",
+      "Tunnel Entrance",
+      "Locker Room",
+      "Press Conference",
+      "Team Bench",
     ]
+
     const placementTypeOptions = [
       "In-Venue Exposures",
       "Broadcast Exposures",
       "Social Media Exposures",
       "Court Side",
       "LED-Fascia",
+      "Virtual Signage",
+      "AR Overlay",
+      "Sponsored Segments",
+      "Half-time Show",
+      "Pre-game Show",
     ]
 
-    // Use refresh key to select different options
-    const randomPlatformIndex =
-      Math.abs(Math.floor(Math.sin(randomSeed * 3) * platformOptions.length)) % platformOptions.length
-    const randomPlacementIndex =
-      Math.abs(Math.floor(Math.sin(randomSeed * 5) * placementOptions.length)) % placementOptions.length
-    const randomPlacementTypeIndex =
-      Math.abs(Math.floor(Math.sin(randomSeed * 7) * placementTypeOptions.length)) % placementTypeOptions.length
+    const platformOptions = [
+      "TikTok",
+      "Instagram",
+      "YouTube",
+      "Twitter",
+      "Facebook",
+      "LinkedIn",
+      "Snapchat",
+      "Twitch",
+      "Reddit",
+      "Pinterest",
+    ]
+
+    // Use refreshKey and current timestamp to get different results each time
+    const seed = refreshKey * Date.now()
+    const getRandomItem = (array: string[]) => {
+      const index = Math.abs(Math.floor(Math.sin(seed * Math.random()) * array.length)) % array.length
+      return array[index]
+    }
+
+    // Generate random metrics
+    const totalSMV = Math.floor(Math.random() * 5000) + 500
+    const totalImpressions = Math.floor(Math.random() * 10000) + 1000
+    const avgSMV = Math.floor(Math.random() * 200) + 50
 
     return {
-      topPlacement:
-        refreshKey % 3 === 0
-          ? shuffledData.reduce((prev, current) => ((prev.smv || 0) > (current.smv || 0) ? prev : current))
-              .placements || "N/A"
-          : placementOptions[randomPlacementIndex],
-      topPlacementTypeBySMV:
-        refreshKey % 2 === 0
-          ? placementTypeOptions[randomPlacementTypeIndex]
-          : (() => {
-              const placementTypesSMV = shuffledData.reduce(
-                (acc, item) => {
-                  const type = item.placementTypes || "Unknown"
-                  acc[type] = (acc[type] || 0) + (item.smv || 0)
-                  return acc
-                },
-                {} as Record<string, number>,
-              )
-              const entries = Object.entries(placementTypesSMV)
-              return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
-            })(),
-      topPlatformByImpressions:
-        refreshKey % 4 === 0
-          ? platformOptions[randomPlatformIndex]
-          : (() => {
-              const platformImpressions = shuffledData.reduce(
-                (acc, item) => {
-                  const platform = item.platforms || "Unknown"
-                  acc[platform] = (acc[platform] || 0) + (item.impressions || 0)
-                  return acc
-                },
-                {} as Record<string, number>,
-              )
-              const entries = Object.entries(platformImpressions)
-              return entries.length > 0 ? entries.reduce((a, b) => (a[1] > b[1] ? a : b))[0] : "N/A"
-            })(),
-      totalSMV: Math.round(shuffledData.reduce((sum, item) => sum + (item.smv || 0), 0) * varianceFactor),
-      totalImpressions: Math.round(
-        shuffledData.reduce((sum, item) => sum + (item.impressions || 0), 0) * varianceFactor,
-      ),
-      avgSMV:
-        shuffledData.length > 0
-          ? Math.round(
-              (shuffledData.reduce((sum, item) => sum + (item.smv || 0), 0) / shuffledData.length) * varianceFactor,
-            )
-          : 0,
+      topPlacement: getRandomItem(placementOptions),
+      topPlacementTypeBySMV: getRandomItem(placementTypeOptions),
+      topPlatformByImpressions: getRandomItem(platformOptions),
+      totalSMV,
+      totalImpressions,
+      avgSMV,
     }
   }, [sortedData, refreshKey])
 
-  // Prepare chart data for automated insights
+  // Generate random recommendations based on current insights
+  const getRandomRecommendations = () => {
+    // Arrays of possible recommendation templates
+    const recommendationTemplates = [
+      "Focus more budget on {placementType} placements for higher SMV returns",
+      "Leverage {platform} platform for maximum impression reach",
+      "Increase investment in {placement} placements based on performance",
+      "Optimize {platform} content strategy to improve engagement",
+      "Consider expanding {placement} placements across more events",
+      "Reduce investment in underperforming {negativeType} placements",
+      "Test new creative formats on {platform} to boost impressions",
+      "Combine {placement} with {platform} promotions for synergy",
+      "Reallocate budget from {negativeType} to {placement} for better ROI",
+      "Implement A/B testing for {placementType} to optimize performance",
+      "Focus on {platform} during peak viewing hours for maximum impact",
+      "Consider seasonal adjustments for {placement} to match audience patterns",
+      "Develop custom content for {platform} to increase engagement",
+      "Analyze competitor presence on {platform} to identify opportunities",
+      "Integrate {placement} with digital activations for cross-platform impact",
+    ]
+
+    // Negative placement types for recommendations about reducing investment
+    const negativeTypes = ["Entrance", "Static Banner", "Print Media", "Radio Mentions"]
+
+    // Select 6 random recommendations without repetition
+    const selectedRecommendations = []
+    const usedIndices = new Set()
+
+    while (selectedRecommendations.length < 6 && usedIndices.size < recommendationTemplates.length) {
+      const index = Math.floor(Math.random() * recommendationTemplates.length)
+      if (!usedIndices.has(index)) {
+        usedIndices.add(index)
+        let recommendation = recommendationTemplates[index]
+
+        // Replace placeholders with actual values
+        recommendation = recommendation.replace("{placement}", insights.topPlacement)
+        recommendation = recommendation.replace("{placementType}", insights.topPlacementTypeBySMV)
+        recommendation = recommendation.replace("{platform}", insights.topPlatformByImpressions)
+        recommendation = recommendation.replace(
+          "{negativeType}",
+          negativeTypes[Math.floor(Math.random() * negativeTypes.length)],
+        )
+
+        selectedRecommendations.push(recommendation)
+      }
+    }
+
+    return selectedRecommendations
+  }
+
+  // Create a memoized version of recommendations that changes with refreshKey
+  const recommendations = useMemo(() => {
+    if (refreshKey === -1 && window.tempSavedInsightData) {
+      return window.tempSavedInsightData.recommendations || []
+    }
+    return getRandomRecommendations()
+  }, [refreshKey, insights])
+
+  // Prepare chart data for automated insights with more randomization
   const automatedChartData = useMemo(() => {
     if (sortedData.length === 0) {
       return []
     }
 
-    return sortedData
-      .slice(0, 10) // Show last 10 data points for better visualization
-      .reverse() // Show chronological order
-      .map((item) => ({
-        date:
-          item.dateObj instanceof Date
-            ? item.dateObj.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" })
-            : new Date(item.dateObj).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" }),
-        fullDate:
-          item.dateObj instanceof Date
-            ? item.dateObj.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
-            : new Date(item.dateObj).toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" }),
-        smv: item.smv || 0,
-        impressions: Math.round((item.impressions || 0) / 10), // Scale down for better visualization
-        views: Math.round((item.views || 0) / 100), // Scale down for better visualization
-        originalImpressions: Math.round((item.impressions || 0) / 1000), // For tooltip display in millions
-        originalViews: Math.round((item.views || 0) / 1000), // For tooltip display in thousands
-        platform: item.platforms || "Unknown",
-        placement: item.placements || "Unknown",
-        placementType: item.placementTypes || "Unknown",
-      }))
-  }, [sortedData])
+    // Use a seed based on refreshKey to ensure different chart patterns each time
+    const seed = refreshKey * Date.now()
+    const randomFactor = () => Math.random() * 2 + 0.5 // Random factor between 0.5 and 2.5
+
+    // Generate completely new random chart data each time
+    return Array.from({ length: 10 }, (_, index) => {
+      // Create a date going back from today
+      const date = new Date()
+      date.setDate(date.getDate() - (9 - index))
+
+      // Generate random values with some trend correlation
+      const baseSMV = 50 + index * 5 * randomFactor()
+      const baseImpressions = 500 + index * 20 * randomFactor()
+      const baseViews = 1000 + index * 50 * randomFactor()
+
+      // Add some noise
+      const noise = () => (Math.random() - 0.5) * 30
+
+      return {
+        date: date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" }),
+        fullDate: date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" }),
+        smv: Math.max(10, Math.round(baseSMV + noise())),
+        impressions: Math.max(10, Math.round((baseImpressions + noise()) / 10)), // Scale down for visualization
+        views: Math.max(10, Math.round((baseViews + noise()) / 100)), // Scale down for visualization
+        originalImpressions: Math.max(10, Math.round((baseImpressions + noise()) / 1000)), // For tooltip display in millions
+        originalViews: Math.max(10, Math.round((baseViews + noise()) / 1000)), // For tooltip display in thousands
+        platform: platformOptions[Math.floor(Math.random() * platformOptions.length)],
+        placement: placementOptions[Math.floor(Math.random() * placementOptions.length)],
+        placementType: placementTypeOptions[Math.floor(Math.random() * placementTypeOptions.length)],
+      }
+    })
+  }, [sortedData, refreshKey])
 
   // Prepare chart data for generated insights
   const generatedChartData = useMemo(() => {
@@ -403,6 +499,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
         insightData: {
           insights,
           trendingAmounts,
+          recommendations,
           filteredData: sortedData.slice(0, 10),
         },
       }
@@ -920,6 +1017,176 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     )
   }
 
+  const handleExitSavedInsightView = () => {
+    setViewingSavedInsight(null)
+    setRefreshKey(0) // Reset to normal view
+    delete window.tempSavedInsightData
+  }
+
+  const handleViewSavedInsight = (savedInsight: any) => {
+    console.log("Viewing saved insight:", savedInsight)
+
+    // Set the viewing state to show we're looking at a saved insight
+    setViewingSavedInsight(savedInsight.id)
+
+    // Temporarily override the current insights with saved data
+    // We'll use a different approach - create a temporary refresh key that uses saved data
+    setRefreshKey(-1) // Use -1 as a special key to indicate saved insight view
+
+    // Store the saved insight data temporarily
+    window.tempSavedInsightData = savedInsight.insightData
+
+    // Scroll to the insights section
+    setTimeout(() => {
+      const insightsElement = document.getElementById("automated-insights-metrics")
+      if (insightsElement) {
+        insightsElement.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
+  }
+
+  // Function to view all saved insights data
+  const handleViewAllSavedInsights = () => {
+    setShowAllSavedInsights(true)
+  }
+
+  // Function to toggle expanded view for individual insights
+  const toggleInsightExpansion = (insightId: string) => {
+    setExpandedInsightId(expandedInsightId === insightId ? null : insightId)
+  }
+
+  // Function to get summary statistics for all saved insights
+  const getSavedInsightsSummary = () => {
+    if (savedInsights.length === 0) {
+      return {
+        totalInsights: 0,
+        avgSMV: 0,
+        avgImpressions: 0,
+        topPlacement: "N/A",
+        topPlatform: "N/A",
+        dateRange: "N/A",
+      }
+    }
+
+    const totalSMV = savedInsights.reduce((sum, insight) => {
+      return sum + (insight.insightData?.insights?.totalSMV || 0)
+    }, 0)
+
+    const totalImpressions = savedInsights.reduce((sum, insight) => {
+      return sum + (insight.insightData?.insights?.totalImpressions || 0)
+    }, 0)
+
+    // Find most common placement and platform
+    const placements = savedInsights.map((insight) => insight.insightData?.insights?.topPlacement).filter(Boolean)
+    const platforms = savedInsights
+      .map((insight) => insight.insightData?.insights?.topPlatformByImpressions)
+      .filter(Boolean)
+
+    const topPlacement =
+      placements.length > 0
+        ? placements.reduce((a, b, i, arr) =>
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+          )
+        : "N/A"
+
+    const topPlatform =
+      platforms.length > 0
+        ? platforms.reduce((a, b, i, arr) =>
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+          )
+        : "N/A"
+
+    const dates = savedInsights.map((insight) => insight.dateSaved).sort((a, b) => a.getTime() - b.getTime())
+    const dateRange =
+      dates.length > 0 ? `${dates[0].toLocaleDateString()} - ${dates[dates.length - 1].toLocaleDateString()}` : "N/A"
+
+    return {
+      totalInsights: savedInsights.length,
+      avgSMV: Math.round(totalSMV / savedInsights.length),
+      avgImpressions: Math.round(totalImpressions / savedInsights.length),
+      topPlacement,
+      topPlatform,
+      dateRange,
+    }
+  }
+
+  const savedInsightsSummary = getSavedInsightsSummary()
+
+  // Add this sorting function before returning the JSX
+  const sortedSavedInsights = useMemo(() => {
+    return [...savedInsights].sort((a, b) => b.dateSaved.getTime() - a.dateSaved.getTime())
+  }, [savedInsights])
+
+  // Function to view all generated insights data
+  const handleViewAllGeneratedInsights = () => {
+    setShowAllGeneratedInsights(true)
+  }
+
+  // Function to toggle expanded view for individual generated insights
+  const toggleGeneratedInsightExpansion = (insightId: string) => {
+    setExpandedGeneratedInsightId(expandedGeneratedInsightId === insightId ? null : insightId)
+  }
+
+  // Function to get summary statistics for all generated insights
+  const getGeneratedInsightsSummary = () => {
+    if (insightsHistory.length === 0) {
+      return {
+        totalInsights: 0,
+        avgTotalSMV: 0,
+        avgEngagement: 0,
+        topPlacement: "N/A",
+        topPlatform: "N/A",
+        dateRange: "N/A",
+      }
+    }
+
+    const totalSMV = insightsHistory.reduce((sum, insight) => {
+      return sum + (insight.content?.keyMetrics?.totalSMV || 0)
+    }, 0)
+
+    const totalEngagement = insightsHistory.reduce((sum, insight) => {
+      return sum + (insight.content?.keyMetrics?.avgEngagement || 0)
+    }, 0)
+
+    // Find most common placement and platform
+    const placements = insightsHistory.map((insight) => insight.content?.topPerformers?.placement).filter(Boolean)
+    const platforms = insightsHistory.map((insight) => insight.content?.topPerformers?.platform).filter(Boolean)
+
+    const topPlacement =
+      placements.length > 0
+        ? placements.reduce((a, b, i, arr) =>
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+          )
+        : "N/A"
+
+    const topPlatform =
+      platforms.length > 0
+        ? platforms.reduce((a, b, i, arr) =>
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+          )
+        : "N/A"
+
+    const dates = insightsHistory.map((insight) => insight.timestamp).sort((a, b) => a.getTime() - b.getTime())
+    const dateRange =
+      dates.length > 0 ? `${dates[0].toLocaleDateString()} - ${dates[dates.length - 1].toLocaleDateString()}` : "N/A"
+
+    return {
+      totalInsights: insightsHistory.length,
+      avgTotalSMV: Math.round(totalSMV / insightsHistory.length),
+      avgEngagement: Math.round(totalEngagement / insightsHistory.length),
+      topPlacement,
+      topPlatform,
+      dateRange,
+    }
+  }
+
+  const generatedInsightsSummary = getGeneratedInsightsSummary()
+
+  // Add this sorting function for generated insights
+  const sortedGeneratedInsights = useMemo(() => {
+    return [...insightsHistory].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+  }, [insightsHistory])
+
   return (
     <TooltipProvider>
       <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
@@ -1002,6 +1269,26 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                     {isGeneratingNewInsight ? "Generating..." : "Generate New Insight"}
                   </Button>
                 </div>
+                {viewingSavedInsight && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm text-blue-700 font-medium">
+                        Viewing Saved Insight from{" "}
+                        {savedInsights.find((s) => s.id === viewingSavedInsight)?.dateSaved.toLocaleDateString()}
+                      </span>
+                    </div>
+                    <Button
+                      onClick={handleExitSavedInsightView}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 text-blue-600 border-blue-300"
+                    >
+                      <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                      Back to Previous
+                    </Button>
+                  </div>
+                )}
                 {/* Original automated insights content */}
                 <div
                   id="automated-insights-metrics"
@@ -1109,14 +1396,9 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                   {showRecommendations && (
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 transition-all duration-300 ease-in-out">
                       <ul className="text-sm text-blue-700 space-y-1">
-                        <li>
-                          • Focus more budget on {insights.topPlacementTypeBySMV} placements for higher SMV returns
-                        </li>
-                        <li>• Leverage {insights.topPlatformByImpressions} platform for maximum impression reach</li>
-                        <li>• Continue current strategy as all key metrics are trending upward</li>
-                        <li>• Consider expanding {insights.topPlacement} placements based on performance</li>
-                        <li>• Review and optimize Entrance placement strategy to address declining performance</li>
-                        <li>• Investigate YouTube platform performance decline and adjust content strategy</li>
+                        {recommendations.map((recommendation, index) => (
+                          <li key={index}>• {recommendation}</li>
+                        ))}
                       </ul>
                     </div>
                   )}
@@ -1130,10 +1412,335 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                   <div className="mt-8">
                     <Card className="w-full">
                       <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <FontAwesomeIcon icon={faBookmark} className="h-5 w-5 text-blue-600" />
-                          Saved Automated Insights
-                        </CardTitle>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <FontAwesomeIcon icon={faBookmark} className="h-5 w-5 text-blue-600" />
+                            Saved Automated Insights
+                          </CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Dialog open={showAllSavedInsights} onOpenChange={setShowAllSavedInsights}>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleViewAllSavedInsights}
+                                  className="flex items-center gap-2"
+                                >
+                                  <FontAwesomeIcon icon={faDatabase} className="h-4 w-4" />
+                                  View All Data
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faDatabase} className="h-5 w-5 text-blue-600" />
+                                    All Saved Insights Data
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Comprehensive view of all saved automated insights with detailed metrics and trends
+                                  </DialogDescription>
+                                </DialogHeader>
+
+                                <ScrollArea className="h-[calc(90vh-120px)] w-full">
+                                  <div className="space-y-6 p-4">
+                                    {/* Summary Statistics */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                      <Card className="p-4">
+                                        <div className="text-center">
+                                          <div className="text-2xl font-bold text-blue-600">
+                                            {savedInsightsSummary.totalInsights}
+                                          </div>
+                                          <div className="text-sm text-gray-600">Total Insights Saved</div>
+                                        </div>
+                                      </Card>
+                                      <Card className="p-4">
+                                        <div className="text-center">
+                                          <div className="text-2xl font-bold text-green-600">
+                                            ${savedInsightsSummary.avgSMV.toLocaleString()}k
+                                          </div>
+                                          <div className="text-sm text-gray-600">Average SMV</div>
+                                        </div>
+                                      </Card>
+                                      <Card className="p-4">
+                                        <div className="text-center">
+                                          <div className="text-2xl font-bold text-purple-600">
+                                            {savedInsightsSummary.avgImpressions.toLocaleString()}MM
+                                          </div>
+                                          <div className="text-sm text-gray-600">Average Impressions</div>
+                                        </div>
+                                      </Card>
+                                    </div>
+
+                                    {/* Top Performers Summary */}
+                                    <Card className="p-4">
+                                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-orange-600" />
+                                        Overall Top Performers
+                                      </h3>
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="p-3 bg-blue-50 rounded-lg">
+                                          <div className="text-xs text-gray-600 mb-1">Most Common Top Placement</div>
+                                          <div className="font-semibold text-blue-700">
+                                            {savedInsightsSummary.topPlacement}
+                                          </div>
+                                        </div>
+                                        <div className="p-3 bg-green-50 rounded-lg">
+                                          <div className="text-xs text-gray-600 mb-1">Most Common Top Platform</div>
+                                          <div className="font-semibold text-green-700 flex items-center gap-2">
+                                            {savedInsightsSummary.topPlatform !== "N/A" && (
+                                              <PlatformIcon platform={savedInsightsSummary.topPlatform} />
+                                            )}
+                                            <span>{savedInsightsSummary.topPlatform}</span>
+                                          </div>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                          <div className="text-xs text-gray-600 mb-1">Date Range</div>
+                                          <div className="font-semibold text-gray-700">
+                                            {savedInsightsSummary.dateRange}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Card>
+
+                                    {/* Individual Insights Details */}
+                                    <div className="space-y-4">
+                                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faHistory} className="h-5 w-5 text-gray-600" />
+                                        Individual Insights Details
+                                      </h3>
+
+                                      {sortedSavedInsights.map((savedInsight) => (
+                                        <Card key={savedInsight.id} className="p-4">
+                                          <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                              <div className="p-2 bg-blue-100 rounded-lg">
+                                                <FontAwesomeIcon
+                                                  icon={faCalendarAlt}
+                                                  className="h-4 w-4 text-blue-600"
+                                                />
+                                              </div>
+                                              <div>
+                                                <div className="font-semibold text-gray-900">
+                                                  {savedInsight.dateSaved.toLocaleString("en-US", {
+                                                    weekday: "long",
+                                                    year: "numeric",
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                  })}
+                                                </div>
+                                                <div className="text-sm text-gray-500">{savedInsight.insightsType}</div>
+                                              </div>
+                                            </div>
+                                            <Button
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={() => toggleInsightExpansion(savedInsight.id)}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={expandedInsightId === savedInsight.id ? faCompress : faExpand}
+                                                className="h-4 w-4"
+                                              />
+                                              {expandedInsightId === savedInsight.id ? "Collapse" : "Expand"}
+                                            </Button>
+                                          </div>
+
+                                          {/* Basic Info */}
+                                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <div className="p-3 bg-gray-50 rounded-lg">
+                                              <div className="text-xs text-gray-600 mb-1">Primary Sponsor</div>
+                                              <div className="font-medium text-gray-900">{savedInsight.sponsor}</div>
+                                            </div>
+                                            <div className="p-3 bg-gray-50 rounded-lg">
+                                              <div className="text-xs text-gray-600 mb-1">Rightsholder</div>
+                                              <div className="font-medium text-gray-900">
+                                                {savedInsight.rightsholder}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Expanded Details */}
+                                          {expandedInsightId === savedInsight.id && savedInsight.insightData && (
+                                            <div className="space-y-6 border-t pt-4">
+                                              {/* Trending Metrics */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faArrowTrendUp}
+                                                    className="h-4 w-4 text-green-600"
+                                                  />
+                                                  Trending Metrics
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">SMV</span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{savedInsight.insightData.trendingAmounts?.smv || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">
+                                                        Impressions
+                                                      </span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{savedInsight.insightData.trendingAmounts?.impressions || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">Views</span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{savedInsight.insightData.trendingAmounts?.views || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Top Performers */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faChartColumn}
+                                                    className="h-4 w-4 text-blue-600"
+                                                  />
+                                                  Top Performers
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                                    <div className="text-xs text-gray-600 mb-1">
+                                                      Highest Performing Placement
+                                                    </div>
+                                                    <div className="font-semibold text-blue-700">
+                                                      {savedInsight.insightData.insights?.topPlacement || "N/A"}
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                                    <div className="text-xs text-gray-600 mb-1">
+                                                      Top Placement Type by SMV
+                                                    </div>
+                                                    <div className="font-semibold text-purple-700">
+                                                      {savedInsight.insightData.insights?.topPlacementTypeBySMV ||
+                                                        "N/A"}
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                                    <div className="text-xs text-gray-600 mb-1">
+                                                      Top Platform by Impressions
+                                                    </div>
+                                                    <div className="font-semibold text-orange-700 flex items-center gap-2">
+                                                      {savedInsight.insightData.insights?.topPlatformByImpressions !==
+                                                        "N/A" && (
+                                                        <PlatformIcon
+                                                          platform={
+                                                            savedInsight.insightData.insights?.topPlatformByImpressions
+                                                          }
+                                                        />
+                                                      )}
+                                                      <span>
+                                                        {savedInsight.insightData.insights?.topPlatformByImpressions ||
+                                                          "N/A"}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Key Metrics */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faLightbulb}
+                                                    className="h-4 w-4 text-yellow-600"
+                                                  />
+                                                  Key Metrics
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Total SMV</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      $
+                                                      {(
+                                                        savedInsight.insightData.insights?.totalSMV || 0
+                                                      ).toLocaleString()}
+                                                      k
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Total Impressions</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      {(
+                                                        savedInsight.insightData.insights?.totalImpressions || 0
+                                                      ).toLocaleString()}
+                                                      MM
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Average SMV</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      ${savedInsight.insightData.insights?.avgSMV || 0}k
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Action Buttons */}
+                                              <div className="flex items-center gap-2 pt-4 border-t">
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => {
+                                                    setShowAllSavedInsights(false)
+                                                    handleViewSavedInsight(savedInsight)
+                                                  }}
+                                                  className="flex items-center gap-2"
+                                                >
+                                                  <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
+                                                  View in Main Interface
+                                                </Button>
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => {
+                                                    setSavedInsights((prev) =>
+                                                      prev.filter((insight) => insight.id !== savedInsight.id),
+                                                    )
+                                                  }}
+                                                  className="flex items-center gap-2 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                                                >
+                                                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                                  Delete
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          )}
+                                        </Card>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </ScrollArea>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <Table>
@@ -1148,16 +1755,28 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {savedInsights.map((savedInsight) => (
+                            {sortedSavedInsights.map((savedInsight) => (
                               <TableRow key={savedInsight.id}>
                                 <TableCell className="font-medium">
-                                  {savedInsight.dateSaved.toLocaleDateString()}
+                                  {savedInsight.dateSaved.toLocaleString("en-US", {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
                                 </TableCell>
                                 <TableCell>{savedInsight.insightsType}</TableCell>
                                 <TableCell>{savedInsight.sponsor}</TableCell>
                                 <TableCell>{savedInsight.rightsholder}</TableCell>
-                                <TableCell className="max-w-xs truncate" title={savedInsight.metric}>
-                                  {savedInsight.metric}
+                                <TableCell className="max-w-xs">
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-gray-100 text-gray-700 font-normal text-xs px-2 py-1 truncate block max-w-full"
+                                    title={savedInsight.metric}
+                                  >
+                                    {savedInsight.metric}
+                                  </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
                                   <div className="flex items-center justify-end gap-2">
@@ -1167,10 +1786,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => {
-                                            // View insight functionality
-                                            console.log("View saved insight:", savedInsight)
-                                          }}
+                                          onClick={() => handleViewSavedInsight(savedInsight)}
                                         >
                                           <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
                                         </Button>
@@ -1680,16 +2296,340 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                 <div className="mt-8">
                   <Card className="w-full">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={faHistory} className="h-5 w-5 text-gray-600" />
-                        Generated Insights History
-                      </CardTitle>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faHistory} className="h-5 w-5 text-gray-600" />
+                          Generated Insights History
+                        </CardTitle>
+                        <div className="flex items-center gap-2">
+                          <Dialog open={showAllGeneratedInsights} onOpenChange={setShowAllGeneratedInsights}>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleViewAllGeneratedInsights}
+                                className="flex items-center gap-2"
+                              >
+                                <FontAwesomeIcon icon={faDatabase} className="h-4 w-4" />
+                                View All Data
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faDatabase} className="h-5 w-5 text-gray-600" />
+                                  All Generated Insights Data
+                                </DialogTitle>
+                                <DialogDescription>
+                                  Comprehensive view of all generated insights with detailed metrics and analysis
+                                </DialogDescription>
+                              </DialogHeader>
+
+                              <ScrollArea className="h-[calc(90vh-120px)] w-full">
+                                <div className="space-y-6 p-4">
+                                  {/* Summary Statistics */}
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <Card className="p-4">
+                                      <div className="text-center">
+                                        <div className="text-2xl font-bold text-purple-600">
+                                          {generatedInsightsSummary.totalInsights}
+                                        </div>
+                                        <div className="text-sm text-gray-600">Total Generated Insights</div>
+                                      </div>
+                                    </Card>
+                                    <Card className="p-4">
+                                      <div className="text-center">
+                                        <div className="text-2xl font-bold text-green-600">
+                                          ${generatedInsightsSummary.avgTotalSMV.toLocaleString()}k
+                                        </div>
+                                        <div className="text-sm text-gray-600">Average Total SMV</div>
+                                      </div>
+                                    </Card>
+                                    <Card className="p-4">
+                                      <div className="text-center">
+                                        <div className="text-2xl font-bold text-blue-600">
+                                          {generatedInsightsSummary.avgEngagement}%
+                                        </div>
+                                        <div className="text-sm text-gray-600">Average Engagement</div>
+                                      </div>
+                                    </Card>
+                                  </div>
+
+                                  {/* Top Performers Summary */}
+                                  <Card className="p-4">
+                                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-purple-600" />
+                                      Overall Generated Insights Summary
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                      <div className="p-3 bg-purple-50 rounded-lg">
+                                        <div className="text-xs text-gray-600 mb-1">Most Common Top Placement</div>
+                                        <div className="font-semibold text-purple-700">
+                                          {generatedInsightsSummary.topPlacement}
+                                        </div>
+                                      </div>
+                                      <div className="p-3 bg-blue-50 rounded-lg">
+                                        <div className="text-xs text-gray-600 mb-1">Most Common Top Platform</div>
+                                        <div className="font-semibold text-blue-700 flex items-center gap-2">
+                                          {generatedInsightsSummary.topPlatform !== "N/A" && (
+                                            <PlatformIcon platform={generatedInsightsSummary.topPlatform} />
+                                          )}
+                                          <span>{generatedInsightsSummary.topPlatform}</span>
+                                        </div>
+                                      </div>
+                                      <div className="p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-xs text-gray-600 mb-1">Date Range</div>
+                                        <div className="font-semibold text-gray-700">
+                                          {generatedInsightsSummary.dateRange}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Card>
+
+                                  {/* Individual Generated Insights Details */}
+                                  <div className="space-y-4">
+                                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                                      <FontAwesomeIcon icon={faRobot} className="h-5 w-5 text-purple-600" />
+                                      Individual Generated Insights Details
+                                    </h3>
+
+                                    {sortedGeneratedInsights.map((generatedInsight) => (
+                                      <Card key={generatedInsight.id} className="p-4">
+                                        <div className="flex items-center justify-between mb-4">
+                                          <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-purple-100 rounded-lg">
+                                              <FontAwesomeIcon icon={faRobot} className="h-4 w-4 text-purple-600" />
+                                            </div>
+                                            <div>
+                                              <div className="font-semibold text-gray-900">
+                                                {generatedInsight.timestamp.toLocaleString("en-US", {
+                                                  weekday: "long",
+                                                  year: "numeric",
+                                                  month: "long",
+                                                  day: "numeric",
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                  second: "2-digit",
+                                                })}
+                                              </div>
+                                              <div className="text-sm text-gray-500">Custom Analysis</div>
+                                            </div>
+                                          </div>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => toggleGeneratedInsightExpansion(generatedInsight.id)}
+                                            className="flex items-center gap-2"
+                                          >
+                                            <FontAwesomeIcon
+                                              icon={
+                                                expandedGeneratedInsightId === generatedInsight.id
+                                                  ? faCompress
+                                                  : faExpand
+                                              }
+                                              className="h-4 w-4"
+                                            />
+                                            {expandedGeneratedInsightId === generatedInsight.id ? "Collapse" : "Expand"}
+                                          </Button>
+                                        </div>
+
+                                        {/* Basic Info */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                          <div className="p-3 bg-gray-50 rounded-lg">
+                                            <div className="text-xs text-gray-600 mb-1">Query</div>
+                                            <div className="font-medium text-gray-900 text-sm">
+                                              {generatedInsight.query}
+                                            </div>
+                                          </div>
+                                          <div className="p-3 bg-gray-50 rounded-lg">
+                                            <div className="text-xs text-gray-600 mb-1">Created By</div>
+                                            <div className="font-medium text-gray-900">AI Assistant</div>
+                                          </div>
+                                        </div>
+
+                                        {/* Expanded Details */}
+                                        {expandedGeneratedInsightId === generatedInsight.id &&
+                                          generatedInsight.content && (
+                                            <div className="space-y-6 border-t pt-4">
+                                              {/* Trending Metrics */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faArrowTrendUp}
+                                                    className="h-4 w-4 text-green-600"
+                                                  />
+                                                  Trending Metrics
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">SMV</span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{generatedInsight.content.trending?.smv || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">
+                                                        Impressions
+                                                      </span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{generatedInsight.content.trending?.impressions || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                                    <div className="flex items-center justify-between">
+                                                      <span className="text-sm font-medium text-gray-700">Views</span>
+                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                                        <FontAwesomeIcon
+                                                          icon={faArrowTrendUp}
+                                                          className="h-3 w-3 mr-1"
+                                                        />
+                                                        +{generatedInsight.content.trending?.views || 0}%
+                                                      </Badge>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Top Performers */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faChartColumn}
+                                                    className="h-4 w-4 text-blue-600"
+                                                  />
+                                                  Top Performers
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Top Placement</div>
+                                                    <div className="font-semibold text-blue-700">
+                                                      {generatedInsight.content.topPerformers?.placement || "N/A"}
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Top Platform</div>
+                                                    <div className="font-semibold text-purple-700 flex items-center gap-2">
+                                                      {generatedInsight.content.topPerformers?.platform !== "N/A" && (
+                                                        <PlatformIcon
+                                                          platform={generatedInsight.content.topPerformers?.platform}
+                                                        />
+                                                      )}
+                                                      <span>
+                                                        {generatedInsight.content.topPerformers?.platform || "N/A"}
+                                                      </span>
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Top Sponsor</div>
+                                                    <div className="font-semibold text-orange-700">
+                                                      {generatedInsight.content.topPerformers?.sponsor || "N/A"}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Key Metrics */}
+                                              <div>
+                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                                  <FontAwesomeIcon
+                                                    icon={faLightbulb}
+                                                    className="h-4 w-4 text-yellow-600"
+                                                  />
+                                                  Key Metrics
+                                                </h4>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Total SMV</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      $
+                                                      {(
+                                                        generatedInsight.content.keyMetrics?.totalSMV || 0
+                                                      ).toLocaleString()}
+                                                      k
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Average Engagement</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      {generatedInsight.content.keyMetrics?.avgEngagement || 0}%
+                                                    </div>
+                                                  </div>
+                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <div className="text-xs text-gray-600 mb-1">Growth Rate</div>
+                                                    <div className="font-semibold text-gray-700">
+                                                      {generatedInsight.content.keyMetrics?.growthRate || 0}%
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+                                              {/* Action Buttons */}
+                                              <div className="flex items-center gap-2 pt-4 border-t">
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => {
+                                                    setShowAllGeneratedInsights(false)
+                                                    handleViewInsight(generatedInsight)
+                                                  }}
+                                                  className="flex items-center gap-2"
+                                                >
+                                                  <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
+                                                  View in Main Interface
+                                                </Button>
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => {
+                                                    setShowAllGeneratedInsights(false)
+                                                    handleEditPrompt(generatedInsight)
+                                                  }}
+                                                  className="flex items-center gap-2"
+                                                >
+                                                  <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
+                                                  Edit Prompt
+                                                </Button>
+                                                <Button
+                                                  variant="outline"
+                                                  size="sm"
+                                                  onClick={() => {
+                                                    handleDeleteInsight(generatedInsight.id)
+                                                  }}
+                                                  className="flex items-center gap-2 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                                                >
+                                                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                                  Delete
+                                                </Button>
+                                              </div>
+                                            </div>
+                                          )}
+                                      </Card>
+                                    ))}
+                                  </div>
+                                </div>
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Date</TableHead>
+                            <TableHead>Date Generated</TableHead>
                             <TableHead>Insights Type</TableHead>
                             <TableHead>Created By</TableHead>
                             <TableHead>Insight Queries</TableHead>
@@ -1707,7 +2647,14 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                             insightsHistory.map((insight) => (
                               <TableRow key={insight.id}>
                                 <TableCell className="font-medium">
-                                  {new Date(insight.timestamp).toLocaleDateString()}
+                                  {new Date(insight.timestamp).toLocaleString("en-US", {
+                                    year: "numeric",
+                                    month: "2-digit",
+                                    day: "2-digit",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                  })}
                                 </TableCell>
                                 <TableCell>Custom Analysis</TableCell>
                                 <TableCell>AI Assistant</TableCell>
@@ -1762,7 +2709,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => handleDeleteInsight(insight.id)}
+                                          onClick={() => handleDeleteInsight(insight)}
                                         >
                                           <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
                                         </Button>
