@@ -1774,50 +1774,6 @@ export default function Page() {
             {/* Filter Bar for Insights Tab */}
             <TabsContent value="insights" className="mt-6 mb-0">
               <div className="p-5">
-                {/* Sort Filters Header with Active Tags */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                      <span className="text-sm font-medium">Sort Filters</span>
-                      <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
-                    </button>
-
-                    {/* Active Filter Tags for Insights Tab */}
-                    <div className="flex items-center gap-2 ml-4">
-                      {/* Time Period Tags */}
-                      {filterType === "dateRange" && dateRange.from && dateRange.to && (
-                        <>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            From: {format(dateRange.from, "yyyy-MM-dd")}
-                          </Badge>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            To: {format(dateRange.to, "yyyy-MM-dd")}
-                          </Badge>
-                        </>
-                      )}
-                      {filterType === "years" && selectedYears.length > 0 && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                          Years: {selectedYears.join(", ")}
-                        </Badge>
-                      )}
-                      {/* Default to current year if no time period is selected */}
-                      {filterType === "years" && selectedYears.length === 0 && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Years: 2025</Badge>
-                      )}
-                      {filterType === "dateRange" && (!dateRange.from || !dateRange.to) && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Years: 2025</Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
-                  </button>
-                </div>
-
                 {/* Main Filters Grid - Collapsible */}
                 {isFilterExpanded && (
                   <div className="space-y-4">
