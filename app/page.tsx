@@ -31,7 +31,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import InsightTemplateGallery from "@/components/insight-template-gallery"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
@@ -273,8 +272,6 @@ export default function Page() {
   const [editingFilterId, setEditingFilterId] = useState<string | null>(null)
   const [filterCategoryToSave, setFilterCategoryToSave] = useState(FILTER_CATEGORIES[0])
   const [filterCategorySearch, setFilterCategorySearch] = useState("")
-  const [chatInput, setChatInput] = useState("")
-  const [templateTrigger, setTemplateTrigger] = useState<{ prompt: string; timestamp: number } | null>(null)
 
   const baseData = useMemo(() => generateBaseData(), [])
 
@@ -648,119 +645,157 @@ export default function Page() {
     )
   }, [savedFilters, filterCategorySearch])
 
-  const handleTemplateSelect = (prompt: string) => {
-    // Set the template trigger to generate automated insights
-    setTemplateTrigger({ prompt, timestamp: Date.now() })
-
-    // Scroll to the insights section after a brief delay
-    setTimeout(() => {
-      const insightsElement = document.getElementById("automated-insights-section")
-      if (insightsElement) {
-        insightsElement.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
-    }, 100)
-  }
-
   return (
     <div className="w-full">
       {/* Sticky Header Section */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="p-3 sm:p-4 lg:p-6 pb-0">
+        <div className="p-6 pb-0">
           {/* Page Header */}
-          <div className="mb-4 lg:mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">Relo Edge AI</h1>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge AI</h1>
           </div>
 
           {/* Main Tabs Section */}
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
-            <TabsList className="inline-flex h-9 sm:h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
+            <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
               <TabsTrigger
                 value="analytics"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
               >
-                <FontAwesomeIcon icon={faChartLine} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                <span className="hidden xs:inline">Analytics</span>
-                <span className="xs:hidden">Data</span>
+                <FontAwesomeIcon icon={faChartLine} className="h-4 w-4 mr-2" />
+                Analytics
               </TabsTrigger>
               <TabsTrigger
                 value="insights"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
               >
-                <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                <span className="hidden xs:inline">Insights</span>
-                <span className="xs:hidden">AI</span>
+                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 mr-2" />
+                Insights
               </TabsTrigger>
             </TabsList>
 
             {/* Thin grey border that extends 100% across the page */}
-            <div className="w-screen relative -ml-3 sm:-ml-4 lg:-ml-6 border-b border-gray-200 mt-3 sm:mt-4"></div>
+            <div className="w-screen relative -ml-6 border-b border-gray-200 mt-4"></div>
 
             {/* Filter Bar for Analytics Tab */}
-            <TabsContent value="analytics" className="mt-4 sm:mt-6 mb-0">
-              <div className="p-2 sm:p-3 lg:p-5">
+            <TabsContent value="analytics" className="mt-6 mb-0">
+              <div className="p-5">
                 {/* Active Filters Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <button className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
-                      <span className="font-medium hidden sm:inline">Sort Filters</span>
-                      <span className="font-medium sm:hidden">Filters</span>
-                      <FontAwesomeIcon icon={faFilter} className="h-3 w-3 sm:h-4 sm:w-4" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
+                      <span className="text-sm font-medium">Sort Filters</span>
+                      <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
                     </button>
 
-                    {/* Active Filter Tags - Scrollable on mobile */}
-                    <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 overflow-x-auto scrollbar-none">
+                    {/* Active Filter Tags */}
+                    <div className="flex items-center gap-2 ml-4">
                       {/* Time Period Tags */}
                       {filterType === "dateRange" && dateRange.from && dateRange.to && (
                         <>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
-                            From: {format(dateRange.from, "MM/dd")}
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            From: {format(dateRange.from, "yyyy-MM-dd")}
                           </Badge>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
-                            To: {format(dateRange.to, "MM/dd/yy")}
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            To: {format(dateRange.to, "yyyy-MM-dd")}
                           </Badge>
                         </>
                       )}
                       {filterType === "years" && selectedYears.length > 0 && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
-                          {selectedYears.length === 1 ? selectedYears[0] : `${selectedYears.length} Years`}
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                          Years: {selectedYears.join(", ")}
                         </Badge>
                       )}
 
-                      {/* Other filter tags with responsive text */}
+                      {/* Rightsholders Tag */}
                       {selectedRightsholders.length > 0 && (
-                        <Badge className="bg-green-100 text-green-700 border-green-300 text-xs whitespace-nowrap">
-                          {selectedRightsholders.length} RH
+                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                          Selected
                         </Badge>
                       )}
 
+                      {/* Sponsors Tag */}
                       {selectedSponsors.length > 0 && (
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-300 text-xs whitespace-nowrap">
-                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""}
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
                         </Badge>
                       )}
 
+                      {/* Placements Tag */}
                       {selectedPlacements.length > 0 && (
-                        <Badge className="bg-orange-100 text-orange-700 border-orange-300 text-xs whitespace-nowrap">
-                          {selectedPlacements.length} Place{selectedPlacements.length !== 1 ? "s" : ""}
+                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
                         </Badge>
                       )}
 
+                      {/* Placement Types Tag */}
                       {selectedPlacementTypes.length > 0 && (
-                        <Badge className="bg-pink-100 text-pink-700 border-pink-300 text-xs whitespace-nowrap">
-                          {selectedPlacementTypes.length} Type{selectedPlacementTypes.length !== 1 ? "s" : ""}
+                        <Badge className="bg-pink-100 text-pink-700 border-pink-300">
+                          {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
+                          Selected
                         </Badge>
                       )}
 
-                      {/* Group By Tag */}
-                      <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
-                        By: {groupBy}
-                      </Badge>
+                      {/* Platforms Tag */}
+                      {selectedPlatforms.length > 0 && (
+                        <Badge className="bg-cyan-100 text-cyan-700 border-cyan-300">
+                          {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Account Types Tag */}
+                      {selectedAccountTypes.length > 0 && (
+                        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-300">
+                          {selectedAccountTypes.length} Account Type{selectedAccountTypes.length !== 1 ? "s" : ""}{" "}
+                          Selected
+                        </Badge>
+                      )}
+
+                      {/* Media Types Tag */}
+                      {selectedMediaTypes.length > 0 && (
+                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                          {selectedMediaTypes.length} Media Type{selectedMediaTypes.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Collections Tag */}
+                      {selectedCollections.length > 0 && (
+                        <Badge className="bg-red-100 text-red-700 border-red-300">
+                          {selectedCollections.length} Collection{selectedCollections.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Hashtags Tag */}
+                      {selectedHashtags.length > 0 && (
+                        <Badge className="bg-teal-100 text-teal-700 border-teal-300">
+                          {selectedHashtags.length} Hashtag{selectedHashtags.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Handles Tag */}
+                      {selectedHandles.length > 0 && (
+                        <Badge className="bg-lime-100 text-lime-700 border-lime-300">
+                          {selectedHandles.length} Handle{selectedHandles.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Comparison Dates Tag */}
+                      {selectedComparisonDates.length > 0 && (
+                        <Badge className="bg-amber-100 text-amber-700 border-amber-300">
+                          {selectedComparisonDates.length} Comparison Date
+                          {selectedComparisonDates.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Group By Tag - Keep as is */}
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                    className="text-gray-400 hover:text-gray-600 p-1 sm:p-0"
+                    className="text-gray-400 hover:text-gray-600"
                   >
                     <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
                   </button>
@@ -769,34 +804,28 @@ export default function Page() {
                 {/* Main Filters Grid - Collapsible */}
                 {isFilterExpanded && (
                   <div className="space-y-4">
-                    {/* Row 1: Primary Filters - Responsive Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+                    {/* All the existing filter content remains the same */}
+                    {/* Row 1: Primary Filters */}
+                    <div className="grid grid-cols-5 gap-4">
                       {/* Rightsholders */}
-                      <div className="col-span-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Rightsholders
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500 truncate">Select Rightsholders</span>
-                              <FontAwesomeIcon
-                                icon={faChevronDown}
-                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
-                              />
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Rightsholders</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
-                            {/* Keep existing popover content but make it responsive */}
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Rightsholders</div>
                                 {selectedRightsholders.length > 0 && (
-                                  <button
-                                    onClick={clearAllRightsholders}
-                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
-                                  >
+                                  <button onClick={clearAllRightsholders} className="btn-tertiary btn-sm">
                                     Clear All
                                   </button>
                                 )}
@@ -804,14 +833,14 @@ export default function Page() {
 
                               {/* Selected Rightsholders Tags */}
                               {selectedRightsholders.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedRightsholders.map((rightsholder) => (
                                     <Badge
                                       key={rightsholder}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      <span className="truncate max-w-[80px]">{rightsholder}</span>
+                                      {rightsholder}
                                       <button
                                         onClick={() => removeRightsholder(rightsholder)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -823,8 +852,8 @@ export default function Page() {
                                 </div>
                               )}
 
-                              {/* Rest of the popover content remains the same but with responsive classes */}
-                              <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              {/* Hierarchical Rightsholders by League */}
+                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {Object.entries(RIGHTSHOLDERS_STRUCTURE).map(([league, teams]) => (
                                   <div key={league} className="space-y-2">
                                     <div className="flex items-center space-x-2">
@@ -838,13 +867,13 @@ export default function Page() {
                                       />
                                       <label
                                         htmlFor={`rightsholder-league-${league}`}
-                                        className="text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
                                       >
                                         {league}
                                       </label>
                                       <span className="text-xs text-gray-500">({teams.length})</span>
                                     </div>
-                                    <div className="ml-4 sm:ml-6 space-y-1">
+                                    <div className="ml-6 space-y-1">
                                       {teams.map((team) => (
                                         <div key={team} className="flex items-center space-x-2">
                                           <Checkbox
@@ -852,10 +881,7 @@ export default function Page() {
                                             checked={selectedRightsholders.includes(team)}
                                             onCheckedChange={() => handleRightsholderToggle(team)}
                                           />
-                                          <label
-                                            htmlFor={`rightsholder-${team}`}
-                                            className="text-xs sm:text-sm cursor-pointer"
-                                          >
+                                          <label htmlFor={`rightsholder-${team}`} className="text-sm cursor-pointer">
                                             {team}
                                           </label>
                                         </div>
@@ -867,7 +893,7 @@ export default function Page() {
                                 <div className="pt-2 border-t">
                                   <button
                                     onClick={() => setSelectedRightsholders([...ALL_RIGHTSHOLDERS])}
-                                    className="btn-secondary text-xs sm:text-sm w-full py-1.5"
+                                    className="btn-secondary btn-sm w-full"
                                   >
                                     Select All
                                   </button>
@@ -878,33 +904,25 @@ export default function Page() {
                         </Popover>
                       </div>
 
-                      {/* Apply similar responsive updates to other filter components... */}
-                      {/* I'll continue with the other filters in the same pattern */}
                       {/* Sponsors */}
-                      <div className="col-span-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Sponsors
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500 truncate">Select Sponsors</span>
-                              <FontAwesomeIcon
-                                icon={faChevronDown}
-                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
-                              />
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Sponsors</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Sponsors</div>
                                 {selectedSponsors.length > 0 && (
-                                  <button
-                                    onClick={clearAllSponsors}
-                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
-                                  >
+                                  <button onClick={clearAllSponsors} className="btn-tertiary btn-sm">
                                     Clear All
                                   </button>
                                 )}
@@ -912,14 +930,14 @@ export default function Page() {
 
                               {/* Selected Sponsors Tags */}
                               {selectedSponsors.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedSponsors.map((sponsor) => (
                                     <Badge
                                       key={sponsor}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      <span className="truncate max-w-[80px]">{sponsor}</span>
+                                      {sponsor}
                                       <button
                                         onClick={() => removeSponsor(sponsor)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -932,12 +950,12 @@ export default function Page() {
                               )}
 
                               {/* Hierarchical Sponsors by Category */}
-                              <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {Object.entries(SPONSORS_BY_CATEGORY).map(([category, sponsors]) => (
                                   <div key={category} className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                       <Checkbox
-                                        id={`insights-sponsor-category-${category}`}
+                                        id={`sponsor-category-${category}`}
                                         checked={isSponsorCategoryFullySelected(sponsors)}
                                         ref={(el) => {
                                           if (el) el.indeterminate = isSponsorCategoryPartiallySelected(sponsors)
@@ -945,25 +963,22 @@ export default function Page() {
                                         onCheckedChange={() => handleSponsorCategorySelectAll(sponsors)}
                                       />
                                       <label
-                                        htmlFor={`insights-sponsor-category-${category}`}
-                                        className="text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                        htmlFor={`sponsor-category-${category}`}
+                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
                                       >
                                         {category}
                                       </label>
                                       <span className="text-xs text-gray-500">({sponsors.length})</span>
                                     </div>
-                                    <div className="ml-4 sm:ml-6 space-y-1">
+                                    <div className="ml-6 space-y-1">
                                       {sponsors.map((sponsor) => (
                                         <div key={sponsor} className="flex items-center space-x-2">
                                           <Checkbox
-                                            id={`insights-sponsor-${sponsor}`}
+                                            id={`sponsor-${sponsor}`}
                                             checked={selectedSponsors.includes(sponsor)}
                                             onCheckedChange={() => handleSponsorToggle(sponsor)}
                                           />
-                                          <label
-                                            htmlFor={`insights-sponsor-${sponsor}`}
-                                            className="text-xs sm:text-sm cursor-pointer"
-                                          >
+                                          <label htmlFor={`sponsor-${sponsor}`} className="text-sm cursor-pointer">
                                             {sponsor}
                                           </label>
                                         </div>
@@ -975,7 +990,7 @@ export default function Page() {
                                 <div className="pt-2 border-t">
                                   <button
                                     onClick={() => setSelectedSponsors([...ALL_SPONSORS])}
-                                    className="btn-secondary text-xs sm:text-sm w-full py-1.5"
+                                    className="btn-secondary btn-sm w-full"
                                   >
                                     Select All
                                   </button>
@@ -986,31 +1001,129 @@ export default function Page() {
                         </Popover>
                       </div>
 
+                      {/* Placement Types */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Placement Types
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Placement Types</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Placement Types</div>
+                                {selectedPlacementTypes.length > 0 && (
+                                  <button onClick={clearAllPlacementTypes} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Placement Types Tags */}
+                              {selectedPlacementTypes.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                  {selectedPlacementTypes.map((placementType) => (
+                                    <Badge
+                                      key={placementType}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {placementType}
+                                      <button
+                                        onClick={() => removePlacementType(placementType)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Hierarchical Placement Types */}
+                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {Object.entries(PLACEMENT_TYPES_STRUCTURE).map(([mainCategory, categories]) => (
+                                  <div key={mainCategory} className="space-y-2">
+                                    <div className="font-semibold text-sm text-gray-800 border-b pb-1">
+                                      {mainCategory}
+                                    </div>
+                                    {Object.entries(categories).map(([subCategory, items]) => (
+                                      <div key={subCategory} className="ml-2 space-y-1">
+                                        <div className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`category-${subCategory}`}
+                                            checked={isCategoryFullySelected(items)}
+                                            ref={(el) => {
+                                              if (el) el.indeterminate = isCategoryPartiallySelected(items)
+                                            }}
+                                            onCheckedChange={() => handleCategorySelectAll(items)}
+                                          />
+                                          <label
+                                            htmlFor={`category-${subCategory}`}
+                                            className="text-sm font-medium cursor-pointer"
+                                          >
+                                            {subCategory}
+                                          </label>
+                                          <span className="text-xs text-gray-500">({items.length})</span>
+                                        </div>
+                                        <div className="ml-6 space-y-1">
+                                          {items.map((item) => (
+                                            <div key={item} className="flex items-center space-x-2">
+                                              <Checkbox
+                                                id={`item-${item}`}
+                                                checked={selectedPlacementTypes.includes(item)}
+                                                onCheckedChange={() => handlePlacementTypeToggle(item)}
+                                              />
+                                              <label htmlFor={`item-${item}`} className="text-sm cursor-pointer">
+                                                {item}
+                                              </label>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="pt-2 border-t">
+                                <button
+                                  onClick={() => setSelectedPlacementTypes([...ALL_PLACEMENT_TYPES])}
+                                  className="btn-secondary btn-sm w-full"
+                                >
+                                  Select All
+                                </button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
                       {/* Placements */}
-                      <div className="col-span-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Placements
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500 truncate">Select Placements</span>
-                              <FontAwesomeIcon
-                                icon={faChevronDown}
-                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
-                              />
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Placements</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Placements</div>
                                 {selectedPlacements.length > 0 && (
-                                  <button
-                                    onClick={clearAllPlacements}
-                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
-                                  >
+                                  <button onClick={clearAllPlacements} className="btn-tertiary btn-sm">
                                     Clear All
                                   </button>
                                 )}
@@ -1018,14 +1131,14 @@ export default function Page() {
 
                               {/* Selected Placements Tags */}
                               {selectedPlacements.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md">
                                   {selectedPlacements.map((placement) => (
                                     <Badge
                                       key={placement}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      <span className="truncate max-w-[80px]">{placement}</span>
+                                      {placement}
                                       <button
                                         onClick={() => removePlacement(placement)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -1038,18 +1151,15 @@ export default function Page() {
                               )}
 
                               {/* Placement Options */}
-                              <div className="space-y-2 max-h-52 sm:max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {PLACEMENT_OPTIONS.map((placement) => (
                                   <div key={placement} className="flex items-center space-x-2">
                                     <Checkbox
-                                      id={`insights-placement-${placement}`}
+                                      id={placement}
                                       checked={selectedPlacements.includes(placement)}
                                       onCheckedChange={() => handlePlacementToggle(placement)}
                                     />
-                                    <label
-                                      htmlFor={`insights-placement-${placement}`}
-                                      className="text-xs sm:text-sm cursor-pointer flex-1"
-                                    >
+                                    <label htmlFor={placement} className="text-sm cursor-pointer flex-1">
                                       {placement}
                                     </label>
                                   </div>
@@ -1059,7 +1169,7 @@ export default function Page() {
                               <div className="pt-2 border-t">
                                 <button
                                   onClick={() => setSelectedPlacements([...PLACEMENT_OPTIONS])}
-                                  className="btn-secondary text-xs sm:text-sm w-full py-1.5"
+                                  className="btn-secondary btn-sm w-full"
                                 >
                                   Select All
                                 </button>
@@ -1069,98 +1179,15 @@ export default function Page() {
                         </Popover>
                       </div>
 
-                      {/* Insights Type */}
-                      <div className="col-span-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
-                          Insights Type
-                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                        </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500 truncate">Select Insights Type</span>
-                              <FontAwesomeIcon
-                                icon={faChevronDown}
-                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
-                              />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <div className="font-medium text-sm">Select Insights Type</div>
-                                {selectedInsightsTypes.length > 0 && (
-                                  <button
-                                    onClick={clearAllInsightsTypes}
-                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
-                                  >
-                                    Clear All
-                                  </button>
-                                )}
-                              </div>
-
-                              {/* Selected Insights Types Tags */}
-                              {selectedInsightsTypes.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
-                                  {selectedInsightsTypes.map((insightsType) => (
-                                    <Badge
-                                      key={insightsType}
-                                      variant="secondary"
-                                      className="flex items-center gap-1 text-xs"
-                                    >
-                                      <span className="truncate max-w-[80px]">{insightsType}</span>
-                                      <button
-                                        onClick={() => removeInsightsType(insightsType)}
-                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                      >
-                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
-                                      </button>
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Insights Type Options */}
-                              <div className="space-y-2 max-h-52 sm:max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
-                                {INSIGHTS_TYPE_OPTIONS.map((insightsType) => (
-                                  <div key={insightsType} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`insights-type-${insightsType}`}
-                                      checked={selectedInsightsTypes.includes(insightsType)}
-                                      onCheckedChange={() => handleInsightsTypeToggle(insightsType)}
-                                    />
-                                    <label
-                                      htmlFor={`insights-type-${insightsType}`}
-                                      className="text-xs sm:text-sm cursor-pointer flex-1"
-                                    >
-                                      {insightsType}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-
-                              <div className="pt-2 border-t">
-                                <button
-                                  onClick={() => setSelectedInsightsTypes([...INSIGHTS_TYPE_OPTIONS])}
-                                  className="btn-secondary text-xs sm:text-sm w-full py-1.5"
-                                >
-                                  Select All
-                                </button>
-                              </div>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {/* Time Period */}
-                      <div className="col-span-1">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                      {/* Season Year or Date Range */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Time Period
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
                               <span
                                 className={`truncate pr-2 min-w-0 flex-1 ${
                                   (filterType === "dateRange" && dateRange.from && dateRange.to) ||
@@ -1179,12 +1206,966 @@ export default function Page() {
                               </span>
                               <FontAwesomeIcon
                                 icon={faChevronDown}
-                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
+                                className="h-4 w-4 text-gray-400 flex-shrink-0 ml-1"
                               />
                             </button>
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-[420px]"
+                            className="w-[var(--radix-popover-trigger-width)] min-w-[420px]"
+                            align="start"
+                          >
+                            <div className="space-y-6">
+                              {/* Header */}
+                              <div className="border-b pb-3">
+                                <h3 className="font-semibold text-gray-900">Select Time Period</h3>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  Choose between specific seasons or a custom date range
+                                </p>
+                              </div>
+
+                              {/* Mode Selection - Radio Buttons */}
+                              <div className="space-y-3">
+                                <div className="flex items-center space-x-4">
+                                  <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      name="filterType"
+                                      value="years"
+                                      checked={filterType === "years"}
+                                      onChange={() => setFilterType("years")}
+                                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">Season Years</span>
+                                  </label>
+                                  <label className="flex items-center space-x-2 cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      name="filterType"
+                                      value="dateRange"
+                                      checked={filterType === "dateRange"}
+                                      onChange={() => setFilterType("dateRange")}
+                                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">Custom Date Range</span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Content Area */}
+                              <div className="min-h-[300px]">
+                                {filterType === "years" ? (
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-medium text-gray-900">Available Seasons</h4>
+                                      {selectedYears.length > 0 && (
+                                        <button
+                                          onClick={() => setSelectedYears([])}
+                                          className="text-xs text-red-600 hover:text-red-700 underline"
+                                        >
+                                          Clear Selection
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Selected Years Display */}
+                                    {selectedYears.length > 0 && (
+                                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                        <div className="text-sm font-medium text-green-900 mb-1">Selected Seasons</div>
+                                        <div className="text-green-800">
+                                          {selectedYears
+                                            .sort((a, b) => Number.parseInt(b) - Number.parseInt(a))
+                                            .join(", ")}
+                                        </div>
+                                        <div className="text-xs text-green-600 mt-1">
+                                          {selectedYears.length} season{selectedYears.length !== 1 ? "s" : ""} selected
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Year Selection Grid */}
+                                    <div className="space-y-2">
+                                      <div className="text-sm font-medium text-gray-700">Select Seasons (up to 5)</div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {availableYears.map((year) => (
+                                          <div key={year} className="flex items-center space-x-2">
+                                            <Checkbox
+                                              id={`year-${year}`}
+                                              checked={selectedYears.includes(year)}
+                                              onCheckedChange={() => handleYearToggle(year)}
+                                              disabled={!selectedYears.includes(year) && selectedYears.length >= 5}
+                                            />
+                                            <label htmlFor={`year-${year}`} className="text-sm cursor-pointer flex-1">
+                                              {year} Season
+                                            </label>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {selectedYears.length >= 5 && (
+                                        <div className="text-xs text-amber-600 mt-2">
+                                          Maximum of 5 seasons can be selected
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="pt-2 border-t">
+                                      <button
+                                        onClick={() => setSelectedYears([...availableYears])}
+                                        className="btn-secondary btn-sm w-full"
+                                        disabled={selectedYears.length >= 5}
+                                      >
+                                        Select All Available
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <h4 className="font-medium text-gray-900">Select Date Range</h4>
+                                      {dateRange.from && dateRange.to && (
+                                        <button
+                                          onClick={() => setDateRange({ from: undefined, to: undefined })}
+                                          className="text-xs text-red-600 hover:text-red-700 underline"
+                                        >
+                                          Clear Dates
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Selected Date Range Display */}
+                                    {dateRange.from && dateRange.to && (
+                                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                        <div className="text-sm font-medium text-green-900 mb-1">Selected Range</div>
+                                        <div className="text-green-800">
+                                          {format(dateRange.from, "MMMM dd, yyyy")} →{" "}
+                                          {format(dateRange.to, "MMMM dd, yyyy")}
+                                        </div>
+                                        <div className="text-xs text-green-600 mt-1">
+                                          {Math.ceil(
+                                            (dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24),
+                                          )}{" "}
+                                          days selected
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Quick Preset Options */}
+                                    <div className="space-y-2">
+                                      <div className="text-sm font-medium text-gray-700">Quick Presets</div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {[
+                                          { label: "Last 30 Days", days: 30 },
+                                          { label: "Last 90 Days", days: 90 },
+                                          { label: "Last 6 Months", days: 180 },
+                                          { label: "Last Year", days: 365 },
+                                        ].map((preset) => (
+                                          <button
+                                            key={preset.label}
+                                            onClick={() => {
+                                              const to = new Date()
+                                              const from = new Date()
+                                              from.setDate(from.getDate() - preset.days)
+                                              setDateRange({ from, to })
+                                            }}
+                                            className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors text-left"
+                                          >
+                                            {preset.label}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
+
+                                    {/* Calendar */}
+                                    <div className="border-t pt-4">
+                                      <div className="text-sm font-medium text-gray-700 mb-3">Custom Selection</div>
+                                      <Calendar
+                                        mode="range"
+                                        selected={dateRange}
+                                        onSelect={(range) => {
+                                          setDateRange({ from: range?.from, to: range?.to })
+                                        }}
+                                        numberOfMonths={1}
+                                        initialFocus
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Footer Actions */}
+                              <div className="flex items-center justify-between pt-4 border-t">
+                                <div className="text-xs text-gray-500">
+                                  {filterType === "years"
+                                    ? `${selectedYears.length} season${selectedYears.length !== 1 ? "s" : ""} selected`
+                                    : dateRange.from && dateRange.to
+                                      ? "Date range selected"
+                                      : "No dates selected"}
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    if (filterType === "years") {
+                                      setSelectedYears([])
+                                    } else {
+                                      setDateRange({ from: undefined, to: undefined })
+                                    }
+                                  }}
+                                  className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                                >
+                                  Clear All
+                                </button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+
+                    {/* Page Specific Metrics - Collapsible */}
+                    <div className="border-t pt-4">
+                      <button
+                        onClick={() => setShowPageSpecificMetrics(!showPageSpecificMetrics)}
+                        className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3"
+                      >
+                        <FontAwesomeIcon
+                          icon={showPageSpecificMetrics ? faChevronDown : faChevronUp}
+                          className="h-3 w-3"
+                        />
+                        Page Specific Metrics
+                      </button>
+
+                      {showPageSpecificMetrics && (
+                        <div className="space-y-4">
+                          {/* Row 2: Page Specific Metrics */}
+                          <div className="grid grid-cols-3 gap-4">
+                            {/* Platforms */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Platforms
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Platforms</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {PLATFORMS_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox id={option} />
+                                        <label htmlFor={option} className="text-sm">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            {/* Account Types */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Account Types
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Account Types</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {ACCOUNT_TYPES_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox id={option} />
+                                        <label htmlFor={option} className="text-sm">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            {/* Media Types */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Media Types
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Media Types</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {MEDIA_TYPES_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox id={option} />
+                                        <label htmlFor={option} className="text-sm">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          </div>
+
+                          {/* Row 3: Additional Filters */}
+                          <div className="grid grid-cols-3 gap-4">
+                            {/* Collections */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Collections
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Collections</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {COLLECTIONS_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox id={option} />
+                                        <label htmlFor={option} className="text-sm">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            {/* Hashtags */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Hashtags
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">
+                                      {selectedHashtags.length > 0
+                                        ? `${selectedHashtags.length} hashtags selected`
+                                        : "Enter hashtags"}
+                                    </span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="font-medium text-sm">Add Hashtags</div>
+                                      {selectedHashtags.length > 0 && (
+                                        <button onClick={() => setSelectedHashtags([])} className="btn-tertiary btn-sm">
+                                          Clear All
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Input for adding hashtags */}
+                                    <div className="space-y-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Enter hashtag (e.g., #NBA, #Basketball)"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            const value = e.currentTarget.value.trim()
+                                            if (value && !selectedHashtags.includes(value)) {
+                                              const hashtag = value.startsWith("#") ? value : `#${value}`
+                                              setSelectedHashtags((prev) => [...prev, hashtag])
+                                              e.currentTarget.value = ""
+                                            }
+                                          }
+                                        }}
+                                      />
+                                      <div className="text-xs text-gray-500">Press Enter to add hashtag</div>
+                                    </div>
+
+                                    {/* Selected Hashtags */}
+                                    {selectedHashtags.length > 0 && (
+                                      <div className="space-y-2">
+                                        <div className="text-sm font-medium">Selected Hashtags:</div>
+                                        <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                          {selectedHashtags.map((hashtag, index) => (
+                                            <Badge
+                                              key={index}
+                                              variant="secondary"
+                                              className="flex items-center gap-1 text-xs"
+                                            >
+                                              {hashtag}
+                                              <button
+                                                onClick={() =>
+                                                  setSelectedHashtags((prev) => prev.filter((_, i) => i !== index))
+                                                }
+                                                className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                              >
+                                                <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                              </button>
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Suggested hashtags */}
+                                    <div className="space-y-2">
+                                      <div className="text-sm font-medium">Suggested:</div>
+                                      <div className="flex flex-wrap gap-1">
+                                        {["#NBA", "#Basketball", "#Sports", "#GameDay", "#Playoffs", "#Finals"].map(
+                                          (suggestion) => (
+                                            <button
+                                              key={suggestion}
+                                              onClick={() => {
+                                                if (!selectedHashtags.includes(suggestion)) {
+                                                  setSelectedHashtags((prev) => [...prev, suggestion])
+                                                }
+                                              }}
+                                              className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                                              disabled={selectedHashtags.includes(suggestion)}
+                                            >
+                                              {suggestion}
+                                            </button>
+                                          ),
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          </div>
+
+                          {/* Row 4: Comparison Dates */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Comparison Dates
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Comparison Dates</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {COMPARISON_DATES_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox id={option} />
+                                        <label htmlFor={option} className="text-sm">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                  Group By
+                                  <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                                </label>
+                                <button
+                                  onClick={() => {
+                                    // Set current groupBy as default
+                                    console.log(`Setting ${groupBy} as default Group By`)
+                                  }}
+                                  className="text-xs text-blue-500 hover:text-blue-700 underline"
+                                >
+                                  Set as default Group By
+                                </button>
+                              </div>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-700">{groupBy}</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-2">
+                                    {GROUP_BY_OPTIONS.map((option) => (
+                                      <div key={option} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`groupby-${option}`}
+                                          checked={groupBy === option}
+                                          onCheckedChange={() => setGroupBy(option)}
+                                        />
+                                        <label htmlFor={`groupby-${option}`} className="text-sm cursor-pointer flex-1">
+                                          {option}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+
+                              {/* Group By Tag Display */}
+                              {groupBy && (
+                                <div className="mt-2">
+                                  <Badge variant="secondary" className="flex items-center gap-1 text-xs w-fit">
+                                    Group By {groupBy}
+                                    <button
+                                      onClick={() => setGroupBy("Date")}
+                                      className="ml-1 hover:bg-gray-300 rounded-full p-1 flex items-center justify-center"
+                                    >
+                                      <FontAwesomeIcon icon={faTimes} className="h-2.5 w-2.5" />
+                                    </button>
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                      <button onClick={openSaveFilterDrawer} className="btn-secondary flex items-center gap-2">
+                        <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
+                        Save Filter
+                      </button>
+                      <button
+                        onClick={() => setShowSavedFiltersDrawer(true)}
+                        className="btn-secondary flex items-center gap-2"
+                      >
+                        <FontAwesomeIcon icon={faFolderOpen} className="h-4 w-4" />
+                        Saved Filters ({savedFilters.length})
+                      </button>
+                      <button onClick={clearAllFilters} className="btn-utility flex items-center gap-2">
+                        <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                        Clear All Filters
+                      </button>
+                      <button onClick={applyFilters} className="btn-primary flex items-center gap-2">
+                        <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
+                        Update Filters
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Filter Bar for Insights Tab */}
+            <TabsContent value="insights" className="mt-6 mb-0">
+              <div className="p-5">
+                {/* Main Filters Grid - Collapsible */}
+                {isFilterExpanded && (
+                  <div className="space-y-4">
+                    {/* Main Filter Row - 5 Filters */}
+                    <div className="grid grid-cols-5 gap-4">
+                      {/* Sponsors */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Sponsors
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Sponsors</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Sponsors</div>
+                                {selectedSponsors.length > 0 && (
+                                  <button onClick={clearAllSponsors} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Sponsors Tags */}
+                              {selectedSponsors.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                  {selectedSponsors.map((sponsor) => (
+                                    <Badge
+                                      key={sponsor}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {sponsor}
+                                      <button
+                                        onClick={() => removeSponsor(sponsor)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Hierarchical Sponsors by Category */}
+                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {Object.entries(SPONSORS_BY_CATEGORY).map(([category, sponsors]) => (
+                                  <div key={category} className="space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`insights-sponsor-category-${category}`}
+                                        checked={isSponsorCategoryFullySelected(sponsors)}
+                                        ref={(el) => {
+                                          if (el) el.indeterminate = isSponsorCategoryPartiallySelected(sponsors)
+                                        }}
+                                        onCheckedChange={() => handleSponsorCategorySelectAll(sponsors)}
+                                      />
+                                      <label
+                                        htmlFor={`insights-sponsor-category-${category}`}
+                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                      >
+                                        {category}
+                                      </label>
+                                      <span className="text-xs text-gray-500">({sponsors.length})</span>
+                                    </div>
+                                    <div className="ml-6 space-y-1">
+                                      {sponsors.map((sponsor) => (
+                                        <div key={sponsor} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`insights-sponsor-${sponsor}`}
+                                            checked={selectedSponsors.includes(sponsor)}
+                                            onCheckedChange={() => handleSponsorToggle(sponsor)}
+                                          />
+                                          <label
+                                            htmlFor={`insights-sponsor-${sponsor}`}
+                                            className="text-sm cursor-pointer"
+                                          >
+                                            {sponsor}
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+
+                                <div className="pt-2 border-t">
+                                  <button
+                                    onClick={() => setSelectedSponsors([...ALL_SPONSORS])}
+                                    className="btn-secondary btn-sm w-full"
+                                  >
+                                    Select All
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Rightsholders */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Rightsholders
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Rightsholders</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Rightsholders</div>
+                                {selectedRightsholders.length > 0 && (
+                                  <button onClick={clearAllRightsholders} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Rightsholders Tags */}
+                              {selectedRightsholders.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                  {selectedRightsholders.map((rightsholder) => (
+                                    <Badge
+                                      key={rightsholder}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {rightsholder}
+                                      <button
+                                        onClick={() => removeRightsholder(rightsholder)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Hierarchical Rightsholders by League */}
+                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {Object.entries(RIGHTSHOLDERS_STRUCTURE).map(([league, teams]) => (
+                                  <div key={league} className="space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`insights-rightsholder-league-${league}`}
+                                        checked={isRightsholderCategoryFullySelected(teams)}
+                                        ref={(el) => {
+                                          if (el) el.indeterminate = isRightsholderCategoryPartiallySelected(teams)
+                                        }}
+                                        onCheckedChange={() => handleRightsholderCategorySelectAll(teams)}
+                                      />
+                                      <label
+                                        htmlFor={`insights-rightsholder-league-${league}`}
+                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                      >
+                                        {league}
+                                      </label>
+                                      <span className="text-xs text-gray-500">({teams.length})</span>
+                                    </div>
+                                    <div className="ml-6 space-y-1">
+                                      {teams.map((team) => (
+                                        <div key={team} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`insights-rightsholder-${team}`}
+                                            checked={selectedRightsholders.includes(team)}
+                                            onCheckedChange={() => handleRightsholderToggle(team)}
+                                          />
+                                          <label
+                                            htmlFor={`insights-rightsholder-${team}`}
+                                            className="text-sm cursor-pointer"
+                                          >
+                                            {team}
+                                          </label>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+
+                                <div className="pt-2 border-t">
+                                  <button
+                                    onClick={() => setSelectedRightsholders([...ALL_RIGHTSHOLDERS])}
+                                    className="btn-secondary btn-sm w-full"
+                                  >
+                                    Select All
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Placements */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Placements
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Placements</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Placements</div>
+                                {selectedPlacements.length > 0 && (
+                                  <button onClick={clearAllPlacements} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Placements Tags */}
+                              {selectedPlacements.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md">
+                                  {selectedPlacements.map((placement) => (
+                                    <Badge
+                                      key={placement}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {placement}
+                                      <button
+                                        onClick={() => removePlacement(placement)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Placement Options */}
+                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {PLACEMENT_OPTIONS.map((placement) => (
+                                  <div key={placement} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`insights-placement-${placement}`}
+                                      checked={selectedPlacements.includes(placement)}
+                                      onCheckedChange={() => handlePlacementToggle(placement)}
+                                    />
+                                    <label
+                                      htmlFor={`insights-placement-${placement}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
+                                      {placement}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="pt-2 border-t">
+                                <button
+                                  onClick={() => setSelectedPlacements([...PLACEMENT_OPTIONS])}
+                                  className="btn-secondary btn-sm w-full"
+                                >
+                                  Select All
+                                </button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Insights Type */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Insights Type
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500">Select Insights Type</span>
+                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">Select Insights Type</div>
+                                {selectedInsightsTypes.length > 0 && (
+                                  <button onClick={clearAllInsightsTypes} className="btn-tertiary btn-sm">
+                                    Clear All
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Selected Insights Types Tags */}
+                              {selectedInsightsTypes.length > 0 && (
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                  {selectedInsightsTypes.map((insightsType) => (
+                                    <Badge
+                                      key={insightsType}
+                                      variant="secondary"
+                                      className="flex items-center gap-1 text-xs"
+                                    >
+                                      {insightsType}
+                                      <button
+                                        onClick={() => removeInsightsType(insightsType)}
+                                        className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      >
+                                        <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Insights Type Options */}
+                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                {INSIGHTS_TYPE_OPTIONS.map((insightsType) => (
+                                  <div key={insightsType} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`insights-type-${insightsType}`}
+                                      checked={selectedInsightsTypes.includes(insightsType)}
+                                      onCheckedChange={() => handleInsightsTypeToggle(insightsType)}
+                                    />
+                                    <label
+                                      htmlFor={`insights-type-${insightsType}`}
+                                      className="text-sm cursor-pointer flex-1"
+                                    >
+                                      {insightsType}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="pt-2 border-t">
+                                <button
+                                  onClick={() => setSelectedInsightsTypes([...INSIGHTS_TYPE_OPTIONS])}
+                                  className="btn-secondary btn-sm w-full"
+                                >
+                                  Select All
+                                </button>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Time Period */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Time Period
+                          <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span
+                                className={`truncate pr-2 min-w-0 flex-1 ${
+                                  (filterType === "dateRange" && dateRange.from && dateRange.to) ||
+                                  (filterType === "years" && selectedYears.length > 0)
+                                    ? "text-gray-900 font-medium"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {filterType === "dateRange" && dateRange.from && dateRange.to
+                                  ? `${format(dateRange.from, "MMM dd")} → ${format(dateRange.to, "MMM dd, yyyy")}`
+                                  : filterType === "years" && selectedYears.length > 0
+                                    ? selectedYears.length === 1
+                                      ? `${selectedYears[0]} Season`
+                                      : `${selectedYears.length} Seasons Selected`
+                                    : "Select time period"}
+                              </span>
+                              <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className="h-4 w-4 text-gray-400 flex-shrink-0 ml-1"
+                              />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[var(--radix-popover-trigger-width)] min-w-[420px]"
                             align="start"
                           >
                             <div className="space-y-6">
@@ -1225,7 +2206,7 @@ export default function Page() {
                               </div>
 
                               {/* Content Area */}
-                              <div className="min-h-[240px] sm:min-h-[300px]">
+                              <div className="min-h-[300px]">
                                 {filterType === "years" ? (
                                   <div className="space-y-4">
                                     <div className="flex items-center justify-between">
@@ -1269,7 +2250,7 @@ export default function Page() {
                                             />
                                             <label
                                               htmlFor={`insights-year-${year}`}
-                                              className="text-xs sm:text-sm cursor-pointer flex-1"
+                                              className="text-sm cursor-pointer flex-1"
                                             >
                                               {year} Season
                                             </label>
@@ -1286,7 +2267,7 @@ export default function Page() {
                                     <div className="pt-2 border-t">
                                       <button
                                         onClick={() => setSelectedYears([...availableYears])}
-                                        className="btn-secondary text-xs sm:text-sm w-full py-1.5"
+                                        className="btn-secondary btn-sm w-full"
                                         disabled={selectedYears.length >= 5}
                                       >
                                         Select All Available
@@ -1397,38 +2378,14 @@ export default function Page() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t">
-                      <button
-                        onClick={openSaveFilterDrawer}
-                        className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
-                      >
-                        <FontAwesomeIcon icon={faSave} className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="hidden sm:inline">Save Filter</span>
-                        <span className="sm:hidden">Save</span>
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                      <button onClick={clearAllFilters} className="btn-utility flex items-center gap-2">
+                        <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                        Clear All Filters
                       </button>
-                      <button
-                        onClick={() => setShowSavedFiltersDrawer(true)}
-                        className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
-                      >
-                        <FontAwesomeIcon icon={faFolderOpen} className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="hidden sm:inline">Saved Filters ({savedFilters.length})</span>
-                        <span className="sm:hidden">Saved ({savedFilters.length})</span>
-                      </button>
-                      <button
-                        onClick={clearAllFilters}
-                        className="btn-utility flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
-                      >
-                        <FontAwesomeIcon icon={faTimes} className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="hidden sm:inline">Clear All Filters</span>
-                        <span className="sm:hidden">Clear All</span>
-                      </button>
-                      <button
-                        onClick={applyFilters}
-                        className="btn-primary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
-                      >
-                        <FontAwesomeIcon icon={faFilter} className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="hidden sm:inline">Update Filters</span>
-                        <span className="sm:hidden">Update</span>
+                      <button onClick={applyFilters} className="btn-primary flex items-center gap-2">
+                        <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
+                        Update Filters
                       </button>
                     </div>
                   </div>
@@ -1438,38 +2395,36 @@ export default function Page() {
           </Tabs>
         </div>
       </div>
-      <div className="p-3 sm:p-4 lg:p-6 pt-0 pb-6">
+      <div className="p-6 pt-0">
         <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
           {/* Content based on selected tab */}
-          <TabsContent value="analytics" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <TabsContent value="analytics" className="space-y-6 mt-6">
             {/* Analytics Sub-tabs Section */}
             <Tabs defaultValue="breakdown" className="w-full">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
-                <TabsList className="inline-flex h-9 sm:h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-full sm:w-auto">
+              <div className="flex items-center justify-between mb-6">
+                <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
                   <TabsTrigger
                     value="breakdown"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                   >
-                    <FontAwesomeIcon icon={faTable} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    <span className="hidden xs:inline">Breakdown</span>
-                    <span className="xs:hidden">Table</span>
+                    <FontAwesomeIcon icon={faTable} className="h-4 w-4 mr-2" />
+                    Breakdown
                   </TabsTrigger>
                   <TabsTrigger
                     value="visualization"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                   >
-                    <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    <span className="hidden xs:inline">Visualization</span>
-                    <span className="xs:hidden">Charts</span>
+                    <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 mr-2" />
+                    Visualization
                   </TabsTrigger>
                 </TabsList>
               </div>
 
-              <TabsContent value="breakdown" className="space-y-4 sm:space-y-6">
+              <TabsContent value="breakdown" className="space-y-6">
                 <DataTable data={filteredData} />
               </TabsContent>
 
-              <TabsContent value="visualization" className="space-y-4 sm:space-y-6">
+              <TabsContent value="visualization" className="space-y-6">
                 <DataBarChart data={filteredData} />
                 <MultiMetricChart data={filteredData} />
                 <ComparisonLineChart data={filteredData} />
@@ -1477,14 +2432,9 @@ export default function Page() {
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-            {/* Insight Template Gallery */}
-            <InsightTemplateGallery onTemplateSelect={handleTemplateSelect} />
-
-            {/* Automated Insights Content */}
-            <div id="automated-insights-section">
-              <AutomatedInsights data={filteredData} templateTrigger={templateTrigger} />
-            </div>
+          <TabsContent value="insights" className="space-y-6 mt-6">
+            {/* Insights Content */}
+            <AutomatedInsights data={filteredData} />
           </TabsContent>
         </Tabs>
       </div>
