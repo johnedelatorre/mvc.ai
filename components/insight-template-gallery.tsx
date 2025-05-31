@@ -385,11 +385,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
             </Badge>
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="self-start sm:self-auto">
-            <FontAwesomeIcon
-              icon={expanded ? faChevronUp : faChevronDown}
-              className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2"
-            />
-            <span className="text-xs sm:text-sm">{expanded ? "Collapse" : "Expand"}</span>
+            <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
 
@@ -401,24 +397,24 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
             </p>
 
             {/* Search and Filters */}
-            <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
               <div className="flex-1 relative">
                 <FontAwesomeIcon
                   icon={faSearch}
                   className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400"
                 />
                 <Input
-                  placeholder="Search templates..."
+                  placeholder="Search templates by name, description, or tags..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-8 sm:pl-10 text-xs sm:text-sm py-2"
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
+                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap min-w-[80px] sm:min-w-[100px]">
                       <span className="text-gray-700">{selectedCategory}</span>
                       <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 ml-2" />
                     </button>
@@ -446,7 +442,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
+                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap min-w-[90px] sm:min-w-[110px]">
                       <span className="text-gray-700">
                         {selectedDifficulty === "All" ? "All Levels" : selectedDifficulty}
                       </span>
