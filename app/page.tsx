@@ -665,153 +665,102 @@ export default function Page() {
     <div className="w-full">
       {/* Sticky Header Section */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="p-6 pb-0">
+        <div className="p-3 sm:p-4 lg:p-6 pb-0">
           {/* Page Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge AI</h1>
+          <div className="mb-4 lg:mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">Relo Edge AI</h1>
           </div>
 
           {/* Main Tabs Section */}
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
-            <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
+            <TabsList className="inline-flex h-9 sm:h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
               <TabsTrigger
                 value="analytics"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
               >
-                <FontAwesomeIcon icon={faChartLine} className="h-4 w-4 mr-2" />
-                Analytics
+                <FontAwesomeIcon icon={faChartLine} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Analytics</span>
+                <span className="xs:hidden">Data</span>
               </TabsTrigger>
               <TabsTrigger
                 value="insights"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
               >
-                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 mr-2" />
-                Insights
+                <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Insights</span>
+                <span className="xs:hidden">AI</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Thin grey border that extends 100% across the page */}
-            <div className="w-screen relative -ml-6 border-b border-gray-200 mt-4"></div>
+            <div className="w-screen relative -ml-3 sm:-ml-4 lg:-ml-6 border-b border-gray-200 mt-3 sm:mt-4"></div>
 
             {/* Filter Bar for Analytics Tab */}
-            <TabsContent value="analytics" className="mt-6 mb-0">
-              <div className="p-5">
+            <TabsContent value="analytics" className="mt-4 sm:mt-6 mb-0">
+              <div className="p-2 sm:p-3 lg:p-5">
                 {/* Active Filters Row */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                      <span className="text-sm font-medium">Sort Filters</span>
-                      <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <button className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
+                      <span className="font-medium hidden sm:inline">Sort Filters</span>
+                      <span className="font-medium sm:hidden">Filters</span>
+                      <FontAwesomeIcon icon={faFilter} className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
 
-                    {/* Active Filter Tags */}
-                    <div className="flex items-center gap-2 ml-4">
+                    {/* Active Filter Tags - Scrollable on mobile */}
+                    <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 overflow-x-auto scrollbar-none">
                       {/* Time Period Tags */}
                       {filterType === "dateRange" && dateRange.from && dateRange.to && (
                         <>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            From: {format(dateRange.from, "yyyy-MM-dd")}
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
+                            From: {format(dateRange.from, "MM/dd")}
                           </Badge>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            To: {format(dateRange.to, "yyyy-MM-dd")}
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
+                            To: {format(dateRange.to, "MM/dd/yy")}
                           </Badge>
                         </>
                       )}
                       {filterType === "years" && selectedYears.length > 0 && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                          Years: {selectedYears.join(", ")}
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
+                          {selectedYears.length === 1 ? selectedYears[0] : `${selectedYears.length} Years`}
                         </Badge>
                       )}
 
-                      {/* Rightsholders Tag */}
+                      {/* Other filter tags with responsive text */}
                       {selectedRightsholders.length > 0 && (
-                        <Badge className="bg-green-100 text-green-700 border-green-300">
-                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
-                          Selected
+                        <Badge className="bg-green-100 text-green-700 border-green-300 text-xs whitespace-nowrap">
+                          {selectedRightsholders.length} RH
                         </Badge>
                       )}
 
-                      {/* Sponsors Tag */}
                       {selectedSponsors.length > 0 && (
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-300 text-xs whitespace-nowrap">
+                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""}
                         </Badge>
                       )}
 
-                      {/* Placements Tag */}
                       {selectedPlacements.length > 0 && (
-                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
-                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                        <Badge className="bg-orange-100 text-orange-700 border-orange-300 text-xs whitespace-nowrap">
+                          {selectedPlacements.length} Place{selectedPlacements.length !== 1 ? "s" : ""}
                         </Badge>
                       )}
 
-                      {/* Placement Types Tag */}
                       {selectedPlacementTypes.length > 0 && (
-                        <Badge className="bg-pink-100 text-pink-700 border-pink-300">
-                          {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
-                          Selected
+                        <Badge className="bg-pink-100 text-pink-700 border-pink-300 text-xs whitespace-nowrap">
+                          {selectedPlacementTypes.length} Type{selectedPlacementTypes.length !== 1 ? "s" : ""}
                         </Badge>
                       )}
 
-                      {/* Platforms Tag */}
-                      {selectedPlatforms.length > 0 && (
-                        <Badge className="bg-cyan-100 text-cyan-700 border-cyan-300">
-                          {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Account Types Tag */}
-                      {selectedAccountTypes.length > 0 && (
-                        <Badge className="bg-indigo-100 text-indigo-700 border-indigo-300">
-                          {selectedAccountTypes.length} Account Type{selectedAccountTypes.length !== 1 ? "s" : ""}{" "}
-                          Selected
-                        </Badge>
-                      )}
-
-                      {/* Media Types Tag */}
-                      {selectedMediaTypes.length > 0 && (
-                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">
-                          {selectedMediaTypes.length} Media Type{selectedMediaTypes.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Collections Tag */}
-                      {selectedCollections.length > 0 && (
-                        <Badge className="bg-red-100 text-red-700 border-red-300">
-                          {selectedCollections.length} Collection{selectedCollections.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Hashtags Tag */}
-                      {selectedHashtags.length > 0 && (
-                        <Badge className="bg-teal-100 text-teal-700 border-teal-300">
-                          {selectedHashtags.length} Hashtag{selectedHashtags.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Handles Tag */}
-                      {selectedHandles.length > 0 && (
-                        <Badge className="bg-lime-100 text-lime-700 border-lime-300">
-                          {selectedHandles.length} Handle{selectedHandles.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Comparison Dates Tag */}
-                      {selectedComparisonDates.length > 0 && (
-                        <Badge className="bg-amber-100 text-amber-700 border-amber-300">
-                          {selectedComparisonDates.length} Comparison Date
-                          {selectedComparisonDates.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Group By Tag - Keep as is */}
-                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
+                      {/* Group By Tag */}
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300 text-xs whitespace-nowrap">
+                        By: {groupBy}
+                      </Badge>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 p-1 sm:p-0"
                   >
                     <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
                   </button>
@@ -820,28 +769,34 @@ export default function Page() {
                 {/* Main Filters Grid - Collapsible */}
                 {isFilterExpanded && (
                   <div className="space-y-4">
-                    {/* All the existing filter content remains the same */}
-                    {/* Row 1: Primary Filters */}
-                    <div className="grid grid-cols-5 gap-4">
+                    {/* Row 1: Primary Filters - Responsive Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
                       {/* Rightsholders */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="col-span-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                           Rightsholders
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500">Select Rightsholders</span>
-                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500 truncate">Select Rightsholders</span>
+                              <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
+                              />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
+                            {/* Keep existing popover content but make it responsive */}
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Rightsholders</div>
                                 {selectedRightsholders.length > 0 && (
-                                  <button onClick={clearAllRightsholders} className="btn-tertiary btn-sm">
+                                  <button
+                                    onClick={clearAllRightsholders}
+                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
+                                  >
                                     Clear All
                                   </button>
                                 )}
@@ -849,14 +804,14 @@ export default function Page() {
 
                               {/* Selected Rightsholders Tags */}
                               {selectedRightsholders.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedRightsholders.map((rightsholder) => (
                                     <Badge
                                       key={rightsholder}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      {rightsholder}
+                                      <span className="truncate max-w-[80px]">{rightsholder}</span>
                                       <button
                                         onClick={() => removeRightsholder(rightsholder)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -868,8 +823,8 @@ export default function Page() {
                                 </div>
                               )}
 
-                              {/* Hierarchical Rightsholders by League */}
-                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              {/* Rest of the popover content remains the same but with responsive classes */}
+                              <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {Object.entries(RIGHTSHOLDERS_STRUCTURE).map(([league, teams]) => (
                                   <div key={league} className="space-y-2">
                                     <div className="flex items-center space-x-2">
@@ -883,13 +838,13 @@ export default function Page() {
                                       />
                                       <label
                                         htmlFor={`rightsholder-league-${league}`}
-                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                        className="text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
                                       >
                                         {league}
                                       </label>
                                       <span className="text-xs text-gray-500">({teams.length})</span>
                                     </div>
-                                    <div className="ml-6 space-y-1">
+                                    <div className="ml-4 sm:ml-6 space-y-1">
                                       {teams.map((team) => (
                                         <div key={team} className="flex items-center space-x-2">
                                           <Checkbox
@@ -897,7 +852,10 @@ export default function Page() {
                                             checked={selectedRightsholders.includes(team)}
                                             onCheckedChange={() => handleRightsholderToggle(team)}
                                           />
-                                          <label htmlFor={`rightsholder-${team}`} className="text-sm cursor-pointer">
+                                          <label
+                                            htmlFor={`rightsholder-${team}`}
+                                            className="text-xs sm:text-sm cursor-pointer"
+                                          >
                                             {team}
                                           </label>
                                         </div>
@@ -909,7 +867,7 @@ export default function Page() {
                                 <div className="pt-2 border-t">
                                   <button
                                     onClick={() => setSelectedRightsholders([...ALL_RIGHTSHOLDERS])}
-                                    className="btn-secondary btn-sm w-full"
+                                    className="btn-secondary text-xs sm:text-sm w-full py-1.5"
                                   >
                                     Select All
                                   </button>
@@ -920,25 +878,33 @@ export default function Page() {
                         </Popover>
                       </div>
 
+                      {/* Apply similar responsive updates to other filter components... */}
+                      {/* I'll continue with the other filters in the same pattern */}
                       {/* Sponsors */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="col-span-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                           Sponsors
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500">Select Sponsors</span>
-                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500 truncate">Select Sponsors</span>
+                              <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
+                              />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Sponsors</div>
                                 {selectedSponsors.length > 0 && (
-                                  <button onClick={clearAllSponsors} className="btn-tertiary btn-sm">
+                                  <button
+                                    onClick={clearAllSponsors}
+                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
+                                  >
                                     Clear All
                                   </button>
                                 )}
@@ -946,14 +912,14 @@ export default function Page() {
 
                               {/* Selected Sponsors Tags */}
                               {selectedSponsors.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedSponsors.map((sponsor) => (
                                     <Badge
                                       key={sponsor}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      {sponsor}
+                                      <span className="truncate max-w-[80px]">{sponsor}</span>
                                       <button
                                         onClick={() => removeSponsor(sponsor)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -966,7 +932,7 @@ export default function Page() {
                               )}
 
                               {/* Hierarchical Sponsors by Category */}
-                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {Object.entries(SPONSORS_BY_CATEGORY).map(([category, sponsors]) => (
                                   <div key={category} className="space-y-2">
                                     <div className="flex items-center space-x-2">
@@ -980,13 +946,13 @@ export default function Page() {
                                       />
                                       <label
                                         htmlFor={`insights-sponsor-category-${category}`}
-                                        className="text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
+                                        className="text-xs sm:text-sm font-semibold text-gray-800 cursor-pointer border-b pb-1"
                                       >
                                         {category}
                                       </label>
                                       <span className="text-xs text-gray-500">({sponsors.length})</span>
                                     </div>
-                                    <div className="ml-6 space-y-1">
+                                    <div className="ml-4 sm:ml-6 space-y-1">
                                       {sponsors.map((sponsor) => (
                                         <div key={sponsor} className="flex items-center space-x-2">
                                           <Checkbox
@@ -996,7 +962,7 @@ export default function Page() {
                                           />
                                           <label
                                             htmlFor={`insights-sponsor-${sponsor}`}
-                                            className="text-sm cursor-pointer"
+                                            className="text-xs sm:text-sm cursor-pointer"
                                           >
                                             {sponsor}
                                           </label>
@@ -1009,7 +975,7 @@ export default function Page() {
                                 <div className="pt-2 border-t">
                                   <button
                                     onClick={() => setSelectedSponsors([...ALL_SPONSORS])}
-                                    className="btn-secondary btn-sm w-full"
+                                    className="btn-secondary text-xs sm:text-sm w-full py-1.5"
                                   >
                                     Select All
                                   </button>
@@ -1021,24 +987,30 @@ export default function Page() {
                       </div>
 
                       {/* Placements */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="col-span-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                           Placements
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500">Select Placements</span>
-                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500 truncate">Select Placements</span>
+                              <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
+                              />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Placements</div>
                                 {selectedPlacements.length > 0 && (
-                                  <button onClick={clearAllPlacements} className="btn-tertiary btn-sm">
+                                  <button
+                                    onClick={clearAllPlacements}
+                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
+                                  >
                                     Clear All
                                   </button>
                                 )}
@@ -1046,14 +1018,14 @@ export default function Page() {
 
                               {/* Selected Placements Tags */}
                               {selectedPlacements.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedPlacements.map((placement) => (
                                     <Badge
                                       key={placement}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      {placement}
+                                      <span className="truncate max-w-[80px]">{placement}</span>
                                       <button
                                         onClick={() => removePlacement(placement)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -1066,7 +1038,7 @@ export default function Page() {
                               )}
 
                               {/* Placement Options */}
-                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-2 max-h-52 sm:max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {PLACEMENT_OPTIONS.map((placement) => (
                                   <div key={placement} className="flex items-center space-x-2">
                                     <Checkbox
@@ -1076,7 +1048,7 @@ export default function Page() {
                                     />
                                     <label
                                       htmlFor={`insights-placement-${placement}`}
-                                      className="text-sm cursor-pointer flex-1"
+                                      className="text-xs sm:text-sm cursor-pointer flex-1"
                                     >
                                       {placement}
                                     </label>
@@ -1087,7 +1059,7 @@ export default function Page() {
                               <div className="pt-2 border-t">
                                 <button
                                   onClick={() => setSelectedPlacements([...PLACEMENT_OPTIONS])}
-                                  className="btn-secondary btn-sm w-full"
+                                  className="btn-secondary text-xs sm:text-sm w-full py-1.5"
                                 >
                                   Select All
                                 </button>
@@ -1098,24 +1070,30 @@ export default function Page() {
                       </div>
 
                       {/* Insights Type */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="col-span-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                           Insights Type
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                              <span className="text-gray-500">Select Insights Type</span>
-                              <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <span className="text-gray-500 truncate">Select Insights Type</span>
+                              <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
+                              />
                             </button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-80">
                             <div className="space-y-4">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium text-sm">Select Insights Type</div>
                                 {selectedInsightsTypes.length > 0 && (
-                                  <button onClick={clearAllInsightsTypes} className="btn-tertiary btn-sm">
+                                  <button
+                                    onClick={clearAllInsightsTypes}
+                                    className="btn-tertiary text-xs sm:text-sm px-2 py-1"
+                                  >
                                     Clear All
                                   </button>
                                 )}
@@ -1123,14 +1101,14 @@ export default function Page() {
 
                               {/* Selected Insights Types Tags */}
                               {selectedInsightsTypes.length > 0 && (
-                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md max-h-16 sm:max-h-20 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                   {selectedInsightsTypes.map((insightsType) => (
                                     <Badge
                                       key={insightsType}
                                       variant="secondary"
                                       className="flex items-center gap-1 text-xs"
                                     >
-                                      {insightsType}
+                                      <span className="truncate max-w-[80px]">{insightsType}</span>
                                       <button
                                         onClick={() => removeInsightsType(insightsType)}
                                         className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
@@ -1143,7 +1121,7 @@ export default function Page() {
                               )}
 
                               {/* Insights Type Options */}
-                              <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-2 max-h-52 sm:max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {INSIGHTS_TYPE_OPTIONS.map((insightsType) => (
                                   <div key={insightsType} className="flex items-center space-x-2">
                                     <Checkbox
@@ -1153,7 +1131,7 @@ export default function Page() {
                                     />
                                     <label
                                       htmlFor={`insights-type-${insightsType}`}
-                                      className="text-sm cursor-pointer flex-1"
+                                      className="text-xs sm:text-sm cursor-pointer flex-1"
                                     >
                                       {insightsType}
                                     </label>
@@ -1164,7 +1142,7 @@ export default function Page() {
                               <div className="pt-2 border-t">
                                 <button
                                   onClick={() => setSelectedInsightsTypes([...INSIGHTS_TYPE_OPTIONS])}
-                                  className="btn-secondary btn-sm w-full"
+                                  className="btn-secondary text-xs sm:text-sm w-full py-1.5"
                                 >
                                   Select All
                                 </button>
@@ -1175,14 +1153,14 @@ export default function Page() {
                       </div>
 
                       {/* Time Period */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="col-span-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                           Time Period
                           <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                            <button className="w-full flex items-center justify-between px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
                               <span
                                 className={`truncate pr-2 min-w-0 flex-1 ${
                                   (filterType === "dateRange" && dateRange.from && dateRange.to) ||
@@ -1201,12 +1179,12 @@ export default function Page() {
                               </span>
                               <FontAwesomeIcon
                                 icon={faChevronDown}
-                                className="h-4 w-4 text-gray-400 flex-shrink-0 ml-1"
+                                className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 ml-1"
                               />
                             </button>
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] min-w-[420px]"
+                            className="w-[var(--radix-popover-trigger-width)] min-w-[280px] sm:min-w-[420px]"
                             align="start"
                           >
                             <div className="space-y-6">
@@ -1247,7 +1225,7 @@ export default function Page() {
                               </div>
 
                               {/* Content Area */}
-                              <div className="min-h-[300px]">
+                              <div className="min-h-[240px] sm:min-h-[300px]">
                                 {filterType === "years" ? (
                                   <div className="space-y-4">
                                     <div className="flex items-center justify-between">
@@ -1291,7 +1269,7 @@ export default function Page() {
                                             />
                                             <label
                                               htmlFor={`insights-year-${year}`}
-                                              className="text-sm cursor-pointer flex-1"
+                                              className="text-xs sm:text-sm cursor-pointer flex-1"
                                             >
                                               {year} Season
                                             </label>
@@ -1308,7 +1286,7 @@ export default function Page() {
                                     <div className="pt-2 border-t">
                                       <button
                                         onClick={() => setSelectedYears([...availableYears])}
-                                        className="btn-secondary btn-sm w-full"
+                                        className="btn-secondary text-xs sm:text-sm w-full py-1.5"
                                         disabled={selectedYears.length >= 5}
                                       >
                                         Select All Available
@@ -1419,25 +1397,38 @@ export default function Page() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                      <button onClick={openSaveFilterDrawer} className="btn-secondary flex items-center gap-2">
-                        <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
-                        Save Filter
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t">
+                      <button
+                        onClick={openSaveFilterDrawer}
+                        className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
+                      >
+                        <FontAwesomeIcon icon={faSave} className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Save Filter</span>
+                        <span className="sm:hidden">Save</span>
                       </button>
                       <button
                         onClick={() => setShowSavedFiltersDrawer(true)}
-                        className="btn-secondary flex items-center gap-2"
+                        className="btn-secondary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
                       >
-                        <FontAwesomeIcon icon={faFolderOpen} className="h-4 w-4" />
-                        Saved Filters ({savedFilters.length})
+                        <FontAwesomeIcon icon={faFolderOpen} className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Saved Filters ({savedFilters.length})</span>
+                        <span className="sm:hidden">Saved ({savedFilters.length})</span>
                       </button>
-                      <button onClick={clearAllFilters} className="btn-utility flex items-center gap-2">
-                        <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
-                        Clear All Filters
+                      <button
+                        onClick={clearAllFilters}
+                        className="btn-utility flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
+                      >
+                        <FontAwesomeIcon icon={faTimes} className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Clear All Filters</span>
+                        <span className="sm:hidden">Clear All</span>
                       </button>
-                      <button onClick={applyFilters} className="btn-primary flex items-center gap-2">
-                        <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
-                        Update Filters
+                      <button
+                        onClick={applyFilters}
+                        className="btn-primary flex items-center justify-center gap-2 text-xs sm:text-sm py-2"
+                      >
+                        <FontAwesomeIcon icon={faFilter} className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Update Filters</span>
+                        <span className="sm:hidden">Update</span>
                       </button>
                     </div>
                   </div>
@@ -1447,36 +1438,38 @@ export default function Page() {
           </Tabs>
         </div>
       </div>
-      <div className="p-6 pt-0 pb-6">
+      <div className="p-3 sm:p-4 lg:p-6 pt-0 pb-6">
         <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
           {/* Content based on selected tab */}
-          <TabsContent value="analytics" className="space-y-6 mt-6">
+          <TabsContent value="analytics" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
             {/* Analytics Sub-tabs Section */}
             <Tabs defaultValue="breakdown" className="w-full">
-              <div className="flex items-center justify-between mb-6">
-                <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
+                <TabsList className="inline-flex h-9 sm:h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-full sm:w-auto">
                   <TabsTrigger
                     value="breakdown"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                   >
-                    <FontAwesomeIcon icon={faTable} className="h-4 w-4 mr-2" />
-                    Breakdown
+                    <FontAwesomeIcon icon={faTable} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Breakdown</span>
+                    <span className="xs:hidden">Table</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="visualization"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
                   >
-                    <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 mr-2" />
-                    Visualization
+                    <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden xs:inline">Visualization</span>
+                    <span className="xs:hidden">Charts</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
 
-              <TabsContent value="breakdown" className="space-y-6">
+              <TabsContent value="breakdown" className="space-y-4 sm:space-y-6">
                 <DataTable data={filteredData} />
               </TabsContent>
 
-              <TabsContent value="visualization" className="space-y-6">
+              <TabsContent value="visualization" className="space-y-4 sm:space-y-6">
                 <DataBarChart data={filteredData} />
                 <MultiMetricChart data={filteredData} />
                 <ComparisonLineChart data={filteredData} />
@@ -1484,7 +1477,7 @@ export default function Page() {
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="insights" className="space-y-6 mt-6">
+          <TabsContent value="insights" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
             {/* Insight Template Gallery */}
             <InsightTemplateGallery onTemplateSelect={handleTemplateSelect} />
 

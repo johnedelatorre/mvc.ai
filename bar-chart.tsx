@@ -110,15 +110,26 @@ export default function DataBarChart({ data }: DataBarChartProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Media Analytics - SMV by Date</CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={downloadChart} className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
-              Download PNG
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+          <CardTitle className="text-base sm:text-lg">Media Analytics - SMV by Date</CardTitle>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadChart}
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
+            >
+              <FontAwesomeIcon icon={faDownload} className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Download PNG</span>
+              <span className="sm:hidden">PNG</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
-              <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleExpanded}
+              className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2"
+            >
+              <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
@@ -126,7 +137,7 @@ export default function DataBarChart({ data }: DataBarChartProps) {
       {isExpanded && (
         <CardContent className="transition-all duration-300 ease-in-out" ref={chartRef}>
           <div className="w-full overflow-x-auto">
-            <div className="min-w-[1200px] h-[400px]">
+            <div className="min-w-[600px] sm:min-w-[800px] lg:min-w-[1200px] h-[300px] sm:h-[400px]">
               <ChartContainer
                 config={{
                   smv: {
@@ -141,14 +152,14 @@ export default function DataBarChart({ data }: DataBarChartProps) {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: 11 }}
+                      tick={{ fontSize: 10 }}
                       interval={0}
                       angle={-45}
                       textAnchor="end"
                       height={60}
                     />
                     <YAxis
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 11 }}
                       label={{
                         value: "Value ($k)",
                         angle: -90,
@@ -164,8 +175,8 @@ export default function DataBarChart({ data }: DataBarChartProps) {
           </div>
 
           {/* Scroll indicator */}
-          <div className="flex justify-center mt-4">
-            <div className="text-sm text-muted-foreground">← Scroll horizontally to view all data →</div>
+          <div className="flex justify-center mt-3 sm:mt-4">
+            <div className="text-xs sm:text-sm text-muted-foreground">← Scroll horizontally to view all data →</div>
           </div>
         </CardContent>
       )}

@@ -74,6 +74,7 @@ declare global {
   interface Window {
     SpeechRecognition: typeof SpeechRecognition
     webkitSpeechRecognition: typeof SpeechRecognition
+    webkitSpeechRecognition: typeof SpeechRecognition
   }
 }
 
@@ -282,14 +283,14 @@ export default function AutomatedInsights({ data = [], templateTrigger }: Automa
     console.log("Generating insights from template:", prompt)
     setIsGeneratingFromTemplate(true)
     setActiveTab("automated") // Switch to automated tab
-    
+
     // Simulate loading time
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     // Generate template-specific insights based on the prompt
     const templateInsights = generateTemplateInsights(prompt)
     setTemplateInsightData(templateInsights)
-    
+
     // Force re-calculation by incrementing refresh key
     setRefreshKey((prev) => prev + 1)
 
@@ -304,18 +305,35 @@ export default function AutomatedInsights({ data = [], templateTrigger }: Automa
 
   const generateTemplateInsights = (prompt: string) => {
     // Extract brand/sponsor from prompt
-    const brands = ["Nike", "Adidas", "Under Armour", "Puma", "New Balance", "Jordan Brand", "Reebok", "ASICS", "Converse", "Vans"]
-    const detectedBrand = brands.find(brand => prompt.toLowerCase().includes(brand.toLowerCase())) || "Nike"
-    
+    const brands = [
+      "Nike",
+      "Adidas",
+      "Under Armour",
+      "Puma",
+      "New Balance",
+      "Jordan Brand",
+      "Reebok",
+      "ASICS",
+      "Converse",
+      "Vans",
+    ]
+    const detectedBrand = brands.find((brand) => prompt.toLowerCase().includes(brand.toLowerCase())) || "Nike"
+
     // Generate insights based on prompt content
     const isROIAnalysis = prompt.toLowerCase().includes("roi") || prompt.toLowerCase().includes("performance")
     const isPlatformComparison = prompt.toLowerCase().includes("vs") || prompt.toLowerCase().includes("compare")
     const isTrendAnalysis = prompt.toLowerCase().includes("trend") || prompt.toLowerCase().includes("year")
-    
+
     return {
       templatePrompt: prompt,
       detectedBrand,
-      analysisType: isROIAnalysis ? "ROI Analysis" : isPlatformComparison ? "Platform Comparison" : isTrendAnalysis ? "Trend Analysis" : "General Analysis",
+      analysisType: isROIAnalysis
+        ? "ROI Analysis"
+        : isPlatformComparison
+          ? "Platform Comparison"
+          : isTrendAnalysis
+            ? "Trend Analysis"
+            : "General Analysis",
       insights: {
         topPlacement: placementOptions[Math.floor(Math.random() * placementOptions.length)],
         topPlacementTypeBySMV: placementTypeOptions[Math.floor(Math.random() * placementTypeOptions.length)],
@@ -335,8 +353,8 @@ export default function AutomatedInsights({ data = [], templateTrigger }: Automa
         `Optimize ${detectedBrand}'s content strategy based on current performance trends`,
         `Consider expanding ${detectedBrand}'s presence in high-performing placement types`,
         `Implement A/B testing for ${detectedBrand} to optimize campaign performance`,
-        `Analyze competitor strategies to identify ${detectedBrand} growth opportunities`
-      ]
+        `Analyze competitor strategies to identify ${detectedBrand} growth opportunities`,
+      ],
     }
   }
 
@@ -463,367 +481,400 @@ export default function AutomatedInsights({ data = [], templateTrigger }: Automa
     }
   }, [sortedData, refreshKey, templateInsightData])
 
-// Generate random recommendations based on current insights
-const getRandomRecommendations = () => {
-  // If we have template data, use its recommendations
-  if (templateInsightData) {
-    return templateInsightData.recommendations
+  // Generate random recommendations based on current insights
+  const getRandomRecommendations = () => {
+    // If we have template data, use its recommendations
+    if (templateInsightData) {
+      return templateInsightData.recommendations
+    }
+
+    // Arrays of possible recommendation templates
+    const recommendationTemplates = [
+      "Focus more budget on {placementType} placements for higher SMV returns",
+      "Leverage {platform} platform for maximum impression reach",
+      "Increase investment in {placement} placements based on performance",
+      "Optimize {platform} content strategy to improve engagement",
+      "Consider expanding {placement} placements across more events",
+      "Reduce investment in underperforming {negativeType} placements",
+      "Test new creative formats on {platform} to boost impressions",
+      "Combine {placement} with {platform} promotions for synergy",
+      "Reallocate budget from {negativeType} to {placement} for better ROI",
+      "Implement A/B testing for {placementType} to optimize performance",
+      "Focus on {platform} during peak viewing hours for maximum impact",
+      "Consider seasonal adjustments for {placement} to match audience patterns",
+      "Develop custom content for {platform} to increase engagement",
+      "Analyze competitor presence on {platform} to identify opportunities",
+      "Integrate {placement} with digital activations for cross-platform impact",
+    ]
+
+    // Negative placement types for recommendations about reducing investment
+    const negativeTypes = ["Entrance", "Static Banner", "Print Media", "Radio Mentions"]
+
+    // Select 6 random recommendations without repetition
+    const selectedRecommendations = []
+    const usedIndices = new Set()
+
+    while (selectedRecommendations.length < 6 && usedIndices.size < recommendationTemplates.length) {
+      const index = Math.floor(Math.random() * recommendationTemplates.length)
+      if (!usedIndices.has(index)) {
+        usedIndices.add(index)
+        let recommendation = recommendationTemplates[index]
+
+        // Replace placeholders with actual values
+        recommendation = recommendation.replace("{placement}", insights.topPlacement)
+        recommendation = recommendation.replace("{placementType}", insights.topPlacementTypeBySMV)
+        recommendation = recommendation.replace("{platform}", insights.topPlatformByImpressions)
+        recommendation = recommendation.replace(
+          "{negativeType}",
+          negativeTypes[Math.floor(Math.random() * negativeTypes.length)],
+        )
+
+        selectedRecommendations.push(recommendation)
+      }
+    }
+
+    return selectedRecommendations
   }
 
-  // Arrays of possible recommendation templates
-  const recommendationTemplates = [
-    "Focus more budget on {placementType} placements for higher SMV returns",
-    "Leverage {platform} platform for maximum impression reach",
-    "Increase investment in {placement} placements based on performance",
-    "Optimize {platform} content strategy to improve engagement",
-    "Consider expanding {placement} placements across more events",
-    "Reduce investment in underperforming {negativeType} placements",
-    "Test new creative formats on {platform} to boost impressions",
-    "Combine {placement} with {platform} promotions for synergy",
-    "Reallocate budget from {negativeType} to {placement} for better ROI",
-    "Implement A/B testing for {placementType} to optimize performance",
-    "Focus on {platform} during peak viewing hours for maximum impact",
-    "Consider seasonal adjustments for {placement} to match audience patterns",
-    "Develop custom content for {platform} to increase engagement",
-    "Analyze competitor presence on {platform} to identify opportunities",
-    "Integrate {placement} with digital activations for cross-platform impact",
-  ]
+  // Create a memoized version of recommendations that changes with refreshKey
+  const recommendations = useMemo(() => {
+    if (refreshKey === -1 && window.tempSavedInsightData) {
+      return window.tempSavedInsightData.recommendations || []
+    }
+    return getRandomRecommendations()
+  }, [refreshKey, insights, templateInsightData])
 
-  // Negative placement types for recommendations about reducing investment
-  const negativeTypes = ["Entrance", "Static Banner", "Print Media", "Radio Mentions"]
-
-  // Select 6 random recommendations without repetition
-  const selectedRecommendations = []
-  const usedIndices = new Set()
-
-  while (selectedRecommendations.length < 6 && usedIndices.size < recommendationTemplates.length) {
-    const index = Math.floor(Math.random() * recommendationTemplates.length)
-    if (!usedIndices.has(index)) {
-      usedIndices.add(index)
-      let recommendation = recommendationTemplates[index]
-
-      // Replace placeholders with actual values
-      recommendation = recommendation.replace("{placement}", insights.topPlacement)
-      recommendation = recommendation.replace("{placementType}", insights.topPlacementTypeBySMV)
-      recommendation = recommendation.replace("{platform}", insights.topPlatformByImpressions)
-      recommendation = recommendation.replace(
-        "{negativeType}",
-        negativeTypes[Math.floor(Math.random() * negativeTypes.length)],
-      )
-
-      selectedRecommendations.push(recommendation)
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded)
+    if (!isExpanded && !hasSeen) {
+      setHasSeen(true)
     }
   }
 
-  return selectedRecommendations
-}
-
-// Create a memoized version of recommendations that changes with refreshKey
-const recommendations = useMemo(() => {
-  if (refreshKey === -1 && window.tempSavedInsightData) {
-    return window.tempSavedInsightData.recommendations || [];
+  const toggleRecommendations = () => {
+    setShowRecommendations(!showRecommendations)
   }
-  return getRandomRecommendations();
-}, [refreshKey, insights, templateInsightData]);
 
-const toggleExpanded = () => {
-  setIsExpanded(!isExpanded)
-  if (!isExpanded && !hasSeen) {
-    setHasSeen(true)
+  const handleGenerateReport = () => {
+    console.log("Generating automated insights report...")
   }
-}
 
-const toggleRecommendations = () => {
-  setShowRecommendations(!showRecommendations)
-}
+  const handleBookmarkInsights = () => {
+    setIsBookmarked(!isBookmarked)
+    console.log(isBookmarked ? "Removing bookmark from insights..." : "Bookmarking insights...")
+  }
 
-const handleGenerateReport = () => {
-  console.log("Generating automated insights report...")
-}
+  const handleGenerateNewInsight = async () => {
+    console.log("Generating new automated insight...")
+    setIsGeneratingNewInsight(true)
 
-const handleBookmarkInsights = () => {
-  setIsBookmarked(!isBookmarked)
-  console.log(isBookmarked ? "Removing bookmark from insights..." : "Bookmarking insights...")
-}
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
-const handleGenerateNewInsight = async () => {
-  console.log("Generating new automated insight...")
-  setIsGeneratingNewInsight(true)
-  
-  await new Promise((resolve) => setTimeout(resolve, 1500))
-  
-  setRefreshKey((prev) => prev + 1)
-  setHasSeen(false)
-  setIsBookmarked(false)
-  setShowRecommendations(true)
-  setTemplateInsightData(null) // Clear template data when generating new insight
-  
-  setIsGeneratingNewInsight(false)
-  console.log("New insight generated successfully")
-}
+    setRefreshKey((prev) => prev + 1)
+    setHasSeen(false)
+    setIsBookmarked(false)
+    setShowRecommendations(true)
+    setTemplateInsightData(null) // Clear template data when generating new insight
 
-const handleRateInsights = (type: "automated" | "generated") => {
-  console.log(`Rating ${type} insights...`)
-}
+    setIsGeneratingNewInsight(false)
+    console.log("New insight generated successfully")
+  }
 
-const handleExitSavedInsightView = () => {
-  setViewingSavedInsight(null)
-  setRefreshKey(0)
-  setTemplateInsightData(null)
-  delete window.tempSavedInsightData
-}
+  const handleRateInsights = (type: "automated" | "generated") => {
+    console.log(`Rating ${type} insights...`)
+  }
 
-return (
-  <TooltipProvider>
-    <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
-            Insights ({sortedData.length} records)
-            {hasSeen && (
-              <span className="flex items-center gap-1 text-xs italic text-gray-500 font-normal">
-                <FontAwesomeIcon icon={faEye} className="h-3 w-3" />
-                Seen
-              </span>
-            )}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button onClick={handleGenerateReport} className="flex items-center gap-2" size="sm">
-              <FontAwesomeIcon icon={faFileText} className="h-4 w-4" />
-              Generate Report
-            </Button>
-            <Button
-              onClick={() => handleRateInsights("automated")}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-              Rate Insights
-            </Button>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={handleBookmarkInsights}
-                  variant={isBookmarked ? "default" : "outline"}
-                  size="sm"
-                  className={`p-2 ${isBookmarked ? "bg-blue-600 text-white" : ""}`}
-                >
-                  <FontAwesomeIcon icon={isBookmarked ? faBookmark : faBookmarkRegular} className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
-              </TooltipContent>
-            </Tooltip>
-            <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
-              <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
+  const handleExitSavedInsightView = () => {
+    setViewingSavedInsight(null)
+    setRefreshKey(0)
+    setTemplateInsightData(null)
+    delete window.tempSavedInsightData
+  }
 
-      {isExpanded && (
-        <CardContent className="transition-all duration-300 ease-in-out">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="automated" className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
-                Automated Insights
-              </TabsTrigger>
-              <TabsTrigger value="generate" className="flex items-center gap-2">
-                <FontAwesomeIcon icon={faRobot} className="h-4 w-4" />
-                Generate Insights
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="automated" className="space-y-6">
-              {/* Generate New Insight Button */}
-              <div className="flex justify-end mb-4">
-                <Button
-                  onClick={handleGenerateNewInsight}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  disabled={isGeneratingNewInsight || isGeneratingFromTemplate}
-                >
-                  {isGeneratingNewInsight || isGeneratingFromTemplate ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                  ) : (
-                    <FontAwesomeIcon icon={faSync} className="h-4 w-4" />
-                  )}
-                  {isGeneratingNewInsight || isGeneratingFromTemplate ? "Generating..." : "Generate New Insight"}
-                </Button>
-              </div>
-
-              {/* Template Generation Indicator */}
-              {isGeneratingFromTemplate && (
-                <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    <span className="text-sm text-blue-700 font-medium">
-                      Generating insights from template...
-                    </span>
-                  </div>
-                </div>
+  return (
+    <TooltipProvider>
+      <Card className="w-full mb-6 border-2 border-blue-300 shadow-md">
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+            <CardTitle className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+              <span className="text-base sm:text-lg">Insights ({sortedData.length} records)</span>
+              {hasSeen && (
+                <span className="flex items-center gap-1 text-xs italic text-gray-500 font-normal">
+                  <FontAwesomeIcon icon={faEye} className="h-2 w-2 sm:h-3 sm:w-3" />
+                  <span className="hidden sm:inline">Seen</span>
+                </span>
               )}
-
-              {/* Template Insight Display */}
-              {templateInsightData && (
-                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-700 font-medium">
-                      Template Analysis: {templateInsightData.analysisType}
-                    </span>
-                  </div>
-                  <p className="text-xs text-green-600">
-                    Brand Focus: {templateInsightData.detectedBrand}
-                  </p>
-                </div>
-              )}
-
-              {viewingSavedInsight && (
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm text-blue-700 font-medium">
-                      Viewing Saved Insight from{" "}
-                      {savedInsights.find((s) => s.id === viewingSavedInsight)?.dateSaved.toLocaleDateString()}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={handleExitSavedInsightView}
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 text-blue-600 border-blue-300"
-                  >
-                    <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
-                    Back to Previous
-                  </Button>
-                </div>
-              )}
-
-              {/* Automated insights metrics */}
-              <div
-                id="automated-insights-metrics"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch"
+            </CardTitle>
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+              <Button
+                onClick={handleGenerateReport}
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
+                size="sm"
               >
-                {/* Trending Metrics */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
-                    Trending Metrics
-                  </h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">SMV</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.smv}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">Impressions</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.impressions}%
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
-                      <span className="text-sm">Views</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 flex items-center gap-1">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />+{trendingAmounts.views}%
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
+                <FontAwesomeIcon icon={faFileText} className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Generate Report</span>
+                <span className="sm:hidden">Report</span>
+              </Button>
+              <Button
+                onClick={() => handleRateInsights("automated")}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
+              >
+                <FontAwesomeIcon icon={faThumbsUp} className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Rate Insights</span>
+                <span className="sm:hidden">Rate</span>
+              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleBookmarkInsights}
+                    variant={isBookmarked ? "default" : "outline"}
+                    size="sm"
+                    className={`p-1.5 sm:p-2 ${isBookmarked ? "bg-blue-600 text-white" : ""}`}
+                  >
+                    <FontAwesomeIcon
+                      icon={isBookmarked ? faBookmark : faBookmarkRegular}
+                      className="h-3 w-3 sm:h-4 sm:w-4"
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleExpanded}
+                className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2"
+              >
+                <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
 
-                {/* Top Performers */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
-                    Top Performers
-                  </h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="p-3 bg-blue-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Highest Performing Placement</div>
-                      <div className="font-semibold text-blue-700">{insights.topPlacement}</div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Top Placement Type by SMV</div>
-                      <div className="font-semibold text-purple-700">{insights.topPlacementTypeBySMV}</div>
-                    </div>
-                    <div className="p-3 bg-orange-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Top Platform by Impressions</div>
-                      <div className="font-semibold text-orange-700 flex items-center gap-2">
-                        {insights.topPlatformByImpressions !== "N/A" && (
-                          <PlatformIcon platform={insights.topPlatformByImpressions} />
-                        )}
-                        <span>{insights.topPlatformByImpressions}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        {isExpanded && (
+          <CardContent className="transition-all duration-300 ease-in-out">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-9 sm:h-10">
+                <TabsTrigger value="automated" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Automated Insights</span>
+                  <span className="sm:hidden">Auto</span>
+                </TabsTrigger>
+                <TabsTrigger value="generate" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  <FontAwesomeIcon icon={faRobot} className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Generate Insights</span>
+                  <span className="sm:hidden">Generate</span>
+                </TabsTrigger>
+              </TabsList>
 
-                {/* Key Metrics Summary */}
-                <div className="space-y-3 flex flex-col h-full">
-                  <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                    Key Metrics
-                  </h4>
-                  <div className="flex flex-col justify-between h-full space-y-2">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Total SMV</div>
-                      <div className="font-semibold text-gray-700">${insights.totalSMV.toLocaleString()}k</div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Total Impressions</div>
-                      <div className="font-semibold text-gray-700">
-                        {insights.totalImpressions.toLocaleString()}MM
-                      </div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-600 mb-1">Average SMV</div>
-                      <div className="font-semibold text-gray-700">${insights.avgSMV}k</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actionable Recommendations */}
-              <div className="mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-sm text-blue-800 flex items-center gap-2">
-                    💡 Actionable Recommendations
-                  </h4>
-                  <Button variant="ghost" size="sm" onClick={toggleRecommendations} className="p-2">
-                    <FontAwesomeIcon icon={showRecommendations ? faEyeSlash : faEye} className="h-4 w-4" />
+              <TabsContent value="automated" className="space-y-6">
+                {/* Generate New Insight Button */}
+                <div className="flex justify-end mb-4">
+                  <Button
+                    onClick={handleGenerateNewInsight}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    disabled={isGeneratingNewInsight || isGeneratingFromTemplate}
+                  >
+                    {isGeneratingNewInsight || isGeneratingFromTemplate ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                    ) : (
+                      <FontAwesomeIcon icon={faSync} className="h-4 w-4" />
+                    )}
+                    {isGeneratingNewInsight || isGeneratingFromTemplate ? "Generating..." : "Generate New Insight"}
                   </Button>
                 </div>
 
-                {showRecommendations && (
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 transition-all duration-300 ease-in-out">
-                    <ul className="text-sm text-blue-700 space-y-1">
-                      {recommendations.map((recommendation, index) => (
-                        <li key={index}>• {recommendation}</li>
-                      ))}
-                    </ul>
+                {/* Template Generation Indicator */}
+                {isGeneratingFromTemplate && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-sm text-blue-700 font-medium">Generating insights from template...</span>
+                    </div>
                   </div>
                 )}
-              </div>
-            </TabsContent>
 
-            <TabsContent value="generate" className="space-y-6">
-              {/* Generate Insights Tab Content */}
-              <div className="text-center py-8">
-                <FontAwesomeIcon icon={faRobot} className="h-12 w-12 text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-700 mb-2">Generate Custom Insights</h3>
-                <p className="text-gray-500">This feature is coming soon. Use the template gallery above to generate insights.</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      )}
-    </Card>
-  </TooltipProvider>
-)
+                {/* Template Insight Display */}
+                {templateInsightData && (
+                  <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-green-700 font-medium">
+                        Template Analysis: {templateInsightData.analysisType}
+                      </span>
+                    </div>
+                    <p className="text-xs text-green-600">Brand Focus: {templateInsightData.detectedBrand}</p>
+                  </div>
+                )}
+
+                {viewingSavedInsight && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faEye} className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm text-blue-700 font-medium">
+                        Viewing Saved Insight from{" "}
+                        {savedInsights.find((s) => s.id === viewingSavedInsight)?.dateSaved.toLocaleDateString()}
+                      </span>
+                    </div>
+                    <Button
+                      onClick={handleExitSavedInsightView}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 text-blue-600 border-blue-300"
+                    >
+                      <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                      Back to Previous
+                    </Button>
+                  </div>
+                )}
+
+                {/* Automated insights metrics */}
+                <div
+                  id="automated-insights-metrics"
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 items-stretch"
+                >
+                  {/* Trending Metrics */}
+                  <div className="space-y-2 sm:space-y-3 flex flex-col h-full">
+                    <h4 className="font-semibold text-xs sm:text-sm text-gray-700 flex items-center gap-1 sm:gap-2">
+                      <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                      Trending Metrics
+                    </h4>
+                    <div className="flex flex-col justify-between h-full space-y-1 sm:space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                        <span className="text-xs sm:text-sm">SMV</span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 flex items-center gap-1 text-xs"
+                        >
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-2 w-2 sm:h-3 sm:w-3" />+
+                          {trendingAmounts.smv}%
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                        <span className="text-xs sm:text-sm">Impressions</span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 flex items-center gap-1 text-xs"
+                        >
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-2 w-2 sm:h-3 sm:w-3" />+
+                          {trendingAmounts.impressions}%
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                        <span className="text-xs sm:text-sm">Views</span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 flex items-center gap-1 text-xs"
+                        >
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-2 w-2 sm:h-3 sm:w-3" />+
+                          {trendingAmounts.views}%
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Performers */}
+                  <div className="space-y-2 sm:space-y-3 flex flex-col h-full">
+                    <h4 className="font-semibold text-xs sm:text-sm text-gray-700 flex items-center gap-1 sm:gap-2">
+                      <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                      Top Performers
+                    </h4>
+                    <div className="flex flex-col justify-between h-full space-y-1 sm:space-y-2">
+                      <div className="p-2 sm:p-3 bg-blue-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Highest Performing Placement</div>
+                        <div className="font-semibold text-blue-700 text-xs sm:text-sm">{insights.topPlacement}</div>
+                      </div>
+                      <div className="p-2 sm:p-3 bg-purple-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Top Placement Type by SMV</div>
+                        <div className="font-semibold text-purple-700 text-xs sm:text-sm">
+                          {insights.topPlacementTypeBySMV}
+                        </div>
+                      </div>
+                      <div className="p-2 sm:p-3 bg-orange-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Top Platform by Impressions</div>
+                        <div className="font-semibold text-orange-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                          {insights.topPlatformByImpressions !== "N/A" && (
+                            <PlatformIcon platform={insights.topPlatformByImpressions} />
+                          )}
+                          <span>{insights.topPlatformByImpressions}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Key Metrics Summary */}
+                  <div className="space-y-2 sm:space-y-3 flex flex-col h-full md:col-span-2 xl:col-span-1">
+                    <h4 className="font-semibold text-xs sm:text-sm text-gray-700 flex items-center gap-1 sm:gap-2">
+                      <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
+                      Key Metrics
+                    </h4>
+                    <div className="flex flex-col justify-between h-full space-y-1 sm:space-y-2">
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Total SMV</div>
+                        <div className="font-semibold text-gray-700 text-xs sm:text-sm">
+                          ${insights.totalSMV.toLocaleString()}k
+                        </div>
+                      </div>
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Total Impressions</div>
+                        <div className="font-semibold text-gray-700 text-xs sm:text-sm">
+                          {insights.totalImpressions.toLocaleString()}MM
+                        </div>
+                      </div>
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-600 mb-1">Average SMV</div>
+                        <div className="font-semibold text-gray-700 text-xs sm:text-sm">${insights.avgSMV}k</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actionable Recommendations */}
+                <div className="mt-4 sm:mt-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <h4 className="font-semibold text-xs sm:text-sm text-blue-800 flex items-center gap-1 sm:gap-2">
+                      💡 Actionable Recommendations
+                    </h4>
+                    <Button variant="ghost" size="sm" onClick={toggleRecommendations} className="p-1 sm:p-2">
+                      <FontAwesomeIcon
+                        icon={showRecommendations ? faEyeSlash : faEye}
+                        className="h-3 w-3 sm:h-4 sm:w-4"
+                      />
+                    </Button>
+                  </div>
+
+                  {showRecommendations && (
+                    <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 transition-all duration-300 ease-in-out">
+                      <ul className="text-xs sm:text-sm text-blue-700 space-y-1">
+                        {recommendations.map((recommendation, index) => (
+                          <li key={index}>• {recommendation}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="generate" className="space-y-6">
+                {/* Generate Insights Tab Content */}
+                <div className="text-center py-8">
+                  <FontAwesomeIcon icon={faRobot} className="h-12 w-12 text-gray-300 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Generate Custom Insights</h3>
+                  <p className="text-gray-500">
+                    This feature is coming soon. Use the template gallery above to generate insights.
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        )}
+      </Card>
+    </TooltipProvider>
+  )
 }

@@ -376,52 +376,55 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
           <CardTitle className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-yellow-600" />
-            Insight Template Gallery
-            <Badge variant="secondary" className="ml-2">
+            <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+            <span className="text-base sm:text-lg">Insight Template Gallery</span>
+            <Badge variant="secondary" className="ml-2 text-xs">
               {INSIGHT_TEMPLATES.length} Templates
             </Badge>
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
-            <FontAwesomeIcon icon={expanded ? faChevronUp : faChevronDown} className="h-4 w-4 mr-2" />
-            {expanded ? "Collapse" : "Expand"}
+          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="self-start sm:self-auto">
+            <FontAwesomeIcon
+              icon={expanded ? faChevronUp : faChevronDown}
+              className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2"
+            />
+            <span className="text-xs sm:text-sm">{expanded ? "Collapse" : "Expand"}</span>
           </Button>
         </div>
 
         {expanded && (
-          <div className="space-y-4 mt-4">
-            <p className="text-sm text-gray-600">
+          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+            <p className="text-xs sm:text-sm text-gray-600">
               Choose from pre-built insight templates to quickly generate comprehensive analytics. Each template
               includes sample metrics and estimated completion time.
             </p>
 
             {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
               <div className="flex-1 relative">
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
+                  className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400"
                 />
                 <Input
-                  placeholder="Search templates by name, description, or tags..."
+                  placeholder="Search templates..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-xs sm:text-sm py-2"
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
+                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
                       <span className="text-gray-700">{selectedCategory}</span>
-                      <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400 ml-2" />
+                      <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 ml-2" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-2" align="end">
-                    <div className="space-y-2 min-w-[160px]">
+                    <div className="space-y-2 min-w-[140px] sm:min-w-[160px]">
                       {CATEGORIES.map((category) => (
                         <div key={category} className="flex items-center space-x-2">
                           <Checkbox
@@ -431,7 +434,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                           />
                           <label
                             htmlFor={`category-${category}`}
-                            className="text-sm cursor-pointer flex-1 whitespace-nowrap"
+                            className="text-xs sm:text-sm cursor-pointer flex-1 whitespace-nowrap"
                           >
                             {category}
                           </label>
@@ -443,15 +446,15 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
+                    <button className="px-2 sm:px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-xs sm:text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 flex items-center justify-between whitespace-nowrap">
                       <span className="text-gray-700">
                         {selectedDifficulty === "All" ? "All Levels" : selectedDifficulty}
                       </span>
-                      <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400 ml-2" />
+                      <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 ml-2" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-2" align="end">
-                    <div className="space-y-2 min-w-[120px]">
+                    <div className="space-y-2 min-w-[100px] sm:min-w-[120px]">
                       {["All", "Beginner", "Intermediate", "Advanced"].map((difficulty) => (
                         <div key={difficulty} className="flex items-center space-x-2">
                           <Checkbox
@@ -461,7 +464,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                           />
                           <label
                             htmlFor={`difficulty-${difficulty}`}
-                            className="text-sm cursor-pointer flex-1 whitespace-nowrap"
+                            className="text-xs sm:text-sm cursor-pointer flex-1 whitespace-nowrap"
                           >
                             {difficulty === "All" ? "All Levels" : difficulty}
                           </label>
@@ -474,7 +477,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
             </div>
 
             {/* Results Summary */}
-            <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs sm:text-sm text-gray-600 gap-2 sm:gap-0">
               <span>
                 Showing {startIndex + 1}-{Math.min(endIndex, filteredTemplates.length)} of {filteredTemplates.length}{" "}
                 templates
@@ -490,7 +493,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                     setSelectedCategory("All")
                     setSelectedDifficulty("All")
                   }}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-blue-600 hover:text-blue-700 text-xs sm:text-sm self-start sm:self-auto"
                 >
                   Clear Filters
                 </Button>
@@ -503,25 +506,25 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
       {expanded && (
         <CardContent>
           {filteredTemplates.length === 0 ? (
-            <div className="text-center py-8">
-              <FontAwesomeIcon icon={faSearch} className="h-12 w-12 text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No templates found</h3>
-              <p className="text-gray-500">Try adjusting your search terms or filters</p>
+            <div className="text-center py-6 sm:py-8">
+              <FontAwesomeIcon icon={faSearch} className="h-8 w-8 sm:h-12 sm:w-12 text-gray-300 mb-3 sm:mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No templates found</h3>
+              <p className="text-sm text-gray-500">Try adjusting your search terms or filters</p>
             </div>
           ) : (
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
               {displayedTemplates.map((template) => (
                 <Card
                   key={template.id}
                   className="cursor-pointer hover:shadow-md transition-all duration-200 border-2 hover:border-blue-300 group"
                   onClick={() => handleTemplateClick(template)}
                 >
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-2 sm:pb-3">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         <FontAwesomeIcon
                           icon={CATEGORY_ICONS[template.category as keyof typeof CATEGORY_ICONS] || faLightbulb}
-                          className="h-4 w-4 text-blue-600"
+                          className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600"
                         />
                         <Badge variant="outline" className="text-xs">
                           {template.category}
@@ -532,40 +535,40 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                       </Badge>
                     </div>
 
-                    <CardTitle className="text-base leading-tight group-hover:text-blue-600 transition-colors">
+                    <CardTitle className="text-sm sm:text-base leading-tight group-hover:text-blue-600 transition-colors">
                       {template.title}
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-gray-600 line-clamp-3">{template.description}</p>
+                  <CardContent className="space-y-3 sm:space-y-4">
+                    <p className="text-xs sm:text-sm text-gray-600 line-clamp-3">{template.description}</p>
 
                     {/* Sample Metrics */}
-                    <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="grid grid-cols-2 gap-1 sm:gap-2 text-xs">
                       {template.sampleMetrics.smv && (
                         <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faDollarSign} className="h-3 w-3 text-green-600" />
+                          <FontAwesomeIcon icon={faDollarSign} className="h-2 w-2 sm:h-3 sm:w-3 text-green-600" />
                           <span className="text-gray-600">SMV:</span>
                           <span className="font-medium">{template.sampleMetrics.smv}</span>
                         </div>
                       )}
                       {template.sampleMetrics.impressions && (
                         <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faEye} className="h-3 w-3 text-blue-600" />
+                          <FontAwesomeIcon icon={faEye} className="h-2 w-2 sm:h-3 sm:w-3 text-blue-600" />
                           <span className="text-gray-600">Impressions:</span>
                           <span className="font-medium">{template.sampleMetrics.impressions}</span>
                         </div>
                       )}
                       {template.sampleMetrics.engagement && (
                         <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faUsers} className="h-3 w-3 text-purple-600" />
+                          <FontAwesomeIcon icon={faUsers} className="h-2 w-2 sm:h-3 sm:w-3 text-purple-600" />
                           <span className="text-gray-600">Engagement:</span>
                           <span className="font-medium">{template.sampleMetrics.engagement}</span>
                         </div>
                       )}
                       {template.sampleMetrics.growth && (
                         <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 text-orange-600" />
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-2 w-2 sm:h-3 sm:w-3 text-orange-600" />
                           <span className="text-gray-600">Growth:</span>
                           <span className="font-medium text-green-600">{template.sampleMetrics.growth}</span>
                         </div>
@@ -575,12 +578,12 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                     {/* Tags */}
                     <div className="flex flex-wrap gap-1">
                       {template.tags.slice(0, 3).map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs px-2 py-0.5">
+                        <Badge key={index} variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5">
                           {tag}
                         </Badge>
                       ))}
                       {template.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                        <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5">
                           +{template.tags.length - 3}
                         </Badge>
                       )}
@@ -589,11 +592,14 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                     {/* Footer */}
                     <div className="flex items-center justify-between pt-2 border-t">
                       <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <FontAwesomeIcon icon={faCalendarAlt} className="h-3 w-3" />
+                        <FontAwesomeIcon icon={faCalendarAlt} className="h-2 w-2 sm:h-3 sm:w-3" />
                         {template.estimatedTime}
                       </div>
-                      <Button size="sm" className="group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <FontAwesomeIcon icon={faPlay} className="h-3 w-3 mr-1" />
+                      <Button
+                        size="sm"
+                        className="group-hover:bg-blue-600 group-hover:text-white transition-colors text-xs px-2 sm:px-3 py-1"
+                      >
+                        <FontAwesomeIcon icon={faPlay} className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                         Generate
                       </Button>
                     </div>
@@ -602,17 +608,18 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
               ))}
             </div>
           )}
+
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-end mt-6 space-x-2">
+            <div className="flex flex-col sm:flex-row items-center justify-end mt-4 sm:mt-6 space-y-2 sm:space-y-0 sm:space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 rotate-90" />
+                <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 sm:h-3 sm:w-3 rotate-90" />
                 Previous
               </Button>
 
@@ -625,7 +632,7 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                       variant={currentPage === page ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 p-0 ${currentPage === page ? "bg-blue-600 text-white" : "hover:bg-gray-100"}`}
+                      className={`w-6 h-6 sm:w-8 sm:h-8 p-0 text-xs sm:text-sm ${currentPage === page ? "bg-blue-600 text-white" : "hover:bg-gray-100"}`}
                     >
                       {page}
                     </Button>
@@ -633,12 +640,12 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                 })}
                 {totalPages > 5 && (
                   <>
-                    {totalPages > 6 && <span className="text-gray-400">...</span>}
+                    {totalPages > 6 && <span className="text-gray-400 text-xs sm:text-sm">...</span>}
                     <Button
                       variant={currentPage === totalPages ? "default" : "outline"}
                       size="sm"
                       onClick={() => setCurrentPage(totalPages)}
-                      className={`w-8 h-8 p-0 ${
+                      className={`w-6 h-6 sm:w-8 sm:h-8 p-0 text-xs sm:text-sm ${
                         currentPage === totalPages ? "bg-blue-600 text-white" : "hover:bg-gray-100"
                       }`}
                     >
@@ -653,10 +660,10 @@ export default function InsightTemplateGallery({ onTemplateSelect }: InsightTemp
                 size="sm"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="flex items-center gap-2"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
                 Next
-                <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 -rotate-90" />
+                <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 sm:h-3 sm:w-3 -rotate-90" />
               </Button>
             </div>
           )}

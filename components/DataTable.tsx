@@ -298,14 +298,17 @@ export default function DataTable({ data }: DataTableProps) {
     <div className="w-full">
       <Card className="w-full mb-6">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold text-gray-900">Measures Breakdown By Date</CardTitle>
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+            <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900">
+              <span className="hidden sm:inline">Measures Breakdown By Date</span>
+              <span className="sm:hidden">Measures Breakdown</span>
+            </CardTitle>
+            <div className="flex items-center gap-2 sm:gap-3">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button className="btn-tertiary btn-icon">
-                      <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
+                    <button className="btn-tertiary p-2 sm:btn-icon">
+                      <FontAwesomeIcon icon={faCog} className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -313,141 +316,155 @@ export default function DataTable({ data }: DataTableProps) {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              <button onClick={handleDownloadCSV} className="btn-primary btn-sm flex items-center gap-2">
-                <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
-                Download As CSV
+              <button
+                onClick={handleDownloadCSV}
+                className="btn-primary text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex items-center gap-1 sm:gap-2"
+              >
+                <FontAwesomeIcon icon={faDownload} className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Download As CSV</span>
+                <span className="sm:hidden">CSV</span>
               </button>
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-[#B8D4E3] hover:bg-[#B8D4E3] border-b border-gray-300">
-                  {columns.map((column) => (
-                    <TableHead
-                      key={column.key}
-                      className="text-gray-700 font-semibold text-sm py-4 px-4 border-r border-gray-300 last:border-r-0"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{column.label}</span>
-                        <button
-                          onClick={() => handleSort(column.key)}
-                          className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
-                        >
-                          <FontAwesomeIcon icon={getSortIcon(column.key)} className="h-3 w-3 text-gray-600" />
-                        </button>
-                      </div>
-                    </TableHead>
-                  ))}
-                  <TableHead className="text-gray-700 font-semibold text-sm py-4 px-4 w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentData.map((row, index) => (
-                  <TableRow
-                    key={row.id}
-                    className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
-                  >
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.date}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.sponsors}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.exposures.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.duration.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.impressionsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.videoViewsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.engagements.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.fmvFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.mvp}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.postCount.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-center">
-                      <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-                            <FontAwesomeIcon icon={faEllipsisV} className="h-4 w-4 text-[#4F8EF7]" />
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="min-w-[800px] px-4 sm:px-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-[#B8D4E3] hover:bg-[#B8D4E3] border-b border-gray-300">
+                    {columns.map((column) => (
+                      <TableHead
+                        key={column.key}
+                        className="text-gray-700 font-semibold text-xs sm:text-sm py-3 sm:py-4 px-2 sm:px-4 border-r border-gray-300 last:border-r-0 whitespace-nowrap"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{column.label}</span>
+                          <button
+                            onClick={() => handleSort(column.key)}
+                            className="ml-1 sm:ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
+                          >
+                            <FontAwesomeIcon
+                              icon={getSortIcon(column.key)}
+                              className="h-2 w-2 sm:h-3 sm:w-3 text-gray-600"
+                            />
                           </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => console.log("View row:", row.id)}>
-                            <FontAwesomeIcon icon={faEye} className="mr-2 h-4 w-4" />
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log("Delete row:", row.id)} className="text-red-600">
-                            <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+                        </div>
+                      </TableHead>
+                    ))}
+                    <TableHead className="text-gray-700 font-semibold text-xs sm:text-sm py-3 sm:py-4 px-2 sm:px-4 w-8 sm:w-12"></TableHead>
                   </TableRow>
-                ))}
+                </TableHeader>
+                <TableBody>
+                  {currentData.map((row, index) => (
+                    <TableRow
+                      key={row.id}
+                      className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
+                    >
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.date}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.sponsors}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.exposures.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.duration.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.impressionsFormatted}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.videoViewsFormatted}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.engagements.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.fmvFormatted}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.mvp}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">
+                        {row.postCount.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="py-2 sm:py-3 px-2 sm:px-4 text-center">
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1 hover:bg-gray-100 rounded transition-colors">
+                              <FontAwesomeIcon icon={faEllipsisV} className="h-3 w-3 sm:h-4 sm:w-4 text-[#4F8EF7]" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => console.log("View row:", row.id)}>
+                              <FontAwesomeIcon icon={faEye} className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => console.log("Delete row:", row.id)}
+                              className="text-red-600"
+                            >
+                              <FontAwesomeIcon icon={faTrash} className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
 
-                {/* Totals Row */}
-                <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    Total
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.exposures.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.duration.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.impressions.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.videoViews.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.engagements.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    ${totals.fmv.toFixed(1)}k
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.mvp}%
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.postCount.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4"></TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                  {/* Totals Row */}
+                  <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      Total
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm">
+                      -
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.exposures.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.duration.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.impressions.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.videoViews.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.engagements.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      ${totals.fmv.toFixed(1)}k
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.mvp}%
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-gray-800 border-r border-gray-300 text-xs sm:text-sm whitespace-nowrap">
+                      {totals.postCount.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="py-3 sm:py-4 px-2 sm:px-4"></TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-center py-4 bg-white border-t border-gray-200">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-center py-3 sm:py-4 bg-white border-t border-gray-200 gap-2 sm:gap-0">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4 text-gray-600" />
+                <FontAwesomeIcon icon={faChevronLeft} className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
               </button>
 
               <div className="flex items-center space-x-1">
@@ -457,7 +474,7 @@ export default function DataTable({ data }: DataTableProps) {
                     <button
                       key={page}
                       onClick={() => goToPage(page)}
-                      className={`w-8 h-8 rounded transition-colors ${
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded transition-colors text-xs sm:text-sm ${
                         currentPage === page ? "bg-[#4F8EF7] text-white" : "hover:bg-gray-100 text-gray-600"
                       }`}
                     >
@@ -470,9 +487,9 @@ export default function DataTable({ data }: DataTableProps) {
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-2 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4 text-gray-600" />
+                <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
               </button>
             </div>
           </div>
