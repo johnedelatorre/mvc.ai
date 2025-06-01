@@ -928,6 +928,7 @@ export default function Page() {
                       <div className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faSliders} className="h-4 w-4" />
                         <span className="text-sm font-medium">Sort Filters</span>
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                       </div>
                     </button>
 
@@ -993,9 +994,6 @@ export default function Page() {
                           Comparison: {selectedComparisonDates[0]}
                         </Badge>
                       )}
-
-                      {/* Group By Tag */}
-                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                     </div>
                   </div>
                 </div>
