@@ -919,84 +919,83 @@ export default function Page() {
               <div className="p-5">
                 {/* Active Filters Row */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center flex-1">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
-                      >
+                  <div className="flex items-center gap-2 flex-1">
+                    <button
+                      onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                      className="flex items-center justify-between w-auto min-w-0 text-gray-600 hover:text-gray-800"
+                    >
+                      <div className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faSliders} className="h-4 w-4" />
                         <span className="text-sm font-medium">Sort Filters</span>
-                      </button>
-
-                      {/* Active Filter Tags */}
-                      <div className="flex items-center gap-2">
-                        {/* Time Period Tags */}
-                        {filterType === "dateRange" && dateRange.from && dateRange.to && (
-                          <>
-                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                              From: {format(dateRange.from, "yyyy-MM-dd")}
-                            </Badge>
-                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                              To: {format(dateRange.to, "yyyy-MM-dd")}
-                            </Badge>
-                          </>
-                        )}
-                        {filterType === "years" && selectedYears.length > 0 && (
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            Years: {selectedYears.join(", ")}
-                          </Badge>
-                        )}
-
-                        {/* Rightsholders Tag */}
-                        {selectedRightsholders.length > 0 && (
-                          <Badge className="bg-green-100 text-green-700 border-green-300">
-                            {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
-                            Selected
-                          </Badge>
-                        )}
-
-                        {/* Sponsors Tag */}
-                        {selectedSponsors.length > 0 && (
-                          <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                            {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Placements Tag */}
-                        {selectedPlacements.length > 0 && (
-                          <Badge className="bg-orange-100 text-orange-700 border-orange-300">
-                            {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Placement Types Tag */}
-                        {selectedPlacementTypes.length > 0 && (
-                          <Badge className="bg-pink-100 text-pink-700 border-pink-300">
-                            {selectedPlacementTypes.length} Placement Type
-                            {selectedPlacementTypes.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Comparison Dates Tag */}
-                        {selectedComparisonDates.length > 0 && (
-                          <Badge className="bg-teal-100 text-teal-700 border-teal-300">
-                            Comparison: {selectedComparisonDates[0]}
-                          </Badge>
-                        )}
-
-                        {/* Group By Tag */}
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                       </div>
-                    </div>
+                    </button>
 
-                    {/* Expand/Collapse Arrow - Flushed Right */}
                     <button
                       onClick={() => setIsFilterExpanded(!isFilterExpanded)}
                       className="ml-auto text-gray-600 hover:text-gray-800"
                     >
                       <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
                     </button>
+
+                    {/* Active Filter Tags */}
+                    <div className="flex items-center gap-2 ml-4">
+                      {/* Time Period Tags */}
+                      {filterType === "dateRange" && dateRange.from && dateRange.to && (
+                        <>
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            From: {format(dateRange.from, "yyyy-MM-dd")}
+                          </Badge>
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            To: {format(dateRange.to, "yyyy-MM-dd")}
+                          </Badge>
+                        </>
+                      )}
+                      {filterType === "years" && selectedYears.length > 0 && (
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                          Years: {selectedYears.join(", ")}
+                        </Badge>
+                      )}
+
+                      {/* Rightsholders Tag */}
+                      {selectedRightsholders.length > 0 && (
+                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                          Selected
+                        </Badge>
+                      )}
+
+                      {/* Sponsors Tag */}
+                      {selectedSponsors.length > 0 && (
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Placements Tag */}
+                      {selectedPlacements.length > 0 && (
+                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Placement Types Tag */}
+                      {selectedPlacementTypes.length > 0 && (
+                        <Badge className="bg-pink-100 text-pink-700 border-pink-300">
+                          {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
+                          Selected
+                        </Badge>
+                      )}
+
+                      {/* Comparison Dates Tag */}
+                      {selectedComparisonDates.length > 0 && (
+                        <Badge className="bg-teal-100 text-teal-700 border-teal-300">
+                          Comparison: {selectedComparisonDates[0]}
+                        </Badge>
+                      )}
+
+                      {/* Group By Tag */}
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
+                    </div>
                   </div>
                 </div>
 
