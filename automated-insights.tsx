@@ -88,6 +88,7 @@ interface SpeechRecognitionResultList {
   length: number
   item(index: number): SpeechRecognitionResult
   [index: number]: SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
@@ -245,6 +246,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
   const [expandedGeneratedInsightId, setExpandedGeneratedInsightId] = useState<string | null>(null)
   const [recognition, setRecognition] = useState<SpeechRecognition | null>(null)
   const [isRecognitionSupported, setIsRecognitionSupported] = useState(false)
+  const [showTemplateGallery, setShowTemplateGallery] = useState(true)
 
   const insightsChartRef = useRef<HTMLDivElement>(null)
 
@@ -2232,30 +2234,46 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                         </div>
                       </div>
 
-                      {/* Recommended Queries */}
-                      <div className="border rounded-lg p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
-                        <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                          AI Recommendations
-                        </h4>
-                        <div className="space-y-2">
-                          {recommendedQueries.map((query, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setChatInput(query)}
-                              disabled={isGenerating}
-                              className="w-full text-left p-3 text-sm bg-white hover:bg-yellow-50 rounded-md transition-colors border border-yellow-200 hover:border-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <div className="flex items-start gap-2">
-                                <FontAwesomeIcon
-                                  icon={faLightbulb}
-                                  className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0"
-                                />
-                                <span className="leading-relaxed">{query}</span>
-                              </div>
-                            </button>
-                          ))}
+                      {/* Insight Template Gallery */}
+                      <div className="border rounded-lg p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                            Insight Template Gallery
+                          </h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowTemplateGallery(!showTemplateGallery)}
+                            className="flex items-center gap-2 ml-auto"
+                          >
+                            <FontAwesomeIcon
+                              icon={showTemplateGallery ? faChevronUp : faChevronDown}
+                              className="h-4 w-4"
+                            />
+                          </Button>
                         </div>
+
+                        {showTemplateGallery && (
+                          <div className="space-y-2">
+                            {recommendedQueries.map((query, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setChatInput(query)}
+                                disabled={isGenerating}
+                                className="w-full text-left p-3 text-sm bg-white hover:bg-yellow-50 rounded-md transition-colors border border-yellow-200 hover:border-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <FontAwesomeIcon
+                                    icon={faLightbulb}
+                                    className="h-3 w-3 text-yellow-600 mt-0.5 flex-shrink-0"
+                                  />
+                                  <span className="leading-relaxed">{query}</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
