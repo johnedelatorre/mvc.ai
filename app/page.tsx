@@ -24,7 +24,6 @@ import {
   faChevronUp,
   faSave,
   faFolderOpen,
-  faRobot,
   faSliders,
 } from "@fortawesome/free-solid-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
@@ -928,6 +927,7 @@ export default function Page() {
                       <div className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faSliders} className="h-4 w-4" />
                         <span className="text-sm font-medium">Sort Filters</span>
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                       </div>
                     </button>
 
@@ -993,9 +993,6 @@ export default function Page() {
                           Comparison: {selectedComparisonDates[0]}
                         </Badge>
                       )}
-
-                      {/* Group By Tag */}
-                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                     </div>
                   </div>
                 </div>
@@ -1823,217 +1820,177 @@ export default function Page() {
             {/* Insights Tab Content */}
             <TabsContent value="insights" className="mt-6 mb-0">
               <div className="w-full">
-                {/* Insights Sub-tabs */}
-                <div className="mb-8">
-                  <div className="border-b border-gray-200">
-                    <nav className="-mb-px flex space-x-8">
-                      <button
-                        onClick={() => setInsightsSubTab("automated")}
-                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                          insightsSubTab === "automated"
-                            ? "border-blue-500 text-blue-600"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 mr-2" />
-                        Automated Insights
-                      </button>
-                      <button
-                        onClick={() => setInsightsSubTab("generated")}
-                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                          insightsSubTab === "generated"
-                            ? "border-blue-500 text-blue-600"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                        }`}
-                      >
-                        <FontAwesomeIcon icon={faRobot} className="h-4 w-4 mr-2" />
-                        Generated Insights
-                      </button>
-                    </nav>
-                  </div>
-                </div>
-
-                {/* Automated Insights Tab Content */}
-                {insightsSubTab === "automated" && (
-                  <div className="space-y-8">
-                    <div className="bg-white border border-gray-200 rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <div>
-                          <h2 className="text-xl font-semibold text-gray-900 mb-2">Insight Template Gallery</h2>
-                          <p className="text-sm text-gray-600">
-                            Choose from pre-built templates to quickly generate automated insights for your data
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setIsTemplateGalleryExpanded(!isTemplateGalleryExpanded)}
-                          className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
-                        >
-                          <FontAwesomeIcon
-                            icon={isTemplateGalleryExpanded ? faChevronUp : faChevronDown}
-                            className="h-4 w-4"
-                          />
-                        </button>
+                <div className="space-y-8">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Insight Template Gallery</h2>
+                        <p className="text-sm text-gray-600">
+                          Choose from pre-built templates to quickly generate automated insights for your data
+                        </p>
                       </div>
+                      <button
+                        onClick={() => setIsTemplateGalleryExpanded(!isTemplateGalleryExpanded)}
+                        className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
+                      >
+                        <FontAwesomeIcon
+                          icon={isTemplateGalleryExpanded ? faChevronUp : faChevronDown}
+                          className="h-4 w-4"
+                        />
+                      </button>
+                    </div>
 
-                      {isTemplateGalleryExpanded && (
-                        <>
-                          {/* Search and Filter Toolbar */}
-                          <div className="flex items-center gap-4 mb-6">
-                            <div className="flex-1 max-w-md">
-                              <Input
-                                type="text"
-                                placeholder="Search Templates..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                                className="h-10"
-                              />
-                            </div>
-                            <div className="w-48">
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <button className="w-full flex items-center justify-between px-3 py-2 h-10 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                    <span className="text-gray-700">{selectedCategory}</span>
-                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-48" align="start">
-                                  <div className="space-y-1">
-                                    {categories.map((category) => (
-                                      <button
-                                        key={category}
-                                        onClick={() => handleCategoryChange(category)}
-                                        className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                          selectedCategory === category
-                                            ? "bg-blue-100 text-blue-900"
-                                            : "hover:bg-gray-100 text-gray-700"
-                                        }`}
-                                      >
-                                        {category}
-                                      </button>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </div>
+                    {isTemplateGalleryExpanded && (
+                      <>
+                        {/* Search and Filter Toolbar */}
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="flex-1 max-w-md">
+                            <Input
+                              type="text"
+                              placeholder="Search Templates..."
+                              value={searchQuery}
+                              onChange={(e) => handleSearchChange(e.target.value)}
+                              className="h-10"
+                            />
                           </div>
-
-                          {/* Template Cards Grid */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                            {visibleTemplates.map((template) => (
-                              <div
-                                key={template.id}
-                                className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
-                              >
-                                {/* Metrics Preview */}
-                                <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                                  <div className="grid grid-cols-2 gap-3 text-xs">
-                                    <div>
-                                      <div className="text-gray-500">SMV</div>
-                                      <div className="font-semibold text-green-600">$2.4M</div>
-                                    </div>
-                                    <div>
-                                      <div className="text-gray-500">Growth</div>
-                                      <div className="font-semibold text-blue-600">+15.3%</div>
-                                    </div>
-                                    <div>
-                                      <div className="text-gray-500">Impressions</div>
-                                      <div className="font-semibold text-purple-600">1.2M</div>
-                                    </div>
-                                    <div>
-                                      <div className="text-gray-500">Insights</div>
-                                      <div className="font-semibold text-orange-600">8</div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="mb-4">
-                                  <h3 className="font-semibold text-gray-900 mb-2">{template.title}</h3>
-                                  <p className="text-sm text-gray-600 leading-relaxed mb-3">{template.description}</p>
-
-                                  {/* Key Insights Preview */}
-                                  <div className="text-xs text-gray-500">
-                                    <div className="font-medium mb-1">Key Insights:</div>
-                                    <ul className="space-y-1">
-                                      <li>• Top performing sponsor identified</li>
-                                      <li>• 23% increase in engagement</li>
-                                      <li>• Optimal placement recommendations</li>
-                                    </ul>
-                                  </div>
-                                </div>
-
-                                {/* Category Badge */}
-                                <div className="mb-4">
-                                  <Badge variant="secondary" className="text-xs">
-                                    {template.category}
-                                  </Badge>
-                                </div>
-
-                                {/* Generate Insight Button */}
-                                <button
-                                  onClick={() => handleGenerateFromTemplate(template)}
-                                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
-                                >
-                                  <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4" />
-                                  Generate Insight
+                          <div className="w-48">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button className="w-full flex items-center justify-between px-3 py-2 h-10 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                  <span className="text-gray-700">{selectedCategory}</span>
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                 </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-48" align="start">
+                                <div className="space-y-1">
+                                  {categories.map((category) => (
+                                    <button
+                                      key={category}
+                                      onClick={() => handleCategoryChange(category)}
+                                      className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                        selectedCategory === category
+                                          ? "bg-blue-100 text-blue-900"
+                                          : "hover:bg-gray-100 text-gray-700"
+                                      }`}
+                                    >
+                                      {category}
+                                    </button>
+                                  ))}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
+
+                        {/* Template Cards Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                          {visibleTemplates.map((template) => (
+                            <div
+                              key={template.id}
+                              className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+                            >
+                              {/* Metrics Preview */}
+                              <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                  <div>
+                                    <div className="text-gray-500">SMV</div>
+                                    <div className="font-semibold text-green-600">$2.4M</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-500">Growth</div>
+                                    <div className="font-semibold text-blue-600">+15.3%</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-500">Impressions</div>
+                                    <div className="font-semibold text-purple-600">1.2M</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-500">Insights</div>
+                                    <div className="font-semibold text-orange-600">8</div>
+                                  </div>
+                                </div>
                               </div>
-                            ))}
-                          </div>
 
-                          {/* Pagination */}
-                          {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2">
+                              {/* Content */}
+                              <div className="mb-4">
+                                <h3 className="font-semibold text-gray-900 mb-2">{template.title}</h3>
+                                <p className="text-sm text-gray-600 leading-relaxed mb-3">{template.description}</p>
+
+                                {/* Key Insights Preview */}
+                                <div className="text-xs text-gray-500">
+                                  <div className="font-medium mb-1">Key Insights:</div>
+                                  <ul className="space-y-1">
+                                    <li>• Top performing sponsor identified</li>
+                                    <li>• 23% increase in engagement</li>
+                                    <li>• Optimal placement recommendations</li>
+                                  </ul>
+                                </div>
+                              </div>
+
+                              {/* Category Badge */}
+                              <div className="mb-4">
+                                <Badge variant="secondary" className="text-xs">
+                                  {template.category}
+                                </Badge>
+                              </div>
+
+                              {/* Generate Insight Button */}
                               <button
-                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                disabled={currentPage === 1}
-                                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                onClick={() => handleGenerateFromTemplate(template)}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
                               >
-                                <ChevronLeftIcon className="h-4 w-4" />
-                                Previous
-                              </button>
-
-                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <button
-                                  key={page}
-                                  onClick={() => setCurrentPage(page)}
-                                  className={`px-3 py-2 text-sm border rounded-md transition-colors ${
-                                    currentPage === page
-                                      ? "bg-blue-600 text-white border-blue-600"
-                                      : "border-gray-300 text-gray-700 hover:border-blue-500"
-                                  }`}
-                                >
-                                  {page}
-                                </button>
-                              ))}
-
-                              <button
-                                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                disabled={currentPage === totalPages}
-                                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
-                                Next
-                                <ChevronRightIcon className="h-4 w-4" />
+                                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4" />
+                                Generate Insight
                               </button>
                             </div>
-                          )}
-                        </>
-                      )}
-                    </div>
+                          ))}
+                        </div>
 
-                    {/* Automated Insights Metrics Section */}
-                    <div id="automated-insights-metrics">
-                      <AutomatedInsights data={filteredData} />
-                    </div>
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              disabled={currentPage === 1}
+                              className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              <ChevronLeftIcon className="h-4 w-4" />
+                              Previous
+                            </button>
+
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-2 text-sm border rounded-md transition-colors ${
+                                  currentPage === page
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "border-gray-300 text-gray-700 hover:border-blue-500"
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            ))}
+
+                            <button
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              disabled={currentPage === totalPages}
+                              className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                              Next
+                              <ChevronRightIcon className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
-                )}
 
-                {/* Generated Insights Tab Content */}
-                {insightsSubTab === "generated" && (
-                  <div className="space-y-6">
+                  {/* Automated Insights Metrics Section */}
+                  <div id="automated-insights-metrics">
                     <AutomatedInsights data={filteredData} />
                   </div>
-                )}
+                </div>
               </div>
             </TabsContent>
           </Tabs>
