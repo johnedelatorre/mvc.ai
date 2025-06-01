@@ -272,6 +272,7 @@ export default function Page() {
   const [chatInput, setChatInput] = useState("")
   const [activeTab, setActiveTab] = useState("generate")
   const [isSecondaryFiltersExpanded, setIsSecondaryFiltersExpanded] = useState(false)
+  const [isTemplateGalleryExpanded, setIsTemplateGalleryExpanded] = useState(true)
 
   // Template Gallery state
   const [currentPage, setCurrentPage] = useState(1)
@@ -919,84 +920,83 @@ export default function Page() {
               <div className="p-5">
                 {/* Active Filters Row */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center flex-1">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
-                      >
+                  <div className="flex items-center gap-2 flex-1">
+                    <button
+                      onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                      className="flex items-center justify-between w-auto min-w-0 text-gray-600 hover:text-gray-800"
+                    >
+                      <div className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faSliders} className="h-4 w-4" />
                         <span className="text-sm font-medium">Sort Filters</span>
-                      </button>
-
-                      {/* Active Filter Tags */}
-                      <div className="flex items-center gap-2">
-                        {/* Time Period Tags */}
-                        {filterType === "dateRange" && dateRange.from && dateRange.to && (
-                          <>
-                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                              From: {format(dateRange.from, "yyyy-MM-dd")}
-                            </Badge>
-                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                              To: {format(dateRange.to, "yyyy-MM-dd")}
-                            </Badge>
-                          </>
-                        )}
-                        {filterType === "years" && selectedYears.length > 0 && (
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            Years: {selectedYears.join(", ")}
-                          </Badge>
-                        )}
-
-                        {/* Rightsholders Tag */}
-                        {selectedRightsholders.length > 0 && (
-                          <Badge className="bg-green-100 text-green-700 border-green-300">
-                            {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
-                            Selected
-                          </Badge>
-                        )}
-
-                        {/* Sponsors Tag */}
-                        {selectedSponsors.length > 0 && (
-                          <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                            {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Placements Tag */}
-                        {selectedPlacements.length > 0 && (
-                          <Badge className="bg-orange-100 text-orange-700 border-orange-300">
-                            {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Placement Types Tag */}
-                        {selectedPlacementTypes.length > 0 && (
-                          <Badge className="bg-pink-100 text-pink-700 border-pink-300">
-                            {selectedPlacementTypes.length} Placement Type
-                            {selectedPlacementTypes.length !== 1 ? "s" : ""} Selected
-                          </Badge>
-                        )}
-
-                        {/* Comparison Dates Tag */}
-                        {selectedComparisonDates.length > 0 && (
-                          <Badge className="bg-teal-100 text-teal-700 border-teal-300">
-                            Comparison: {selectedComparisonDates[0]}
-                          </Badge>
-                        )}
-
-                        {/* Group By Tag */}
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
                       </div>
-                    </div>
+                    </button>
 
-                    {/* Expand/Collapse Arrow - Flushed Right */}
                     <button
                       onClick={() => setIsFilterExpanded(!isFilterExpanded)}
                       className="ml-auto text-gray-600 hover:text-gray-800"
                     >
                       <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
                     </button>
+
+                    {/* Active Filter Tags */}
+                    <div className="flex items-center gap-2 ml-4">
+                      {/* Time Period Tags */}
+                      {filterType === "dateRange" && dateRange.from && dateRange.to && (
+                        <>
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            From: {format(dateRange.from, "yyyy-MM-dd")}
+                          </Badge>
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            To: {format(dateRange.to, "yyyy-MM-dd")}
+                          </Badge>
+                        </>
+                      )}
+                      {filterType === "years" && selectedYears.length > 0 && (
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                          Years: {selectedYears.join(", ")}
+                        </Badge>
+                      )}
+
+                      {/* Rightsholders Tag */}
+                      {selectedRightsholders.length > 0 && (
+                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                          Selected
+                        </Badge>
+                      )}
+
+                      {/* Sponsors Tag */}
+                      {selectedSponsors.length > 0 && (
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Placements Tag */}
+                      {selectedPlacements.length > 0 && (
+                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                        </Badge>
+                      )}
+
+                      {/* Placement Types Tag */}
+                      {selectedPlacementTypes.length > 0 && (
+                        <Badge className="bg-pink-100 text-pink-700 border-pink-300">
+                          {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
+                          Selected
+                        </Badge>
+                      )}
+
+                      {/* Comparison Dates Tag */}
+                      {selectedComparisonDates.length > 0 && (
+                        <Badge className="bg-teal-100 text-teal-700 border-teal-300">
+                          Comparison: {selectedComparisonDates[0]}
+                        </Badge>
+                      )}
+
+                      {/* Group By Tag */}
+                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
+                    </div>
                   </div>
                 </div>
 
@@ -1856,154 +1856,168 @@ export default function Page() {
                 {/* Automated Insights Tab Content */}
                 {insightsSubTab === "automated" && (
                   <div className="space-y-8">
-                    {/* Template Gallery - Only in Automated Insights */}
                     <div className="bg-white border border-gray-200 rounded-lg p-6">
-                      <div className="mb-6">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Insight Template Gallery</h2>
-                        <p className="text-sm text-gray-600">
-                          Choose from pre-built templates to quickly generate automated insights for your data
-                        </p>
-                      </div>
-
-                      {/* Search and Filter Toolbar */}
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="flex-1 max-w-md">
-                          <Input
-                            type="text"
-                            placeholder="Search Templates..."
-                            value={searchQuery}
-                            onChange={(e) => handleSearchChange(e.target.value)}
-                            className="h-10"
+                      <div className="flex items-center justify-between mb-6">
+                        <div>
+                          <h2 className="text-xl font-semibold text-gray-900 mb-2">Insight Template Gallery</h2>
+                          <p className="text-sm text-gray-600">
+                            Choose from pre-built templates to quickly generate automated insights for your data
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setIsTemplateGalleryExpanded(!isTemplateGalleryExpanded)}
+                          className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                          <FontAwesomeIcon
+                            icon={isTemplateGalleryExpanded ? faChevronUp : faChevronDown}
+                            className="h-4 w-4"
                           />
-                        </div>
-                        <div className="w-48">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="w-full flex items-center justify-between px-3 py-2 h-10 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                <span className="text-gray-700">{selectedCategory}</span>
-                                <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-48" align="start">
-                              <div className="space-y-1">
-                                {categories.map((category) => (
-                                  <button
-                                    key={category}
-                                    onClick={() => handleCategoryChange(category)}
-                                    className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                      selectedCategory === category
-                                        ? "bg-blue-100 text-blue-900"
-                                        : "hover:bg-gray-100 text-gray-700"
-                                    }`}
-                                  >
-                                    {category}
+                        </button>
+                      </div>
+
+                      {isTemplateGalleryExpanded && (
+                        <>
+                          {/* Search and Filter Toolbar */}
+                          <div className="flex items-center gap-4 mb-6">
+                            <div className="flex-1 max-w-md">
+                              <Input
+                                type="text"
+                                placeholder="Search Templates..."
+                                value={searchQuery}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                className="h-10"
+                              />
+                            </div>
+                            <div className="w-48">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 h-10 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-700">{selectedCategory}</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                                   </button>
-                                ))}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                      </div>
-
-                      {/* Template Cards Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        {visibleTemplates.map((template) => (
-                          <div
-                            key={template.id}
-                            className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
-                          >
-                            {/* Metrics Preview */}
-                            <div className="mb-4 p-3 bg-gray-50 rounded-md">
-                              <div className="grid grid-cols-2 gap-3 text-xs">
-                                <div>
-                                  <div className="text-gray-500">SMV</div>
-                                  <div className="font-semibold text-green-600">$2.4M</div>
-                                </div>
-                                <div>
-                                  <div className="text-gray-500">Growth</div>
-                                  <div className="font-semibold text-blue-600">+15.3%</div>
-                                </div>
-                                <div>
-                                  <div className="text-gray-500">Impressions</div>
-                                  <div className="font-semibold text-purple-600">1.2M</div>
-                                </div>
-                                <div>
-                                  <div className="text-gray-500">Insights</div>
-                                  <div className="font-semibold text-orange-600">8</div>
-                                </div>
-                              </div>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-48" align="start">
+                                  <div className="space-y-1">
+                                    {categories.map((category) => (
+                                      <button
+                                        key={category}
+                                        onClick={() => handleCategoryChange(category)}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                          selectedCategory === category
+                                            ? "bg-blue-100 text-blue-900"
+                                            : "hover:bg-gray-100 text-gray-700"
+                                        }`}
+                                      >
+                                        {category}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
                             </div>
-
-                            {/* Content */}
-                            <div className="mb-4">
-                              <h3 className="font-semibold text-gray-900 mb-2">{template.title}</h3>
-                              <p className="text-sm text-gray-600 leading-relaxed mb-3">{template.description}</p>
-
-                              {/* Key Insights Preview */}
-                              <div className="text-xs text-gray-500">
-                                <div className="font-medium mb-1">Key Insights:</div>
-                                <ul className="space-y-1">
-                                  <li>• Top performing sponsor identified</li>
-                                  <li>• 23% increase in engagement</li>
-                                  <li>• Optimal placement recommendations</li>
-                                </ul>
-                              </div>
-                            </div>
-
-                            {/* Category Badge */}
-                            <div className="mb-4">
-                              <Badge variant="secondary" className="text-xs">
-                                {template.category}
-                              </Badge>
-                            </div>
-
-                            {/* Generate Insight Button */}
-                            <button
-                              onClick={() => handleGenerateFromTemplate(template)}
-                              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
-                            >
-                              <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4" />
-                              Generate Insight
-                            </button>
                           </div>
-                        ))}
-                      </div>
 
-                      {/* Pagination */}
-                      {totalPages > 1 && (
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                            disabled={currentPage === 1}
-                            className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            <ChevronLeftIcon className="h-4 w-4" />
-                            Previous
-                          </button>
+                          {/* Template Cards Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                            {visibleTemplates.map((template) => (
+                              <div
+                                key={template.id}
+                                className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+                              >
+                                {/* Metrics Preview */}
+                                <div className="mb-4 p-3 bg-gray-50 rounded-md">
+                                  <div className="grid grid-cols-2 gap-3 text-xs">
+                                    <div>
+                                      <div className="text-gray-500">SMV</div>
+                                      <div className="font-semibold text-green-600">$2.4M</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-gray-500">Growth</div>
+                                      <div className="font-semibold text-blue-600">+15.3%</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-gray-500">Impressions</div>
+                                      <div className="font-semibold text-purple-600">1.2M</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-gray-500">Insights</div>
+                                      <div className="font-semibold text-orange-600">8</div>
+                                    </div>
+                                  </div>
+                                </div>
 
-                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <button
-                              key={page}
-                              onClick={() => setCurrentPage(page)}
-                              className={`px-3 py-2 text-sm border rounded-md transition-colors ${
-                                currentPage === page
-                                  ? "bg-blue-600 text-white border-blue-600"
-                                  : "border-gray-300 text-gray-700 hover:border-blue-500"
-                              }`}
-                            >
-                              {page}
-                            </button>
-                          ))}
+                                {/* Content */}
+                                <div className="mb-4">
+                                  <h3 className="font-semibold text-gray-900 mb-2">{template.title}</h3>
+                                  <p className="text-sm text-gray-600 leading-relaxed mb-3">{template.description}</p>
 
-                          <button
-                            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                            disabled={currentPage === totalPages}
-                            className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                          >
-                            Next
-                            <ChevronRightIcon className="h-4 w-4" />
-                          </button>
-                        </div>
+                                  {/* Key Insights Preview */}
+                                  <div className="text-xs text-gray-500">
+                                    <div className="font-medium mb-1">Key Insights:</div>
+                                    <ul className="space-y-1">
+                                      <li>• Top performing sponsor identified</li>
+                                      <li>• 23% increase in engagement</li>
+                                      <li>• Optimal placement recommendations</li>
+                                    </ul>
+                                  </div>
+                                </div>
+
+                                {/* Category Badge */}
+                                <div className="mb-4">
+                                  <Badge variant="secondary" className="text-xs">
+                                    {template.category}
+                                  </Badge>
+                                </div>
+
+                                {/* Generate Insight Button */}
+                                <button
+                                  onClick={() => handleGenerateFromTemplate(template)}
+                                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
+                                >
+                                  <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4" />
+                                  Generate Insight
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Pagination */}
+                          {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                disabled={currentPage === 1}
+                                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              >
+                                <ChevronLeftIcon className="h-4 w-4" />
+                                Previous
+                              </button>
+
+                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <button
+                                  key={page}
+                                  onClick={() => setCurrentPage(page)}
+                                  className={`px-3 py-2 text-sm border rounded-md transition-colors ${
+                                    currentPage === page
+                                      ? "bg-blue-600 text-white border-blue-600"
+                                      : "border-gray-300 text-gray-700 hover:border-blue-500"
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              ))}
+
+                              <button
+                                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                disabled={currentPage === totalPages}
+                                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md hover:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              >
+                                Next
+                                <ChevronRightIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
 

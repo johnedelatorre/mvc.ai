@@ -106,6 +106,7 @@ interface SpeechRecognitionAlternative {
 declare var SpeechRecognition: {
   prototype: SpeechRecognition
   new (): SpeechRecognition
+  new (): SpeechRecognition
 }
 
 interface AutomatedInsightsProps {
