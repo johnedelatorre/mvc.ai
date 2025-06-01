@@ -25,6 +25,7 @@ import {
   faSave,
   faFolderOpen,
   faRobot,
+  faSliders,
 } from "@fortawesome/free-solid-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 
@@ -918,77 +919,84 @@ export default function Page() {
               <div className="p-5">
                 {/* Active Filters Row */}
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center flex-1">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+                      >
+                        <FontAwesomeIcon icon={faSliders} className="h-4 w-4" />
+                        <span className="text-sm font-medium">Sort Filters</span>
+                      </button>
+
+                      {/* Active Filter Tags */}
+                      <div className="flex items-center gap-2">
+                        {/* Time Period Tags */}
+                        {filterType === "dateRange" && dateRange.from && dateRange.to && (
+                          <>
+                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                              From: {format(dateRange.from, "yyyy-MM-dd")}
+                            </Badge>
+                            <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                              To: {format(dateRange.to, "yyyy-MM-dd")}
+                            </Badge>
+                          </>
+                        )}
+                        {filterType === "years" && selectedYears.length > 0 && (
+                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                            Years: {selectedYears.join(", ")}
+                          </Badge>
+                        )}
+
+                        {/* Rightsholders Tag */}
+                        {selectedRightsholders.length > 0 && (
+                          <Badge className="bg-green-100 text-green-700 border-green-300">
+                            {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
+                            Selected
+                          </Badge>
+                        )}
+
+                        {/* Sponsors Tag */}
+                        {selectedSponsors.length > 0 && (
+                          <Badge className="bg-purple-100 text-purple-700 border-purple-300">
+                            {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
+                          </Badge>
+                        )}
+
+                        {/* Placements Tag */}
+                        {selectedPlacements.length > 0 && (
+                          <Badge className="bg-orange-100 text-orange-700 border-orange-300">
+                            {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
+                          </Badge>
+                        )}
+
+                        {/* Placement Types Tag */}
+                        {selectedPlacementTypes.length > 0 && (
+                          <Badge className="bg-pink-100 text-pink-700 border-pink-300">
+                            {selectedPlacementTypes.length} Placement Type
+                            {selectedPlacementTypes.length !== 1 ? "s" : ""} Selected
+                          </Badge>
+                        )}
+
+                        {/* Comparison Dates Tag */}
+                        {selectedComparisonDates.length > 0 && (
+                          <Badge className="bg-teal-100 text-teal-700 border-teal-300">
+                            Comparison: {selectedComparisonDates[0]}
+                          </Badge>
+                        )}
+
+                        {/* Group By Tag */}
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
+                      </div>
+                    </div>
+
+                    {/* Expand/Collapse Arrow - Flushed Right */}
                     <button
                       onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                      className="text-gray-400 hover:text-gray-600 mr-2"
+                      className="ml-auto text-gray-600 hover:text-gray-800"
                     >
                       <FontAwesomeIcon icon={isFilterExpanded ? faChevronUp : faChevronDown} className="h-4 w-4" />
                     </button>
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
-                      <span className="text-sm font-medium">Sort Filters</span>
-                      <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
-                    </button>
-
-                    {/* Active Filter Tags */}
-                    <div className="flex items-center gap-2 ml-4">
-                      {/* Time Period Tags */}
-                      {filterType === "dateRange" && dateRange.from && dateRange.to && (
-                        <>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            From: {format(dateRange.from, "yyyy-MM-dd")}
-                          </Badge>
-                          <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            To: {format(dateRange.to, "yyyy-MM-dd")}
-                          </Badge>
-                        </>
-                      )}
-                      {filterType === "years" && selectedYears.length > 0 && (
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                          Years: {selectedYears.join(", ")}
-                        </Badge>
-                      )}
-
-                      {/* Rightsholders Tag */}
-                      {selectedRightsholders.length > 0 && (
-                        <Badge className="bg-green-100 text-green-700 border-green-300">
-                          {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
-                          Selected
-                        </Badge>
-                      )}
-
-                      {/* Sponsors Tag */}
-                      {selectedSponsors.length > 0 && (
-                        <Badge className="bg-purple-100 text-purple-700 border-purple-300">
-                          {selectedSponsors.length} Sponsor{selectedSponsors.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Placements Tag */}
-                      {selectedPlacements.length > 0 && (
-                        <Badge className="bg-orange-100 text-orange-700 border-orange-300">
-                          {selectedPlacements.length} Placement{selectedPlacements.length !== 1 ? "s" : ""} Selected
-                        </Badge>
-                      )}
-
-                      {/* Placement Types Tag */}
-                      {selectedPlacementTypes.length > 0 && (
-                        <Badge className="bg-pink-100 text-pink-700 border-pink-300">
-                          {selectedPlacementTypes.length} Placement Type{selectedPlacementTypes.length !== 1 ? "s" : ""}{" "}
-                          Selected
-                        </Badge>
-                      )}
-
-                      {/* Comparison Dates Tag */}
-                      {selectedComparisonDates.length > 0 && (
-                        <Badge className="bg-teal-100 text-teal-700 border-teal-300">
-                          Comparison: {selectedComparisonDates[0]}
-                        </Badge>
-                      )}
-
-                      {/* Group By Tag */}
-                      <Badge className="bg-blue-100 text-blue-700 border-blue-300">Group By: {groupBy}</Badge>
-                    </div>
                   </div>
                 </div>
 
@@ -1611,144 +1619,149 @@ export default function Page() {
                     </div>
 
                     {/* Row 2: Secondary Filters - Collapsible */}
-                    <div className="border-t pt-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setIsSecondaryFiltersExpanded(!isSecondaryFiltersExpanded)}
-                            className="text-gray-400 hover:text-gray-600 mr-2"
-                          >
-                            <FontAwesomeIcon
-                              icon={isSecondaryFiltersExpanded ? faChevronUp : faChevronDown}
-                              className="h-4 w-4"
-                            />
-                          </button>
-                          <span className="text-sm font-medium text-gray-700">Page Specific Filters</span>
+                    <div className="border-t pt-4 -mx-5">
+                      <div className="px-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2 flex-1">
+                            <button
+                              onClick={() => setIsSecondaryFiltersExpanded(!isSecondaryFiltersExpanded)}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors border border-gray-200 w-full justify-between"
+                            >
+                              <div className="flex items-center gap-2">
+                                <FontAwesomeIcon icon={faChartLine} className="h-3 w-3" />
+                                <span>Page Specific Metrics</span>
+                              </div>
+                              <FontAwesomeIcon
+                                icon={isSecondaryFiltersExpanded ? faChevronUp : faChevronDown}
+                                className="h-3 w-3"
+                              />
+                            </button>
+                          </div>
                         </div>
-                      </div>
 
-                      {isSecondaryFiltersExpanded && (
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Comparison Dates */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Comparison Dates
-                              <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                            </label>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                  <span className="text-gray-500">Select Comparison Dates</span>
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
-                                <div className="space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <div className="font-medium text-sm">Select Comparison Dates</div>
+                        {isSecondaryFiltersExpanded && (
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Comparison Dates */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Comparison Dates
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-500">Select Comparison Dates</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-80">
+                                  <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                      <div className="font-medium text-sm">Select Comparison Dates</div>
+                                      {selectedComparisonDates.length > 0 && (
+                                        <button onClick={clearAllComparisonDates} className="btn-tertiary btn-sm">
+                                          Clear All
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Selected Comparison Dates Tags */}
                                     {selectedComparisonDates.length > 0 && (
-                                      <button onClick={clearAllComparisonDates} className="btn-tertiary btn-sm">
-                                        Clear All
-                                      </button>
-                                    )}
-                                  </div>
-
-                                  {/* Selected Comparison Dates Tags */}
-                                  {selectedComparisonDates.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md">
-                                      {selectedComparisonDates.map((date) => (
-                                        <Badge
-                                          key={date}
-                                          variant="secondary"
-                                          className="flex items-center gap-1 text-xs"
-                                        >
-                                          {date}
-                                          <button
-                                            onClick={() => removeComparisonDate(date)}
-                                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                      <div className="flex flex-wrap gap-1 p-2 bg-gray-50 rounded-md">
+                                        {selectedComparisonDates.map((date) => (
+                                          <Badge
+                                            key={date}
+                                            variant="secondary"
+                                            className="flex items-center gap-1 text-xs"
                                           >
-                                            <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
-                                          </button>
-                                        </Badge>
+                                            {date}
+                                            <button
+                                              onClick={() => removeComparisonDate(date)}
+                                              className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                                            >
+                                              <FontAwesomeIcon icon={faTimes} className="h-2 w-2" />
+                                            </button>
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Comparison Date Options */}
+                                    <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                                      {COMPARISON_DATES_OPTIONS.map((date) => (
+                                        <div key={date} className="flex items-center space-x-2">
+                                          <input
+                                            type="radio"
+                                            id={`comparison-date-${date}`}
+                                            name="comparison-date"
+                                            checked={selectedComparisonDates.includes(date)}
+                                            onChange={() => handleComparisonDateToggle(date)}
+                                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                          />
+                                          <label
+                                            htmlFor={`comparison-date-${date}`}
+                                            className="text-sm cursor-pointer flex-1"
+                                          >
+                                            {date}
+                                          </label>
+                                        </div>
                                       ))}
                                     </div>
-                                  )}
 
-                                  {/* Comparison Date Options */}
-                                  <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
-                                    {COMPARISON_DATES_OPTIONS.map((date) => (
-                                      <div key={date} className="flex items-center space-x-2">
-                                        <input
-                                          type="radio"
-                                          id={`comparison-date-${date}`}
-                                          name="comparison-date"
-                                          checked={selectedComparisonDates.includes(date)}
-                                          onChange={() => handleComparisonDateToggle(date)}
-                                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                                        />
-                                        <label
-                                          htmlFor={`comparison-date-${date}`}
-                                          className="text-sm cursor-pointer flex-1"
+                                    {selectedComparisonDates.length > 0 && (
+                                      <div className="pt-2 border-t">
+                                        <button
+                                          onClick={() => setSelectedComparisonDates([])}
+                                          className="btn-secondary btn-sm w-full"
                                         >
-                                          {date}
-                                        </label>
+                                          Clear Selection
+                                        </button>
                                       </div>
+                                    )}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+
+                            {/* Group By */}
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Group By
+                                <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
+                              </label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                                    <span className="text-gray-700">{groupBy}</span>
+                                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
+                                  <div className="space-y-1">
+                                    {GROUP_BY_OPTIONS.map((option) => (
+                                      <button
+                                        key={option}
+                                        onClick={() => {
+                                          setGroupBy(option)
+                                          // Close the popover
+                                          document.body.click()
+                                        }}
+                                        className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                          groupBy === option
+                                            ? "bg-blue-100 text-blue-900"
+                                            : "hover:bg-gray-100 text-gray-700"
+                                        }`}
+                                      >
+                                        {option}
+                                      </button>
                                     ))}
                                   </div>
-
-                                  {selectedComparisonDates.length > 0 && (
-                                    <div className="pt-2 border-t">
-                                      <button
-                                        onClick={() => setSelectedComparisonDates([])}
-                                        className="btn-secondary btn-sm w-full"
-                                      >
-                                        Clear Selection
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
                           </div>
-
-                          {/* Group By */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Group By
-                              <FontAwesomeIcon icon={faFilter} className="h-3 w-3 ml-1 text-gray-400" />
-                            </label>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                                  <span className="text-gray-700">{groupBy}</span>
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                                </button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
-                                <div className="space-y-1">
-                                  {GROUP_BY_OPTIONS.map((option) => (
-                                    <button
-                                      key={option}
-                                      onClick={() => {
-                                        setGroupBy(option)
-                                        // Close the popover
-                                        document.body.click()
-                                      }}
-                                      className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                        groupBy === option
-                                          ? "bg-blue-100 text-blue-900"
-                                          : "hover:bg-gray-100 text-gray-700"
-                                      }`}
-                                    >
-                                      {option}
-                                    </button>
-                                  ))}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
