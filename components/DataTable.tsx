@@ -1,5 +1,4 @@
 "use client"
-import { useState, useMemo } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -13,11 +12,13 @@ import {
   faChevronRight,
   faDownload,
   faCog,
-  faSort,
-  faSortUp,
-  faSortDown,
 } from "@fortawesome/free-solid-svg-icons"
 import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
+import { faGripVertical } from "@fortawesome/free-solid-svg-icons"
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
   const getIcon = () => {
@@ -46,14 +47,13 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
         <TooltipContent>
           <p>{platform}</p>
         </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
+      </TooltipProvider>
+  );
 }
 
 type SortConfig = {
-  key: string
-  direction: "asc" | "desc"
+  key: string;
+  direction: "asc" | "desc";
 } | null
 
 type SearchFilters = {
@@ -83,6 +83,20 @@ export default function DataTable({ data }: DataTableProps) {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
   const [activeSearchColumn, setActiveSearchColumn] = useState<string | null>(null)
   const itemsPerPage = 10
+  const [columnSettings, setColumnSettings] = useState({
+    date: { visible: true, order: 0 },
+    sponsors: { visible: true, order: 1 },
+    exposures: { visible: true, order: 2 },
+    duration: { visible: true, order: 3 },
+    impressions: { visible: true, order: 4 },
+    videoViews: { visible: true, order: 5 },
+    engagements: { visible: true, order: 6 },
+    fmv: { visible: true, order: 7 },
+    mvp: { visible: true, order: 8 },
+    postCount: { visible: true, order: 9 },
+  })
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [tempColumnSettings, setTempColumnSettings] = useState(columnSettings)
 
   // Format the data for display
   const baseData = useMemo(() => {
@@ -281,18 +295,74 @@ export default function DataTable({ data }: DataTableProps) {
     URL.revokeObjectURL(url)
   }
 
-  const columns = [
-    { key: "date", label: "Date" },
-    { key: "sponsors", label: "Sponsors" },
-    { key: "exposures", label: "Exposures" },
-    { key: "duration", label: "Duration (Sec)" },
-    { key: "impressions", label: "Impressions" },
-    { key: "videoViews", label: "Video Views" },
-    { key: "engagements", label: "Engagements" },
-    { key: "fmv", label: "FMV" },
-    { key: "mvp", label: "MVP %" },
-    { key: "postCount", label: "Post Count" },
-  ]
+  const handleTempColumnVisibilityChange = (columnKey: string, visible: boolean) => {
+    const visibleCount = Object.values(tempColumnSettings).filter((col) => col.visible).length
+
+    // Prevent hiding if it would result in less than 5 visible columns
+    if (!visible && visibleCount <= 5) {
+      return
+    }
+
+    setTempColumnSettings((prev) => ({
+      ...prev,
+      [columnKey]: { ...prev[columnKey as keyof typeof prev], visible },
+    }))
+  }
+
+  const handleTempColumnReorder = (result: any) => {
+    if (!result.destination) return
+
+    const visibleColumns = Object.entries(tempColumnSettings)
+      .filter(([_, settings]) => settings.visible)
+      .sort(([, a], [, b]) => a.order - b.order)
+
+    const [reorderedItem] = visibleColumns.splice(result.source.index, 1)
+    visibleColumns.splice(result.destination.index, 0, reorderedItem)
+
+    const newSettings = { ...tempColumnSettings }
+    visibleColumns.forEach(([key], index) => {
+      newSettings[key as keyof typeof newSettings].order = index
+    })
+
+    setTempColumnSettings(newSettings)
+  }
+
+  const getTempVisibleColumnsCount = () => {
+    return Object.values(tempColumnSettings).filter((col) => col.visible).length
+  }
+
+  const handleApply = () => {
+    setColumnSettings(tempColumnSettings)
+    setIsSettingsOpen(false)
+  }
+
+  const handleCancel = () => {
+    setTempColumnSettings(columnSettings)
+    setIsSettingsOpen(false)
+  }
+
+  const columns = useMemo(() => {
+    const allColumns = [
+      { key: "date", label: "Date" },
+      { key: "sponsors", label: "Sponsors" },
+      { key: "exposures", label: "Exposures" },
+      { key: "duration", label: "Duration (Sec)" },
+      { key: "impressions", label: "Impressions" },
+      { key: "videoViews", label: "Video Views" },
+      { key: "engagements", label: "Engagements" },
+      { key: "fmv", label: "FMV" },
+      { key: "mvp", label: "MVP %" },
+      { key: "postCount", label: "Post Count" },
+    ]
+
+    return allColumns
+      .filter((col) => columnSettings[col.key as keyof typeof columnSettings]?.visible)
+      .sort(
+        (a, b) =>
+          columnSettings[a.key as keyof typeof columnSettings].order -
+          columnSettings[b.key as keyof typeof columnSettings].order,
+      )
+  }, [columnSettings])
 
   return (
     <div className="w-full">
@@ -301,18 +371,121 @@ export default function DataTable({ data }: DataTableProps) {
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold text-gray-900">Measures Breakdown By Date</CardTitle>
             <div className="flex items-center gap-3">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="btn-tertiary btn-icon">
-                      <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Settings</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Dialog
+                open={isSettingsOpen}
+                onOpenChange={(open) => {
+                  if (open) {
+                    setTempColumnSettings(columnSettings)
+                  } else {
+                    handleCancel()
+                  }
+                  setIsSettingsOpen(open)
+                }}
+              >
+                <DialogTrigger asChild>
+                  <button className="btn-tertiary btn-icon">
+                    <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+                  <DialogHeader>
+                    <DialogTitle>Column Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Column Visibility</h4>
+                      <div className="space-y-2">
+                        {Object.entries(tempColumnSettings).map(([key, settings]) => {
+                          const column = [
+                            { key: "date", label: "Date" },
+                            { key: "sponsors", label: "Sponsors" },
+                            { key: "exposures", label: "Exposures" },
+                            { key: "duration", label: "Duration (Sec)" },
+                            { key: "impressions", label: "Impressions" },
+                            { key: "videoViews", label: "Video Views" },
+                            { key: "engagements", label: "Engagements" },
+                            { key: "fmv", label: "FMV" },
+                            { key: "mvp", label: "MVP %" },
+                            { key: "postCount", label: "Post Count" },
+                          ].find((col) => col.key === key)
+
+                          return (
+                            <div key={key} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={key}
+                                checked={settings.visible}
+                                onCheckedChange={(checked) => handleTempColumnVisibilityChange(key, checked as boolean)}
+                                disabled={settings.visible && getTempVisibleColumnsCount() <= 5}
+                              />
+                              <label htmlFor={key} className="text-sm cursor-pointer">
+                                {column?.label}
+                              </label>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Minimum 5 columns must be visible</p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Column Order</h4>
+                      <DragDropContext onDragEnd={handleTempColumnReorder}>
+                        <Droppable droppableId="columns">
+                          {(provided) => (
+                            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-1">
+                              {Object.entries(tempColumnSettings)
+                                .filter(([_, settings]) => settings.visible)
+                                .sort(([, a], [, b]) => a.order - b.order)
+                                .map(([key], index) => {
+                                  const column = [
+                                    { key: "date", label: "Date" },
+                                    { key: "sponsors", label: "Sponsors" },
+                                    { key: "exposures", label: "Exposures" },
+                                    { key: "duration", label: "Duration (Sec)" },
+                                    { key: "impressions", label: "Impressions" },
+                                    { key: "videoViews", label: "Video Views" },
+                                    { key: "engagements", label: "Engagements" },
+                                    { key: "fmv", label: "FMV" },
+                                    { key: "mvp", label: "MVP %" },
+                                    { key: "postCount", label: "Post Count" },
+                                  ].find((col) => col.key === key)
+
+                                  return (
+                                    <Draggable key={key} draggableId={key} index={index}>
+                                      {(provided, snapshot) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          className={`flex items-center space-x-2 p-2 bg-gray-50 rounded border cursor-move ${
+                                            snapshot.isDragging ? "shadow-lg bg-white" : ""
+                                          }`}
+                                        >
+                                          <FontAwesomeIcon icon={faGripVertical} className="h-3 w-3 text-gray-400" />
+                                          <span className="text-sm">{column?.label}</span>
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  )
+                                })}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
+
+                    <div className="flex justify-end space-x-2 pt-4 border-t">
+                      <Button variant="outline" onClick={handleCancel} size="sm">
+                        Cancel
+                      </Button>
+                      <Button onClick={handleApply} size="sm" className="bg-[#4F8EF7] hover:bg-[#3F7EE7]">
+                        Apply
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <button onClick={handleDownloadCSV} className="btn-primary btn-sm flex items-center gap-2">
                 <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
                 Download As CSV
@@ -351,36 +524,20 @@ export default function DataTable({ data }: DataTableProps) {
                     key={row.id}
                     className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                   >
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.date}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.sponsors}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.exposures.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.duration.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.impressionsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.videoViewsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.engagements.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.fmvFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.mvp}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.postCount.toLocaleString()}
-                    </TableCell>
+                    {columns.map((column) => (
+                      <TableCell key={column.key} className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
+                        {column.key === "date" && row.date}
+                        {column.key === "sponsors" && row.sponsors}
+                        {column.key === "exposures" && row.exposures.toLocaleString()}
+                        {column.key === "duration" && row.duration.toLocaleString()}
+                        {column.key === "impressions" && row.impressionsFormatted}
+                        {column.key === "videoViews" && row.videoViewsFormatted}
+                        {column.key === "engagements" && row.engagements.toLocaleString()}
+                        {column.key === "fmv" && row.fmvFormatted}
+                        {column.key === "mvp" && row.mvp}
+                        {column.key === "postCount" && row.postCount.toLocaleString()}
+                      </TableCell>
+                    ))}
                     <TableCell className="py-3 px-4 text-center">
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
@@ -405,34 +562,20 @@ export default function DataTable({ data }: DataTableProps) {
 
                 {/* Totals Row */}
                 <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    Total
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.exposures.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.duration.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.impressions.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.videoViews.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.engagements.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    ${totals.fmv.toFixed(1)}k
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.mvp}%
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.postCount.toLocaleString()}
-                  </TableCell>
+                  {columns.map((column) => (
+                    <TableCell key={column.key} className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
+                      {column.key === "date" && "Total"}
+                      {column.key === "sponsors" && "-"}
+                      {column.key === "exposures" && totals.exposures.toLocaleString()}
+                      {column.key === "duration" && totals.duration.toLocaleString()}
+                      {column.key === "impressions" && totals.impressions.toLocaleString()}
+                      {column.key === "videoViews" && totals.videoViews.toLocaleString()}
+                      {column.key === "engagements" && totals.engagements.toLocaleString()}
+                      {column.key === "fmv" && `$${totals.fmv.toFixed(1)}k`}
+                      {column.key === "mvp" && `${totals.mvp}%`}
+                      {column.key === "postCount" && totals.postCount.toLocaleString()}
+                    </TableCell>
+                  ))}
                   <TableCell className="py-4 px-4"></TableCell>
                 </TableRow>
               </TableBody>
