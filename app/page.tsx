@@ -19,7 +19,7 @@ import {
   faTimes,
   faChevronDown,
   faChartLine,
-  faLightbulb,
+  faMagicWandSparkles,
   faFilter,
   faChevronUp,
   faSave,
@@ -894,19 +894,19 @@ export default function Page() {
 
           {/* Main Tabs Section */}
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
-            <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
+            <TabsList className="inline-flex bg-transparent border-b border-gray-200 rounded-none p-0 h-auto w-auto">
               <TabsTrigger
                 value="analytics"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
               >
-                <FontAwesomeIcon icon={faChartLine} className="h-4 w-4 mr-2" />
+                <FontAwesomeIcon icon={faChartLine} className="h-5 w-5 mr-2" />
                 Analytics
               </TabsTrigger>
               <TabsTrigger
                 value="insights"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
               >
-                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 mr-2" />
+                <FontAwesomeIcon icon={faMagicWandSparkles} className="h-5 w-5 mr-2" />
                 Insights
               </TabsTrigger>
             </TabsList>
@@ -1939,7 +1939,7 @@ export default function Page() {
                                 onClick={() => handleGenerateFromTemplate(template)}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
                               >
-                                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4" />
+                                <FontAwesomeIcon icon={faMagicWandSparkles} className="h-4 w-4" />
                                 Generate Insight
                               </button>
                             </div>
