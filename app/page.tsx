@@ -1784,9 +1784,12 @@ export default function Page() {
                 )}
               </div>
 
+              {/* Full-width divider */}
+              <div className="w-screen relative -ml-6 border-b border-gray-200"></div>
+
               {/* Analytics Sub-tabs Section */}
               <Tabs defaultValue="breakdown" className="w-full">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-6 mt-6">
                   <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-auto">
                     <TabsTrigger
                       value="breakdown"
