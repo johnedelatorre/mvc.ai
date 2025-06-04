@@ -1,7 +1,6 @@
 "use client"
-import { useState, useRef, useMemo } from "react"
 import type React from "react"
-
+import { useState, useMemo, useRef } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -79,19 +78,13 @@ interface DataTableProps {
   }>
 }
 
-interface ColumnType {
-  key: string
-  label: string
-  width: number
-}
-
 export default function DataTable({ data }: DataTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [isExpanded, setIsExpanded] = useState(true)
   const [sortConfig, setSortConfig] = useState<SortConfig>(null)
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
   const [activeSearchColumn, setActiveSearchColumn] = useState<string | null>(null)
-  const [columns, setColumns] = useState<ColumnType[]>([
+  const [columns, setColumns] = useState<Array<{ key: string; label: string; width: number }>>([
     { key: "date", label: "Date", width: 120 },
     { key: "sponsors", label: "Sponsors", width: 150 },
     { key: "exposures", label: "Exposures", width: 120 },
@@ -138,9 +131,7 @@ export default function DataTable({ data }: DataTableProps) {
     let processedData = [...baseData]
 
     // Apply search filters
-    Object.entries(searchFilters).forEach(([_column, _searchTerm]) => {
-      const column = _column
-      const searchTerm = _searchTerm
+    Object.entries(searchFilters).forEach(([column, searchTerm]) => {
       if (searchTerm) {
         processedData = processedData.filter((item) => {
           const value = item[column as keyof typeof item]
@@ -230,6 +221,58 @@ export default function DataTable({ data }: DataTableProps) {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
   }
 
+  // Column resizing handlers
+  const handleResizeMouseDown = (e: React.MouseEvent, index: number) => {
+    e.preventDefault()
+    setResizingColumnIndex(index)
+
+    const startX = e.clientX
+    const startWidth = columns[index].width
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (resizingColumnIndex !== null) {
+        const newWidth = Math.max(80, startWidth + (moveEvent.clientX - startX))
+        setColumns((prevColumns) => {
+          const newColumns = [...prevColumns]
+          newColumns[index] = { ...newColumns[index], width: newWidth }
+          return newColumns
+        })
+      }
+    }
+
+    const handleMouseUp = () => {
+      setResizingColumnIndex(null)
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+
+    document.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("mouseup", handleMouseUp)
+  }
+
+  // Column drag and drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedColumnIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    setDragOverColumnIndex(index)
+  }
+
+  const handleDragEnd = () => {
+    if (draggedColumnIndex !== null && dragOverColumnIndex !== null && draggedColumnIndex !== dragOverColumnIndex) {
+      setColumns((prevColumns) => {
+        const newColumns = [...prevColumns]
+        const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1)
+        newColumns.splice(dragOverColumnIndex, 0, draggedColumn)
+        return newColumns
+      })
+    }
+    setDraggedColumnIndex(null)
+    setDragOverColumnIndex(null)
+  }
+
   const handleDownloadCSV = () => {
     // Define CSV headers
     const headers = columns.map((col) => col.label)
@@ -238,7 +281,18 @@ export default function DataTable({ data }: DataTableProps) {
     const csvData = filteredAndSortedData.map((row) => {
       return columns.map((col) => {
         const key = col.key as keyof typeof row
-        return row[key]
+        let value = row[key]
+
+        // Format specific columns for CSV
+        if (col.key === "exposures") value = row.exposures
+        else if (col.key === "duration") value = row.duration
+        else if (col.key === "impressions") value = row.impressions
+        else if (col.key === "videoViews") value = row.videoViews
+        else if (col.key === "engagements") value = row.engagements
+        else if (col.key === "fmv") value = `${row.fmv.toFixed(1)}k`
+        else if (col.key === "postCount") value = row.postCount
+
+        return value
       })
     })
 
@@ -291,58 +345,6 @@ export default function DataTable({ data }: DataTableProps) {
     document.body.removeChild(link)
 
     URL.revokeObjectURL(url)
-  }
-
-  // Column resizing handlers
-  const handleResizeMouseDown = (e: React.MouseEvent, index: number) => {
-    e.preventDefault()
-    setResizingColumnIndex(index)
-
-    const startX = e.clientX
-    const startWidth = columns[index].width
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (resizingColumnIndex !== null) {
-        const newWidth = Math.max(80, startWidth + (moveEvent.clientX - startX))
-        setColumns((prevColumns) => {
-          const newColumns = [...prevColumns]
-          newColumns[index] = { ...newColumns[index], width: newWidth }
-          return newColumns
-        })
-      }
-    }
-
-    const handleMouseUp = () => {
-      setResizingColumnIndex(null)
-      document.removeEventListener("mousemove", handleMouseMove)
-      document.removeEventListener("mouseup", handleMouseUp)
-    }
-
-    document.addEventListener("mousemove", handleMouseMove)
-    document.addEventListener("mouseup", handleMouseUp)
-  }
-
-  // Column drag and drop handlers
-  const handleDragStart = (index: number) => {
-    setDraggedColumnIndex(index)
-  }
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault()
-    setDragOverColumnIndex(index)
-  }
-
-  const handleDragEnd = () => {
-    if (draggedColumnIndex !== null && dragOverColumnIndex !== null && draggedColumnIndex !== dragOverColumnIndex) {
-      setColumns((prevColumns) => {
-        const newColumns = [...prevColumns]
-        const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1)
-        newColumns.splice(dragOverColumnIndex, 0, draggedColumn)
-        return newColumns
-      })
-    }
-    setDraggedColumnIndex(null)
-    setDragOverColumnIndex(null)
   }
 
   return (
@@ -399,7 +401,7 @@ export default function DataTable({ data }: DataTableProps) {
                         </div>
                         <button
                           onClick={() => handleSort(column.key)}
-                          className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors opacity-0 group-hover:opacity-100"
                         >
                           <FontAwesomeIcon icon={getSortIcon(column.key)} className="h-3 w-3 text-gray-600" />
                         </button>
@@ -420,15 +422,30 @@ export default function DataTable({ data }: DataTableProps) {
                     key={row.id}
                     className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                   >
-                    {columns.map((column, colIndex) => (
-                      <TableCell
-                        key={`${row.id}-${column.key}`}
-                        className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200"
-                        style={{ width: `${column.width}px`, minWidth: `${column.width}px` }}
-                      >
-                        {row[column.key as keyof typeof row]}
-                      </TableCell>
-                    ))}
+                    {columns.map((column, colIndex) => {
+                      let cellContent: React.ReactNode = ""
+
+                      if (column.key === "date") cellContent = row.date
+                      else if (column.key === "sponsors") cellContent = row.sponsors
+                      else if (column.key === "exposures") cellContent = row.exposures.toLocaleString()
+                      else if (column.key === "duration") cellContent = row.duration.toLocaleString()
+                      else if (column.key === "impressions") cellContent = row.impressionsFormatted
+                      else if (column.key === "videoViews") cellContent = row.videoViewsFormatted
+                      else if (column.key === "engagements") cellContent = row.engagements.toLocaleString()
+                      else if (column.key === "fmv") cellContent = row.fmvFormatted
+                      else if (column.key === "mvp") cellContent = row.mvp
+                      else if (column.key === "postCount") cellContent = row.postCount.toLocaleString()
+
+                      return (
+                        <TableCell
+                          key={`${row.id}-${column.key}`}
+                          className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200"
+                          style={{ width: `${column.width}px`, minWidth: `${column.width}px` }}
+                        >
+                          {cellContent}
+                        </TableCell>
+                      )
+                    })}
                     <TableCell className="py-3 px-4 text-center">
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
