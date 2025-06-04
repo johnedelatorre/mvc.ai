@@ -1,5 +1,7 @@
 "use client"
-import { useState, useMemo } from "react"
+import { useState, useRef, useMemo } from "react"
+import type React from "react"
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -13,6 +15,7 @@ import {
   faChevronRight,
   faDownload,
   faCog,
+  faGripLines,
   faSort,
   faSortUp,
   faSortDown,
@@ -76,12 +79,34 @@ interface DataTableProps {
   }>
 }
 
+interface ColumnType {
+  key: string
+  label: string
+  width: number
+}
+
 export default function DataTable({ data }: DataTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [isExpanded, setIsExpanded] = useState(true)
   const [sortConfig, setSortConfig] = useState<SortConfig>(null)
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
   const [activeSearchColumn, setActiveSearchColumn] = useState<string | null>(null)
+  const [columns, setColumns] = useState<ColumnType[]>([
+    { key: "date", label: "Date", width: 120 },
+    { key: "sponsors", label: "Sponsors", width: 150 },
+    { key: "exposures", label: "Exposures", width: 120 },
+    { key: "duration", label: "Duration (Sec)", width: 140 },
+    { key: "impressions", label: "Impressions", width: 120 },
+    { key: "videoViews", label: "Video Views", width: 120 },
+    { key: "engagements", label: "Engagements", width: 120 },
+    { key: "fmv", label: "FMV", width: 100 },
+    { key: "mvp", label: "MVP %", width: 100 },
+    { key: "postCount", label: "Post Count", width: 120 },
+  ])
+  const [resizingColumnIndex, setResizingColumnIndex] = useState<number | null>(null)
+  const [draggedColumnIndex, setDraggedColumnIndex] = useState<number | null>(null)
+  const [dragOverColumnIndex, setDragOverColumnIndex] = useState<number | null>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
   const itemsPerPage = 10
 
   // Format the data for display
@@ -113,7 +138,9 @@ export default function DataTable({ data }: DataTableProps) {
     let processedData = [...baseData]
 
     // Apply search filters
-    Object.entries(searchFilters).forEach(([column, searchTerm]) => {
+    Object.entries(searchFilters).forEach(([_column, _searchTerm]) => {
+      const column = _column
+      const searchTerm = _searchTerm
       if (searchTerm) {
         processedData = processedData.filter((item) => {
           const value = item[column as keyof typeof item]
@@ -205,46 +232,31 @@ export default function DataTable({ data }: DataTableProps) {
 
   const handleDownloadCSV = () => {
     // Define CSV headers
-    const headers = [
-      "Date",
-      "Sponsors",
-      "Exposures",
-      "Duration (Sec)",
-      "Impressions",
-      "Video Views",
-      "Engagements",
-      "FMV",
-      "MVP %",
-      "Post Count",
-    ]
+    const headers = columns.map((col) => col.label)
 
     // Convert data to CSV format
-    const csvData = filteredAndSortedData.map((row) => [
-      row.date,
-      row.sponsors,
-      row.exposures,
-      row.duration,
-      row.impressions,
-      row.videoViews,
-      row.engagements,
-      row.fmv.toFixed(1) + "k",
-      row.mvp,
-      row.postCount,
-    ])
+    const csvData = filteredAndSortedData.map((row) => {
+      return columns.map((col) => {
+        const key = col.key as keyof typeof row
+        return row[key]
+      })
+    })
 
     // Add totals row
-    const totalsRow = [
-      "Total",
-      "-", // No total for sponsors
-      totals.exposures,
-      totals.duration,
-      totals.impressions,
-      totals.videoViews,
-      totals.engagements,
-      totals.fmv.toFixed(1) + "k",
-      totals.mvp + "%",
-      totals.postCount,
-    ]
+    const totalsRow = columns.map((col) => {
+      const key = col.key
+      if (key === "date") return "Total"
+      if (key === "sponsors") return "-"
+      if (key === "exposures") return totals.exposures
+      if (key === "duration") return totals.duration
+      if (key === "impressions") return totals.impressions
+      if (key === "videoViews") return totals.videoViews
+      if (key === "engagements") return totals.engagements
+      if (key === "fmv") return totals.fmv.toFixed(1) + "k"
+      if (key === "mvp") return totals.mvp + "%"
+      if (key === "postCount") return totals.postCount
+      return ""
+    })
 
     // Combine headers, data, and totals
     const allData = [headers, ...csvData, totalsRow]
@@ -281,18 +293,57 @@ export default function DataTable({ data }: DataTableProps) {
     URL.revokeObjectURL(url)
   }
 
-  const columns = [
-    { key: "date", label: "Date" },
-    { key: "sponsors", label: "Sponsors" },
-    { key: "exposures", label: "Exposures" },
-    { key: "duration", label: "Duration (Sec)" },
-    { key: "impressions", label: "Impressions" },
-    { key: "videoViews", label: "Video Views" },
-    { key: "engagements", label: "Engagements" },
-    { key: "fmv", label: "FMV" },
-    { key: "mvp", label: "MVP %" },
-    { key: "postCount", label: "Post Count" },
-  ]
+  // Column resizing handlers
+  const handleResizeMouseDown = (e: React.MouseEvent, index: number) => {
+    e.preventDefault()
+    setResizingColumnIndex(index)
+
+    const startX = e.clientX
+    const startWidth = columns[index].width
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (resizingColumnIndex !== null) {
+        const newWidth = Math.max(80, startWidth + (moveEvent.clientX - startX))
+        setColumns((prevColumns) => {
+          const newColumns = [...prevColumns]
+          newColumns[index] = { ...newColumns[index], width: newWidth }
+          return newColumns
+        })
+      }
+    }
+
+    const handleMouseUp = () => {
+      setResizingColumnIndex(null)
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+
+    document.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("mouseup", handleMouseUp)
+  }
+
+  // Column drag and drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedColumnIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    setDragOverColumnIndex(index)
+  }
+
+  const handleDragEnd = () => {
+    if (draggedColumnIndex !== null && dragOverColumnIndex !== null && draggedColumnIndex !== dragOverColumnIndex) {
+      setColumns((prevColumns) => {
+        const newColumns = [...prevColumns]
+        const [draggedColumn] = newColumns.splice(draggedColumnIndex, 1)
+        newColumns.splice(dragOverColumnIndex, 0, draggedColumn)
+        return newColumns
+      })
+    }
+    setDraggedColumnIndex(null)
+    setDragOverColumnIndex(null)
+  }
 
   return (
     <div className="w-full">
@@ -323,64 +374,61 @@ export default function DataTable({ data }: DataTableProps) {
 
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
+            <Table ref={tableRef}>
               <TableHeader>
                 <TableRow className="bg-[#B8D4E3] hover:bg-[#B8D4E3] border-b border-gray-300">
-                  {columns.map((column) => (
+                  {columns.map((column, index) => (
                     <TableHead
                       key={column.key}
-                      className="text-gray-700 font-semibold text-sm py-4 px-4 border-r border-gray-300 last:border-r-0"
+                      className={`text-gray-700 font-semibold text-sm py-4 px-4 border-r border-gray-300 last:border-r-0 relative select-none group ${
+                        draggedColumnIndex === index ? "opacity-50" : ""
+                      } ${dragOverColumnIndex === index ? "bg-blue-100" : ""}`}
+                      style={{ width: `${column.width}px`, minWidth: `${column.width}px` }}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
                     >
                       <div className="flex items-center justify-between">
-                        <span>{column.label}</span>
+                        <div className="flex items-center">
+                          <FontAwesomeIcon
+                            icon={faGripLines}
+                            className="h-3 w-3 text-gray-400 mr-2 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity"
+                          />
+                          <span>{column.label}</span>
+                        </div>
                         <button
                           onClick={() => handleSort(column.key)}
-                          className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
+                          className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <FontAwesomeIcon icon={getSortIcon(column.key)} className="h-3 w-3 text-gray-600" />
                         </button>
                       </div>
+                      {/* Resizer */}
+                      <div
+                        className="absolute top-0 right-0 h-full w-2 cursor-col-resize hover:bg-blue-400 hover:opacity-50"
+                        onMouseDown={(e) => handleResizeMouseDown(e, index)}
+                      />
                     </TableHead>
                   ))}
                   <TableHead className="text-gray-700 font-semibold text-sm py-4 px-4 w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentData.map((row, index) => (
+                {currentData.map((row, rowIndex) => (
                   <TableRow
                     key={row.id}
                     className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                   >
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.date}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.sponsors}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.exposures.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.duration.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.impressionsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.videoViewsFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.engagements.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.fmvFormatted}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.mvp}
-                    </TableCell>
-                    <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.postCount.toLocaleString()}
-                    </TableCell>
+                    {columns.map((column, colIndex) => (
+                      <TableCell
+                        key={`${row.id}-${column.key}`}
+                        className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200"
+                        style={{ width: `${column.width}px`, minWidth: `${column.width}px` }}
+                      >
+                        {row[column.key as keyof typeof row]}
+                      </TableCell>
+                    ))}
                     <TableCell className="py-3 px-4 text-center">
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
@@ -405,34 +453,29 @@ export default function DataTable({ data }: DataTableProps) {
 
                 {/* Totals Row */}
                 <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    Total
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.exposures.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.duration.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.impressions.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.videoViews.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.engagements.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    ${totals.fmv.toFixed(1)}k
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.mvp}%
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.postCount.toLocaleString()}
-                  </TableCell>
+                  {columns.map((column, index) => {
+                    let content: React.ReactNode = "-"
+
+                    if (column.key === "date") content = "Total"
+                    else if (column.key === "exposures") content = totals.exposures.toLocaleString()
+                    else if (column.key === "duration") content = totals.duration.toLocaleString()
+                    else if (column.key === "impressions") content = totals.impressions.toLocaleString()
+                    else if (column.key === "videoViews") content = totals.videoViews.toLocaleString()
+                    else if (column.key === "engagements") content = totals.engagements.toLocaleString()
+                    else if (column.key === "fmv") content = `$${totals.fmv.toFixed(1)}k`
+                    else if (column.key === "mvp") content = `${totals.mvp}%`
+                    else if (column.key === "postCount") content = totals.postCount.toLocaleString()
+
+                    return (
+                      <TableCell
+                        key={`totals-${column.key}`}
+                        className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300"
+                        style={{ width: `${column.width}px`, minWidth: `${column.width}px` }}
+                      >
+                        {content}
+                      </TableCell>
+                    )
+                  })}
                   <TableCell className="py-4 px-4"></TableCell>
                 </TableRow>
               </TableBody>
