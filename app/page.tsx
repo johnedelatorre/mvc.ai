@@ -25,7 +25,10 @@ import {
   faSave,
   faFolderOpen,
   faSliders,
+  faEye,
+  faBookmark,
 } from "@fortawesome/free-solid-svg-icons"
+import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 
 // Available placement options
@@ -272,6 +275,28 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState("generate")
   const [isSecondaryFiltersExpanded, setIsSecondaryFiltersExpanded] = useState(false)
   const [isTemplateGalleryExpanded, setIsTemplateGalleryExpanded] = useState(true)
+  const [generatedTemplates, setGeneratedTemplates] = useState<Set<number>>(new Set())
+  const [bookmarkedTemplates, setBookmarkedTemplates] = useState<Set<number>>(new Set())
+  const [savedTemplateInsights, setSavedTemplateInsights] = useState<
+    Array<{
+      id: string
+      dateSaved: Date
+      insightsType: string
+      sponsor: string
+      rightsholder: string
+      metric: string
+      description?: string
+      templateData: any
+      filters?: {
+        sponsors: string[]
+        rightsholders: string[]
+        placements: string[]
+        placementTypes: string[]
+        dateRange: { from: Date | undefined; to: Date | undefined }
+        selectedYears: string[]
+      }
+    }>
+  >([])
 
   // Template Gallery state
   const [currentPage, setCurrentPage] = useState(1)
@@ -394,6 +419,7 @@ export default function Page() {
 
   const categories = [
     "All",
+    "Bookmarked",
     "ROI Analysis",
     "Trend Comparison",
     "Platform Performance",
@@ -405,7 +431,9 @@ export default function Page() {
   const filteredTemplates = useMemo(() => {
     let filtered = templateData
 
-    if (selectedCategory !== "All") {
+    if (selectedCategory === "Bookmarked") {
+      filtered = filtered.filter((template) => bookmarkedTemplates.has(template.id))
+    } else if (selectedCategory !== "All") {
       filtered = filtered.filter((template) => template.category === selectedCategory)
     }
 
@@ -418,24 +446,10 @@ export default function Page() {
     }
 
     return filtered
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, bookmarkedTemplates])
 
   const totalPages = Math.ceil(filteredTemplates.length / 6)
   const visibleTemplates = filteredTemplates.slice((currentPage - 1) * 6, currentPage * 6)
-
-  const handleUseTemplate = (template: (typeof templateData)[0]) => {
-    setChatInput(template.prompt)
-    setMainTab("insights")
-    setActiveTab("generate")
-
-    // Focus the input after a brief delay to ensure tab switch completes
-    setTimeout(() => {
-      const inputElement = document.querySelector('input[placeholder*="Ask about your data"]') as HTMLInputElement
-      if (inputElement) {
-        inputElement.focus()
-      }
-    }, 100)
-  }
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query)
@@ -855,12 +869,15 @@ export default function Page() {
   // Add new state for insights sub-tabs
   const [insightsSubTab, setInsightsSubTab] = useState("automated")
 
+  // Add handlers for missing filters
   const handleGenerateFromTemplate = (template: (typeof templateData)[0]) => {
+    // Mark the template as generated/seen
+    setGeneratedTemplates((prev) => new Set(prev).add(template.id))
+
     // Simulate generating an automated insight based on the template
     console.log(`Generating automated insight from template: ${template.title}`)
 
-    // You can add logic here to trigger specific insight generation
-    // For now, we'll just scroll to the automated insights section
+    // Scroll to the automated insights section
     setTimeout(() => {
       const insightsElement = document.getElementById("automated-insights-metrics")
       if (insightsElement) {
@@ -869,7 +886,20 @@ export default function Page() {
     }, 100)
   }
 
-  // Add handlers for missing filters
+  const handleUseTemplate = (template: (typeof templateData)[0]) => {
+    setChatInput(template.prompt)
+    setMainTab("insights")
+    setActiveTab("generate")
+
+    // Focus the input after a brief delay to ensure tab switch completes
+    setTimeout(() => {
+      const inputElement = document.querySelector('input[placeholder*="Ask about your data"]') as HTMLInputElement
+      if (inputElement) {
+        inputElement.focus()
+      }
+    }, 100)
+  }
+
   const handleComparisonDateToggle = (date: string) => {
     setSelectedComparisonDates([date]) // Only allow single selection
   }
@@ -880,6 +910,49 @@ export default function Page() {
 
   const clearAllComparisonDates = () => {
     setSelectedComparisonDates([])
+  }
+
+  const handleBookmarkTemplate = (templateId: number) => {
+    const template = templateData.find((t) => t.id === templateId)
+    if (!template) return
+
+    setBookmarkedTemplates((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(templateId)) {
+        newSet.delete(templateId)
+        // Remove from saved insights when unbookmarking
+        setSavedTemplateInsights((prevInsights) =>
+          prevInsights.filter((insight) => insight.templateData?.id !== templateId),
+        )
+      } else {
+        newSet.add(templateId)
+        // Add to saved insights when bookmarking - enhanced structure
+        const currentSponsors = selectedSponsors.length > 0 ? selectedSponsors.join(", ") : "All Sponsors"
+        const currentRightsholders =
+          selectedRightsholders.length > 0 ? selectedRightsholders.join(", ") : "All Rightsholders"
+
+        const newSavedInsight = {
+          id: `template_${templateId}_${Date.now()}`,
+          dateSaved: new Date(),
+          insightsType: template.category,
+          sponsor: currentSponsors,
+          rightsholder: currentRightsholders,
+          metric: template.title,
+          description: template.description,
+          templateData: template,
+          filters: {
+            sponsors: selectedSponsors,
+            rightsholders: selectedRightsholders,
+            placements: selectedPlacements,
+            placementTypes: selectedPlacementTypes,
+            dateRange: dateRange,
+            selectedYears: selectedYears,
+          },
+        }
+        setSavedTemplateInsights((prevInsights) => [newSavedInsight, ...prevInsights])
+      }
+      return newSet
+    })
   }
 
   return (
@@ -1887,8 +1960,34 @@ export default function Page() {
                           {visibleTemplates.map((template) => (
                             <div
                               key={template.id}
-                              className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
+                              className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow duration-200 relative"
                             >
+                              {/* Top right indicators */}
+                              <div className="absolute top-3 right-3 flex items-center gap-2">
+                                {/* Bookmark Button */}
+                                <button
+                                  onClick={() => handleBookmarkTemplate(template.id)}
+                                  className={`flex items-center justify-center w-6 h-6 rounded-full transition-colors ${
+                                    bookmarkedTemplates.has(template.id)
+                                      ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                                      : "bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                                  }`}
+                                  title={bookmarkedTemplates.has(template.id) ? "Remove bookmark" : "Bookmark insight"}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={bookmarkedTemplates.has(template.id) ? faBookmark : faBookmarkRegular}
+                                    className="h-3 w-3"
+                                  />
+                                </button>
+
+                                {/* Seen/Generated Indicator */}
+                                {generatedTemplates.has(template.id) && (
+                                  <div className="flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                                    <FontAwesomeIcon icon={faEye} className="h-3 w-3 text-green-600" />
+                                  </div>
+                                )}
+                              </div>
+
                               {/* Metrics Preview */}
                               <div className="mb-4 p-3 bg-gray-50 rounded-md">
                                 <div className="grid grid-cols-2 gap-3 text-xs">
@@ -1932,11 +2031,19 @@ export default function Page() {
                                 <Badge variant="secondary" className="text-xs">
                                   {template.category}
                                 </Badge>
+                                {bookmarkedTemplates.has(template.id) && (
+                                  <Badge variant="outline" className="text-xs ml-2 border-yellow-300 text-yellow-700">
+                                    Bookmarked
+                                  </Badge>
+                                )}
                               </div>
 
                               {/* Generate Insight Button */}
                               <button
-                                onClick={() => handleGenerateFromTemplate(template)}
+                                onClick={() => {
+                                  handleGenerateFromTemplate(template)
+                                  handleUseTemplate(template)
+                                }}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2"
                               >
                                 <FontAwesomeIcon icon={faMagicWandSparkles} className="h-4 w-4" />
@@ -1988,7 +2095,7 @@ export default function Page() {
 
                   {/* Automated Insights Metrics Section */}
                   <div id="automated-insights-metrics">
-                    <AutomatedInsights data={filteredData} />
+                    <AutomatedInsights data={filteredData} savedTemplateInsights={savedTemplateInsights} />
                   </div>
                 </div>
               </div>
