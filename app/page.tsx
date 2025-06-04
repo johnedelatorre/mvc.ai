@@ -889,7 +889,7 @@ export default function Page() {
         <div className="p-6 pb-0">
           {/* Page Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge AI</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">MVC Relo Edge AI</h1>
           </div>
 
           {/* Main Tabs Section */}
