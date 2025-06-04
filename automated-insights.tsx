@@ -122,6 +122,7 @@ interface AutomatedInsightsProps {
     views: number
     videoViews: number
   }>
+  generatedTemplateId?: number // Add this new prop
 }
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
@@ -154,7 +155,7 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
   )
 }
 
-export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps) {
+export default function AutomatedInsights({ data = [], generatedTemplateId }: AutomatedInsightsProps) {
   // Arrays of possible values for more variety
   const placementOptions = [
     "Billboard",
@@ -579,31 +580,74 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
     // You can implement actual PDF generation or download functionality here
   }
 
+  const generatedTemplates = new Set<number>()
+
   const handleBookmarkInsights = () => {
-    if (!isBookmarked) {
-      // Save the insight
-      const newSavedInsight = {
-        id: Date.now().toString(),
-        dateSaved: new Date(),
-        insightsType: "Automated Insights",
-        sponsor: insights.topPlacement || "Multiple",
-        rightsholder: "Multiple", // You can modify this based on your data
-        metric: `SMV: $${insights.totalSMV.toLocaleString()}k, Impressions: ${insights.totalImpressions.toLocaleString()}MM`,
-        insightData: {
-          insights,
-          trendingAmounts,
-          recommendations,
-          filteredData: sortedData.slice(0, 10),
-        },
-      }
-      setSavedInsights((prev) => [newSavedInsight, ...prev])
-    } else {
-      // Remove the most recent insight (simple implementation)
-      setSavedInsights((prev) => prev.slice(1))
+    // Always save the insight - create a unique entry for each bookmark action
+    const currentInsightData =
+      activeTab === "generate" && generatedInsights
+        ? {
+            // For generated insights
+            insights: {
+              topPlacement: generatedInsights.topPerformers.placement,
+              topPlacementTypeBySMV: "Generated Analysis",
+              topPlatformByImpressions: generatedInsights.topPerformers.platform,
+              totalSMV: generatedInsights.keyMetrics.totalSMV,
+              totalImpressions: Math.floor(Math.random() * 5000) + 1000, // Mock data
+              avgSMV: Math.floor(generatedInsights.keyMetrics.totalSMV / 10),
+            },
+            trendingAmounts: generatedInsights.trending,
+            recommendations: [
+              `Focus on ${generatedInsights.topPerformers.platform} for higher engagement`,
+              `Increase investment in ${generatedInsights.topPerformers.sponsor} sponsorships`,
+              `Optimize placement strategy based on ${generatedInsights.topPerformers.placement}`,
+            ],
+            filteredData: sortedData.slice(0, 10),
+            templateId: generatedTemplateId || null,
+            refreshKey: Date.now(), // Use timestamp for unique identification
+            generatedInsight: generatedInsights, // Store the full generated insight
+          }
+        : {
+            // For automated insights
+            insights,
+            trendingAmounts,
+            recommendations,
+            filteredData: sortedData.slice(0, 10),
+            templateId: generatedTemplateId || null,
+            refreshKey: refreshKey,
+          }
+
+    const newSavedInsight = {
+      id: Date.now().toString(),
+      dateSaved: new Date(),
+      insightsType:
+        activeTab === "generate"
+          ? "Generated Insight"
+          : generatedTemplateId
+            ? "Template Insight"
+            : "Automated Insights",
+      sponsor:
+        activeTab === "generate" && generatedInsights
+          ? generatedInsights.topPerformers.sponsor
+          : insights.topPlacement || "Multiple",
+      rightsholder: "Multiple",
+      metric:
+        activeTab === "generate" && generatedInsights
+          ? `SMV: $${generatedInsights.keyMetrics.totalSMV.toLocaleString()}k, Engagement: ${generatedInsights.keyMetrics.avgEngagement}%`
+          : `SMV: $${insights.totalSMV.toLocaleString()}k, Impressions: ${insights.totalImpressions.toLocaleString()}MM`,
+      insightData: currentInsightData,
     }
 
-    setIsBookmarked(!isBookmarked)
-    console.log(isBookmarked ? "Removing bookmark from insights..." : "Bookmarking insights...")
+    setSavedInsights((prev) => [newSavedInsight, ...prev])
+
+    // Provide visual feedback that the insight was saved
+    setIsBookmarked(true)
+    console.log("Insight saved successfully!")
+
+    // Reset bookmark visual state after a short delay to show it was saved
+    setTimeout(() => {
+      setIsBookmarked(false)
+    }, 1500)
   }
 
   const handleGenerateNewInsight = async () => {
@@ -618,7 +662,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
 
     // Reset states to make it feel like a fresh insight
     setHasSeen(false)
-    setIsBookmarked(false)
+    setIsBookmarked(false) // Reset bookmark state for new insight
     setShowRecommendations(true)
 
     setIsGeneratingNewInsight(false)
@@ -1334,7 +1378,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{isBookmarked ? "Remove Bookmark" : "Bookmark Insight"}</p>
+                  <p>Save Insight</p>
                 </TooltipContent>
               </Tooltip>
               <Button variant="ghost" size="sm" onClick={toggleExpanded} className="flex items-center gap-2">
@@ -2879,7 +2923,7 @@ export default function AutomatedInsights({ data = [] }: AutomatedInsightsProps)
                                           variant="ghost"
                                           size="sm"
                                           className="p-2"
-                                          onClick={() => handleDeleteInsight(insight.id)}
+                                          onClick={() => handleDeleteInsight(insight)}
                                         >
                                           <FontAwesomeIcon icon={faTrash} className="h-4 w-4 text-red-600" />
                                         </Button>
