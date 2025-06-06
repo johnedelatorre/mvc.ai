@@ -27,9 +27,33 @@ import {
   faSliders,
   faEye,
   faBookmark,
+  faRobot,
+  faArrowTrendUp,
+  faLightbulb,
+  faPaperPlane,
+  faClock,
+  faSearch,
+  faUsers,
+  faStar,
+  faTrash,
+  faCompress,
+  faExpand,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts"
+import { ChartContainer } from "@/components/chart-container"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
@@ -271,7 +295,6 @@ export default function Page() {
   const [editingFilterId, setEditingFilterId] = useState<string | null>(null)
   const [filterCategoryToSave, setFilterCategoryToSave] = useState(FILTER_CATEGORIES[0])
   const [filterCategorySearch, setFilterCategorySearch] = useState("")
-  const [chatInput, setChatInput] = useState("")
   const [activeTab, setActiveTab] = useState("generate")
   const [isSecondaryFiltersExpanded, setIsSecondaryFiltersExpanded] = useState(false)
   const [isTemplateGalleryExpanded, setIsTemplateGalleryExpanded] = useState(true)
@@ -297,6 +320,36 @@ export default function Page() {
       }
     }>
   >([])
+
+  // Custom Insights state
+  const [customInsightsCount, setCustomInsightsCount] = useState(0)
+  const [chatInput, setChatInput] = useState("")
+  const [chatHistory, setChatHistory] = useState<
+    Array<{
+      id: string
+      type: "user" | "assistant"
+      content: string
+      timestamp: Date
+      insight?: any
+    }>
+  >([])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [currentInsight, setCurrentInsight] = useState<any>(null)
+  const [savedCustomInsights, setSavedCustomInsights] = useState<
+    Array<{
+      id: string
+      dateGenerated: Date
+      insightType: string
+      createdBy: string
+      query: string
+      insight: any
+    }>
+  >([])
+  const [showRatingDrawer, setShowRatingDrawer] = useState(false)
+  const [currentRating, setCurrentRating] = useState(0)
+  const [ratingFeedback, setRatingFeedback] = useState("")
+  const [showAllInsightsModal, setShowAllInsightsModal] = useState(false)
+  const [expandedGeneratedInsightId, setExpandedGeneratedInsightId] = useState<string | null>(null)
 
   // Template Gallery state
   const [currentPage, setCurrentPage] = useState(1)
@@ -737,26 +790,19 @@ export default function Page() {
     setSelectedInsightsTypes([])
   }
 
-  // Add animation states for drawers
-  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
-  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
-
-  // Update the openSaveFilterDrawer function
   const openSaveFilterDrawer = () => {
-    setFilterNameToSave("")
-    setFilterDescriptionToSave("")
-    setEditingFilterId(null)
     setShowSaveFilterDrawer(true)
-    // Use requestAnimationFrame for smooth animation
-    requestAnimationFrame(() => {
-      setSaveFilterDrawerAnimating(true)
-    })
+    setTimeout(() => setSaveFilterDrawerAnimating(true), 0)
   }
 
-  // Add close functions with animation
   const closeSaveFilterDrawer = () => {
     setSaveFilterDrawerAnimating(false)
     setTimeout(() => setShowSaveFilterDrawer(false), 300)
+  }
+
+  const openSavedFiltersDrawer = () => {
+    setShowSavedFiltersDrawer(true)
+    setTimeout(() => setSavedFiltersDrawerAnimating(true), 0)
   }
 
   const closeSavedFiltersDrawer = () => {
@@ -764,26 +810,20 @@ export default function Page() {
     setTimeout(() => setShowSavedFiltersDrawer(false), 300)
   }
 
-  // Update the openSavedFiltersDrawer function
-  const openSavedFiltersDrawer = () => {
-    setShowSavedFiltersDrawer(true)
-    // Use requestAnimationFrame for smooth animation
-    requestAnimationFrame(() => {
-      setSavedFiltersDrawerAnimating(true)
-    })
-  }
+  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
+  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
 
-  // Update the saveCurrentFilters function to use the new close function
   const saveCurrentFilters = () => {
-    if (!filterNameToSave.trim()) return
+    if (!filterNameToSave.trim()) {
+      alert("Please enter a filter name.")
+      return
+    }
 
     const newFilter = {
-      id: editingFilterId || `filter_${Date.now()}`,
-      name: filterNameToSave.trim(),
-      description: filterDescriptionToSave.trim(),
-      createdAt: editingFilterId
-        ? savedFilters.find((f) => f.id === editingFilterId)?.createdAt || new Date()
-        : new Date(),
+      id: editingFilterId || Math.random().toString(36).substring(7),
+      name: filterNameToSave,
+      description: filterDescriptionToSave,
+      createdAt: new Date(),
       category: filterCategoryToSave,
       filters: {
         filterType,
@@ -805,103 +845,84 @@ export default function Page() {
     }
 
     if (editingFilterId) {
-      setSavedFilters((prev) => prev.map((f) => (f.id === editingFilterId ? newFilter : f)))
+      // Update existing filter
+      setSavedFilters((prev) => prev.map((filter) => (filter.id === editingFilterId ? newFilter : filter)))
     } else {
+      // Add new filter
       setSavedFilters((prev) => [...prev, newFilter])
     }
 
-    // Reset form and close with animation
+    closeSaveFilterDrawer()
     setFilterNameToSave("")
     setFilterDescriptionToSave("")
     setEditingFilterId(null)
-    closeSaveFilterDrawer()
   }
 
-  // Update applySavedFilter function
-  const applySavedFilter = (savedFilter: (typeof savedFilters)[0]) => {
-    const { filters } = savedFilter
-    setFilterType(filters.filterType)
-    setDateRange(filters.dateRange)
-    setSelectedYears(filters.selectedYears)
-    setSelectedSponsors(filters.selectedSponsors)
-    setSelectedPlacements(filters.selectedPlacements)
-    setSelectedPlacementTypes(filters.selectedPlacementTypes)
-    setSelectedRightsholders(filters.selectedRightsholders)
-    setSelectedPlatforms(filters.selectedPlatforms)
-    setSelectedAccountTypes(filters.selectedAccountTypes)
-    setSelectedMediaTypes(filters.selectedMediaTypes)
-    setSelectedCollections(filters.selectedCollections)
-    setSelectedHashtags(filters.selectedHashtags)
-    setSelectedHandles(filters.selectedHandles)
-    setSelectedComparisonDates(filters.selectedComparisonDates)
-    setGroupBy(filters.groupBy)
+  const applySavedFilter = (filter: any) => {
+    setFilterType(filter.filters.filterType)
+    setDateRange(filter.filters.dateRange)
+    setSelectedYears(filter.filters.selectedYears)
+    setSelectedSponsors(filter.filters.selectedSponsors)
+    setSelectedPlacements(filter.filters.selectedPlacements)
+    setSelectedPlacementTypes(filter.filters.selectedPlacementTypes)
+    setSelectedRightsholders(filter.filters.selectedRightsholders)
+    setSelectedPlatforms(filter.filters.selectedPlatforms)
+    setSelectedAccountTypes(filter.filters.selectedAccountTypes)
+    setSelectedMediaTypes(filter.filters.selectedMediaTypes)
+    setSelectedCollections(filter.filters.selectedCollections)
+    setSelectedHashtags(filter.filters.selectedHashtags)
+    setSelectedHandles(filter.filters.selectedHandles)
+    setSelectedComparisonDates(filter.filters.selectedComparisonDates)
+    setGroupBy(filter.filters.groupBy)
     closeSavedFiltersDrawer()
   }
-
-  // Update editSavedFilter function
-  const editSavedFilter = (savedFilter: (typeof savedFilters)[0]) => {
-    setFilterNameToSave(savedFilter.name)
-    setFilterDescriptionToSave(savedFilter.description || "")
-    setEditingFilterId(savedFilter.id)
-    setFilterCategoryToSave(savedFilter.category)
-    closeSavedFiltersDrawer()
-    // Open save drawer after closing saved filters drawer
-    setTimeout(() => openSaveFilterDrawer(), 300)
-  }
-
-  const filteredSavedFilters = useMemo(() => {
-    if (!filterCategorySearch) {
-      return savedFilters
-    }
-    const searchTerm = filterCategorySearch.toLowerCase()
-    return savedFilters.filter(
-      (filter) =>
-        filter.name.toLowerCase().includes(searchTerm) ||
-        filter.description?.toLowerCase().includes(searchTerm) ||
-        filter.category.toLowerCase().includes(searchTerm),
-    )
-  }, [savedFilters, filterCategorySearch])
 
   const deleteSavedFilter = (id: string) => {
     setSavedFilters((prev) => prev.filter((filter) => filter.id !== id))
   }
 
-  // Add new state for insights sub-tabs
-  const [insightsSubTab, setInsightsSubTab] = useState("automated")
-
-  // Add handlers for missing filters
-  const handleGenerateFromTemplate = (template: (typeof templateData)[0]) => {
-    // Mark the template as generated/seen
-    setGeneratedTemplates((prev) => new Set(prev).add(template.id))
-
-    // Simulate generating an automated insight based on the template
-    console.log(`Generating automated insight from template: ${template.title}`)
-
-    // Scroll to the automated insights section
-    setTimeout(() => {
-      const insightsElement = document.getElementById("automated-insights-metrics")
-      if (insightsElement) {
-        insightsElement.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
-    }, 100)
+  const editSavedFilter = (filter: any) => {
+    setEditingFilterId(filter.id)
+    setFilterNameToSave(filter.name)
+    setFilterDescriptionToSave(filter.description || "")
+    setFilterCategoryToSave(filter.category)
+    openSaveFilterDrawer()
   }
 
-  const handleUseTemplate = (template: (typeof templateData)[0]) => {
-    setChatInput(template.prompt)
-    setMainTab("automated-insights")
-    setActiveTab("generate")
+  const filteredSavedFilters = useMemo(() => {
+    if (!filterCategorySearch) return savedFilters
 
-    // Focus the input after a brief delay to ensure tab switch completes
-    setTimeout(() => {
-      const inputElement = document.querySelector('input[placeholder*="Ask about your data"]') as HTMLInputElement
-      if (inputElement) {
-        inputElement.focus()
+    const searchTerm = filterCategorySearch.toLowerCase()
+    return savedFilters.filter(
+      (filter) => filter.name.toLowerCase().includes(searchTerm) || filter.category.toLowerCase().includes(searchTerm),
+    )
+  }, [savedFilters, filterCategorySearch])
+
+  const handleGenerateFromTemplate = (template: any) => {
+    // Placeholder function to simulate generating insights from a template
+    console.log(`Generating insight from template: ${template.title}`)
+    setGeneratedTemplates((prev) => new Set(prev).add(template.id))
+  }
+
+  const handleUseTemplate = (template: any) => {
+    // Placeholder function to simulate using a template
+    console.log(`Using template: ${template.title}`)
+  }
+
+  const handleBookmarkTemplate = (templateId: number) => {
+    setBookmarkedTemplates((prev) => {
+      const newBookmarks = new Set(prev)
+      if (newBookmarks.has(templateId)) {
+        newBookmarks.delete(templateId)
+      } else {
+        newBookmarks.add(templateId)
       }
-    }, 100)
+      return newBookmarks
+    })
   }
 
   const handleComparisonDateToggle = (date: string) => {
-    setSelectedComparisonDates([date]) // Only allow single selection
+    setSelectedComparisonDates((prev) => (prev.includes(date) ? prev.filter((d) => d !== date) : [date]))
   }
 
   const removeComparisonDate = (date: string) => {
@@ -912,47 +933,137 @@ export default function Page() {
     setSelectedComparisonDates([])
   }
 
-  const handleBookmarkTemplate = (templateId: number) => {
-    const template = templateData.find((t) => t.id === templateId)
-    if (!template) return
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return
 
-    setBookmarkedTemplates((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(templateId)) {
-        newSet.delete(templateId)
-        // Remove from saved insights when unbookmarking
-        setSavedTemplateInsights((prevInsights) =>
-          prevInsights.filter((insight) => insight.templateData?.id !== templateId),
-        )
-      } else {
-        newSet.add(templateId)
-        // Add to saved insights when bookmarking - enhanced structure
-        const currentSponsors = selectedSponsors.length > 0 ? selectedSponsors.join(", ") : "All Sponsors"
-        const currentRightsholders =
-          selectedRightsholders.length > 0 ? selectedRightsholders.join(", ") : "All Rightsholders"
+    const userMessage = {
+      id: Date.now().toString(),
+      type: "user" as const,
+      content: chatInput,
+      timestamp: new Date(),
+    }
 
-        const newSavedInsight = {
-          id: `template_${templateId}_${Date.now()}`,
-          dateSaved: new Date(),
-          insightsType: template.category,
-          sponsor: currentSponsors,
-          rightsholder: currentRightsholders,
-          metric: template.title,
-          description: template.description,
-          templateData: template,
-          filters: {
-            sponsors: selectedSponsors,
-            rightsholders: selectedRightsholders,
-            placements: selectedPlacements,
-            placementTypes: selectedPlacementTypes,
-            dateRange: dateRange,
-            selectedYears: selectedYears,
-          },
-        }
-        setSavedTemplateInsights((prevInsights) => [newSavedInsight, ...prevInsights])
+    setChatHistory((prev) => [...prev, userMessage])
+    setChatInput("")
+    setIsGenerating(true)
+
+    // Simulate AI response
+    setTimeout(() => {
+      const assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant" as const,
+        content: `Based on your query "${userMessage.content}", I've analyzed the data and generated comprehensive insights.`,
+        timestamp: new Date(),
       }
-      return newSet
+
+      setChatHistory((prev) => [...prev, assistantMessage])
+
+      // Generate mock insight with unique timestamp for chart variation
+      const newInsight = {
+        trending: {
+          smv: Math.floor(Math.random() * 50) + 10,
+          impressions: Math.floor(Math.random() * 30) + 15,
+          engagement: Math.floor(Math.random() * 40) + 20,
+        },
+        topPerformers: {
+          sponsor: ["Nike", "Adidas", "Coca-Cola", "Pepsi", "Under Armour", "Puma"][Math.floor(Math.random() * 6)],
+          platform: ["Instagram", "TikTok", "YouTube", "Twitter", "LinkedIn", "Snapchat"][
+            Math.floor(Math.random() * 6)
+          ],
+          placement: ["Jersey", "Billboard", "Court Side", "LED-Fascia", "Digital Display", "Floor Logo"][
+            Math.floor(Math.random() * 6)
+          ],
+        },
+        keyMetrics: {
+          totalSMV: Math.floor(Math.random() * 1000) + 500,
+          roi: Math.floor(Math.random() * 200) + 150,
+          reach: (Math.random() * 3 + 1).toFixed(1),
+        },
+        // Add a unique identifier for chart generation
+        generatedAt: Date.now(),
+        chartSeed: Math.random() * 10000,
+      }
+
+      setCurrentInsight(newInsight)
+      setCustomInsightsCount((prev) => prev + 1)
+      setIsGenerating(false)
+    }, 2000)
+  }
+
+  const handlePromptClick = (prompt: string) => {
+    setChatInput(prompt)
+    // Auto-submit the prompt
+    setTimeout(() => {
+      handleSendMessage()
+    }, 100)
+  }
+
+  // State for chart type selection
+  const [chartType, setChartType] = useState<"bar" | "line">("bar")
+
+  // Function to generate chart data from the current insight
+  const generateChartData = (insight: any) => {
+    if (!insight) return []
+
+    // Generate 6 months of data based on the insight values
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+    const baseSmv = insight?.keyMetrics?.totalSMV || 500
+    const baseImpressions = insight?.keyMetrics?.reach ? Number.parseFloat(insight.keyMetrics.reach) * 10 : 20
+    const baseEngagement = insight?.trending?.engagement || 25
+
+    // Create more varied trends based on the trending values
+    const smvTrend = insight?.trending?.smv || 15
+    const impressionsTrend = insight?.trending?.impressions || 20
+    const engagementTrend = insight?.trending?.engagement || 25
+
+    // Use a unique seed based on insight generation time and random values
+    const seed = Date.now() + Math.random() * 1000
+
+    return months.map((month, index) => {
+      // Create different trend patterns for variety
+      const trendPatterns = [
+        // Linear growth
+        (i: number) => 1 + (smvTrend / 100) * (i / 5),
+        // Exponential growth
+        (i: number) => 1 + Math.pow(1 + smvTrend / 200, i),
+        // Seasonal pattern
+        (i: number) => 1 + (smvTrend / 100) * Math.sin((i / 5) * Math.PI) * (i / 5),
+        // Step growth
+        (i: number) => 1 + (smvTrend / 100) * Math.floor((i + 1) / 2) * 0.5,
+        // Volatile growth
+        (i: number) => 1 + (smvTrend / 100) * (i / 5) * (0.7 + Math.sin(seed + i) * 0.3),
+      ]
+
+      // Select a random pattern based on the seed
+      const patternIndex = Math.floor((seed + index) % trendPatterns.length)
+      const trendPattern = trendPatterns[patternIndex]
+
+      // Apply different volatility levels
+      const volatilityFactor = () => {
+        const baseVolatility = 0.8 + Math.sin(seed + index * 2.5) * 0.4 // 0.4 to 1.2
+        return Math.max(0.3, baseVolatility) // Ensure minimum of 0.3
+      }
+
+      // Create different starting points and growth curves
+      const smvMultiplier = trendPattern(index) * volatilityFactor()
+      const impressionsMultiplier = trendPattern(index + 1) * volatilityFactor()
+      const engagementMultiplier = trendPattern(index + 2) * volatilityFactor()
+
+      // Add some correlation between metrics but with individual variation
+      const correlationNoise = () => Math.sin(seed + index * 1.7) * 0.2 + 1 // 0.8 to 1.2
+
+      return {
+        month,
+        smv: Math.max(10, Math.round(baseSmv * smvMultiplier * correlationNoise())),
+        impressions: Math.max(5, Math.round(baseImpressions * impressionsMultiplier * correlationNoise())),
+        engagement: Math.max(5, Math.round(baseEngagement * engagementMultiplier * correlationNoise())),
+      }
     })
+  }
+
+  // Function to toggle expanded view for individual generated insights
+  const toggleGeneratedInsightExpansion = (insightId: string) => {
+    setExpandedGeneratedInsightId(expandedGeneratedInsightId === insightId ? null : insightId)
   }
 
   return (
@@ -981,6 +1092,13 @@ export default function Page() {
               >
                 <FontAwesomeIcon icon={faMagicWandSparkles} className="h-5 w-5 mr-2" />
                 Automated Insights
+              </TabsTrigger>
+              <TabsTrigger
+                value="custom-insights"
+                className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
+              >
+                <FontAwesomeIcon icon={faRobot} className="h-5 w-5 mr-2" />
+                Custom Insights
               </TabsTrigger>
             </TabsList>
 
@@ -2100,6 +2218,624 @@ export default function Page() {
                 </div>
               </div>
             </TabsContent>
+
+            {/* Custom Insights Tab Content */}
+            <TabsContent value="custom-insights" className="mt-6 mb-0">
+              <div className="w-full">
+                <div className="space-y-8">
+                  {/* Custom Insights Card */}
+                  <div className="bg-white border-2 border-blue-300 rounded-lg p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <FontAwesomeIcon icon={faRobot} className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-semibold text-gray-900">
+                            Custom Insights ({customInsightsCount})
+                          </h2>
+                          <p className="text-sm text-gray-600">
+                            Generate personalized insights using AI-powered analysis
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {currentInsight && (
+                          <>
+                            <button
+                              onClick={() => {
+                                const newSavedInsight = {
+                                  id: Date.now().toString(),
+                                  dateGenerated: new Date(),
+                                  insightType: "Custom Analysis",
+                                  createdBy: "AI Assistant",
+                                  query: chatHistory[chatHistory.length - 2]?.content || "",
+                                  insight: currentInsight,
+                                }
+                                setSavedCustomInsights((prev) => [newSavedInsight, ...prev])
+                              }}
+                              className="btn-primary flex items-center gap-2"
+                            >
+                              <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
+                              Save Generated Insight
+                            </button>
+                            <button
+                              onClick={() => setShowRatingDrawer(true)}
+                              className="btn-secondary flex items-center gap-2"
+                            >
+                              <FontAwesomeIcon icon={faStar} className="h-4 w-4" />
+                              Rate This Insight
+                            </button>
+                          </>
+                        )}
+                        <div className="text-sm text-gray-500">{savedCustomInsights.length} insights saved</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Chatbot Section */}
+                      <div className="lg:col-span-2">
+                        {/* Sticky Input */}
+                        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 pb-4 mb-4">
+                          <div className="flex gap-2">
+                            <Input
+                              value={chatInput}
+                              onChange={(e) => setChatInput(e.target.value)}
+                              placeholder="Ask about your data insights... (e.g., 'Show me top performing sponsors this quarter')"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  e.preventDefault()
+                                  handleSendMessage()
+                                }
+                              }}
+                              className="flex-1 py-3 text-sm"
+                              disabled={isGenerating}
+                            />
+                            <button
+                              onClick={handleSendMessage}
+                              disabled={!chatInput.trim() || isGenerating}
+                              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {isGenerating ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              ) : (
+                                <FontAwesomeIcon icon={faPaperPlane} className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Chat History */}
+                        <div className="min-h-[400px] max-h-[600px] overflow-y-auto border rounded-lg bg-gray-50 p-4 space-y-3">
+                          {chatHistory.length === 0 ? (
+                            <div className="flex items-center justify-center h-full text-gray-500">
+                              <div className="text-center">
+                                <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-400" />
+                                <h4 className="font-medium text-gray-700 mb-2">AI-Powered Custom Insights</h4>
+                                <p className="text-sm text-gray-500 mb-4 max-w-md">
+                                  Ask questions about your data and get instant, personalized insights with
+                                  visualizations.
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            chatHistory.map((message) => (
+                              <div
+                                key={message.id}
+                                className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
+                              >
+                                <div
+                                  className={`max-w-[85%] p-3 rounded-lg ${
+                                    message.type === "user"
+                                      ? "bg-blue-600 text-white rounded-br-sm"
+                                      : "bg-white border border-gray-200 rounded-bl-sm shadow-sm"
+                                  }`}
+                                >
+                                  <p className="text-sm leading-relaxed">{message.content}</p>
+                                  <p
+                                    className={`text-xs mt-2 ${
+                                      message.type === "user" ? "text-blue-100" : "text-gray-500"
+                                    }`}
+                                  >
+                                    {message.timestamp.toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                          {isGenerating && (
+                            <div className="flex justify-start">
+                              <div className="bg-white border border-gray-200 p-4 rounded-lg rounded-bl-sm shadow-sm">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex space-x-1">
+                                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                    <div
+                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                      style={{ animationDelay: "0.1s" }}
+                                    ></div>
+                                    <div
+                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                      style={{ animationDelay: "0.2s" }}
+                                    ></div>
+                                  </div>
+                                  <p className="text-sm text-gray-600">
+                                    Analyzing your data and generating insights...
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Generated Insight Display */}
+                        {currentInsight && (
+                          <div className="mt-6 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200 shadow-sm">
+                            <h4 className="font-semibold text-xl text-gray-800 mb-4 flex items-center gap-3">
+                              <div className="p-2 bg-yellow-100 rounded-lg">
+                                <FontAwesomeIcon icon={faLightbulb} className="h-6 w-6 text-yellow-600" />
+                              </div>
+                              Generated Custom Insight
+                            </h4>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                              {/* Trending Metrics */}
+                              <div className="space-y-3">
+                                <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
+                                  Trending Metrics
+                                </h5>
+                                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">SMV</span>
+                                    <span className="font-medium text-green-700">
+                                      +{currentInsight.trending?.smv || 25}%
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">Impressions</span>
+                                    <span className="font-medium text-green-700">
+                                      +{currentInsight.trending?.impressions || 18}%
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-600">Engagement</span>
+                                    <span className="font-medium text-green-700">
+                                      +{currentInsight.trending?.engagement || 32}%
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Top Performers */}
+                              <div className="space-y-3">
+                                <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
+                                  Top Performers
+                                </h5>
+                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                  <div className="mb-2">
+                                    <span className="text-xs text-gray-600">Top Sponsor</span>
+                                    <div className="font-medium text-blue-700">
+                                      {currentInsight.topPerformers?.sponsor || "Nike"}
+                                    </div>
+                                  </div>
+                                  <div className="mb-2">
+                                    <span className="text-xs text-gray-600">Best Platform</span>
+                                    <div className="font-medium text-blue-700">
+                                      {currentInsight.topPerformers?.platform || "Instagram"}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-600">Top Placement</span>
+                                    <div className="font-medium text-blue-700">
+                                      {currentInsight.topPerformers?.placement || "Jersey"}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Key Metrics */}
+                              <div className="space-y-3">
+                                <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                                  Key Metrics
+                                </h5>
+                                <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">Total SMV</span>
+                                    <span className="font-medium text-yellow-700">
+                                      ${currentInsight.keyMetrics?.totalSMV || 850}k
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-gray-600">ROI</span>
+                                    <span className="font-medium text-yellow-700">
+                                      {currentInsight.keyMetrics?.roi || 245}%
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-600">Reach</span>
+                                    <span className="font-medium text-yellow-700">
+                                      {currentInsight.keyMetrics?.reach || 2.4}M
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Chart Placeholder */}
+                            {/* Replace the Chart Placeholder section with actual charts */}
+                            <div className="mt-6 space-y-4">
+                              <h5 className="font-semibold text-gray-700 mb-2">Performance Visualization</h5>
+
+                              {/* Tabs for chart types */}
+                              <div className="flex items-center space-x-2 mb-4">
+                                <button
+                                  className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                    chartType === "bar"
+                                      ? "bg-blue-100 text-blue-700 font-medium"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                  onClick={() => setChartType("bar")}
+                                >
+                                  <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 mr-2" />
+                                  Bar Chart
+                                </button>
+                                <button
+                                  className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                    chartType === "line"
+                                      ? "bg-blue-100 text-blue-700 font-medium"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                  onClick={() => setChartType("line")}
+                                >
+                                  <FontAwesomeIcon icon={faChartLine} className="h-4 w-4 mr-2" />
+                                  Line Chart
+                                </button>
+                              </div>
+
+                              {/* Chart container */}
+                              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                <div className="h-80">
+                                  <ChartContainer
+                                    config={{
+                                      smv: {
+                                        label: "SMV ($k)",
+                                        color: "#4F8EF7",
+                                      },
+                                      impressions: {
+                                        label: "Impressions (MM)",
+                                        color: "#6BA3F8",
+                                      },
+                                      engagement: {
+                                        label: "Engagement (%)",
+                                        color: "#87B8F9",
+                                      },
+                                    }}
+                                    className="h-full w-full"
+                                  >
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      {chartType === "bar" ? (
+                                        <BarChart
+                                          data={generateChartData(currentInsight)}
+                                          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                                          barCategoryGap="20%"
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" />
+                                          <XAxis
+                                            dataKey="month"
+                                            tick={{ fontSize: 11 }}
+                                            interval={0}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={60}
+                                          />
+                                          <YAxis
+                                            tick={{ fontSize: 12 }}
+                                            label={{
+                                              value: "Values",
+                                              angle: -90,
+                                              position: "insideLeft",
+                                            }}
+                                          />
+                                          <Tooltip
+                                            formatter={(value, name) => {
+                                              if (name === "SMV ($k)") return [`$${value}k`, name]
+                                              if (name === "Impressions (MM)") return [`${value}MM`, name]
+                                              if (name === "Engagement (%)") return [`${value}%`, name]
+                                              return [value, name]
+                                            }}
+                                          />
+                                          <Legend />
+                                          <Bar dataKey="smv" fill="#4F8EF7" name="SMV ($k)" radius={[4, 4, 0, 0]} />
+                                          <Bar
+                                            dataKey="impressions"
+                                            fill="#6BA3F8"
+                                            name="Impressions (MM)"
+                                            radius={[4, 4, 0, 0]}
+                                          />
+                                          <Bar
+                                            dataKey="engagement"
+                                            fill="#87B8F9"
+                                            name="Engagement (%)"
+                                            radius={[4, 4, 0, 0]}
+                                          />
+                                        </BarChart>
+                                      ) : (
+                                        <LineChart
+                                          data={generateChartData(currentInsight)}
+                                          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" />
+                                          <XAxis
+                                            dataKey="month"
+                                            tick={{ fontSize: 11 }}
+                                            interval={0}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={60}
+                                          />
+                                          <YAxis
+                                            tick={{ fontSize: 12 }}
+                                            label={{
+                                              value: "Values",
+                                              angle: -90,
+                                              position: "insideLeft",
+                                            }}
+                                          />
+                                          <Tooltip
+                                            formatter={(value, name) => {
+                                              if (name === "SMV ($k)") return [`$${value}k`, name]
+                                              if (name === "Impressions (MM)") return [`${value}MM`, name]
+                                              if (name === "Engagement (%)") return [`${value}%`, name]
+                                              return [value, name]
+                                            }}
+                                          />
+                                          <Legend />
+                                          <Line
+                                            type="monotone"
+                                            dataKey="smv"
+                                            stroke="#4F8EF7"
+                                            strokeWidth={2}
+                                            dot={{ r: 4 }}
+                                            name="SMV ($k)"
+                                          />
+                                          <Line
+                                            type="monotone"
+                                            dataKey="impressions"
+                                            stroke="#6BA3F8"
+                                            strokeWidth={2}
+                                            dot={{ r: 4 }}
+                                            name="Impressions (MM)"
+                                          />
+                                          <Line
+                                            type="monotone"
+                                            dataKey="engagement"
+                                            stroke="#87B8F9"
+                                            strokeWidth={2}
+                                            dot={{ r: 4 }}
+                                            name="Engagement (%)"
+                                          />
+                                        </LineChart>
+                                      )}
+                                    </ResponsiveContainer>
+                                  </ChartContainer>
+                                </div>
+
+                                <div className="mt-4 text-xs text-gray-500">
+                                  <div className="font-medium mb-1">Chart Information:</div>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <div>SMV: Social Media Value in thousands ($k)</div>
+                                    <div>Impressions: Values shown in millions (MM)</div>
+                                    <div>Engagement: Percentage of audience engagement</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Recommendations */}
+                            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
+                              <h5 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                                AI Recommendations
+                              </h5>
+                              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                                <li>Increase investment in top-performing sponsor partnerships</li>
+                                <li>Optimize placement strategy for maximum visibility</li>
+                                <li>Focus marketing efforts on high-engagement platforms</li>
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Prompt Tags Section */}
+                      <div className="space-y-6">
+                        {/* Recent Queries */}
+                        <div className="border rounded-lg p-4 bg-white">
+                          <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-500" />
+                            Recent Queries
+                          </h4>
+                          <div className="space-y-2">
+                            {[
+                              "Show me Nike performance in Q4",
+                              "Compare Instagram vs TikTok engagement",
+                              "Top performing placements this month",
+                            ].map((query, index) => (
+                              <button
+                                key={index}
+                                onClick={() => handlePromptClick(query)}
+                                className="w-full text-left p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors border border-transparent hover:border-gray-200"
+                              >
+                                {query}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Popular Searches */}
+                        <div className="border rounded-lg p-4 bg-white">
+                          <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
+                            Popular Searches
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {["SMV trends", "Platform comparison", "Sponsor performance", "ROI analysis"].map(
+                              (search, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => handlePromptClick(search)}
+                                  className="px-3 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full transition-colors border border-blue-200 hover:border-blue-300"
+                                >
+                                  {search}
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Evaluation Searches */}
+                        <div className="border rounded-lg p-4 bg-white">
+                          <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-gray-500" />
+                            Evaluation Searches
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {["MVP% Evaluation", "YoY Benchmarking", "Performance Metrics", "Engagement Analysis"].map(
+                              (search, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => handlePromptClick(search)}
+                                  className="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-full transition-colors border border-purple-200 hover:border-purple-300"
+                                >
+                                  {search}
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Persona-Driven Prompts */}
+                        <div className="border rounded-lg p-4 bg-white">
+                          <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                            <FontAwesomeIcon icon={faUsers} className="h-4 w-4 text-gray-500" />
+                            Persona-Driven Prompts
+                          </h4>
+                          <div className="space-y-3">
+                            <div>
+                              <div className="text-xs font-medium text-gray-600 mb-2">Rightsholders</div>
+                              <div className="flex flex-wrap gap-1">
+                                {["Revenue optimization insights", "Fan engagement metrics"].map((prompt, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => handlePromptClick(prompt)}
+                                    className="px-2 py-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors"
+                                  >
+                                    {prompt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-medium text-gray-600 mb-2">Brands</div>
+                              <div className="flex flex-wrap gap-1">
+                                {["Brand visibility analysis", "Sponsorship ROI insights"].map((prompt, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => handlePromptClick(prompt)}
+                                    className="px-2 py-1 text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 rounded transition-colors"
+                                  >
+                                    {prompt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-medium text-gray-600 mb-2">Agencies</div>
+                              <div className="flex flex-wrap gap-1">
+                                {["Campaign performance", "Media planning insights"].map((prompt, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => handlePromptClick(prompt)}
+                                    className="px-2 py-1 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded transition-colors"
+                                  >
+                                    {prompt}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Saved Generated Insights Table */}
+                  {savedCustomInsights.length > 0 && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900">Saved Generated Insights</h3>
+                        <button
+                          onClick={() => setShowAllInsightsModal(true)}
+                          className="btn-secondary flex items-center gap-2"
+                        >
+                          <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
+                          View All Data Insights
+                        </button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200">
+                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Date Generated</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Insight Type</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Created By</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Insight Query</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {savedCustomInsights.slice(0, 5).map((insight) => (
+                              <tr key={insight.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                <td className="py-3 px-4 text-sm text-gray-900">
+                                  {insight.dateGenerated.toLocaleDateString()}
+                                </td>
+                                <td className="py-3 px-4 text-sm text-gray-900">{insight.insightType}</td>
+                                <td className="py-3 px-4 text-sm text-gray-900">{insight.createdBy}</td>
+                                <td className="py-3 px-4">
+                                  <Badge variant="secondary" className="text-xs">
+                                    {insight.query.length > 50 ? `${insight.query.substring(0, 50)}...` : insight.query}
+                                  </Badge>
+                                </td>
+                                <td className="py-3 px-4">
+                                  <div className="flex items-center gap-2">
+                                    <button className="text-blue-600 hover:text-blue-800 text-sm">View</button>
+                                    <button className="text-gray-600 hover:text-gray-800 text-sm">Edit</button>
+                                    <button
+                                      onClick={() =>
+                                        setSavedCustomInsights((prev) => prev.filter((i) => i.id !== insight.id))
+                                      }
+                                      className="text-red-600 hover:text-red-800 text-sm"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
 
           {/* Save Filter Drawer */}
@@ -2284,6 +3020,388 @@ export default function Page() {
           )}
         </div>
       </div>
+
+      {/* Rating Drawer */}
+      {showRatingDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowRatingDrawer(false)}></div>
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-lg shadow-xl transform transition-transform duration-300">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Rate This Insight</h3>
+                <button onClick={() => setShowRatingDrawer(false)} className="text-gray-400 hover:text-gray-600">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-700 mb-2">How helpful was this insight?</h4>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        onClick={() => setCurrentRating(rating)}
+                        className={`p-2 rounded-lg border ${
+                          currentRating >= rating
+                            ? "border-yellow-500 bg-yellow-50 text-yellow-600"
+                            : "border-gray-200 hover:border-gray-300 text-gray-400"
+                        }`}
+                      >
+                        <FontAwesomeIcon icon={faStar} className="h-5 w-5" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-700 mb-2">Additional Feedback</h4>
+                  <textarea
+                    value={ratingFeedback}
+                    onChange={(e) => setRatingFeedback(e.target.value)}
+                    placeholder="Share any additional feedback..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    rows={3}
+                  />
+                </div>
+
+                <button
+                  onClick={() => {
+                    console.log("Rating submitted:", { rating: currentRating, feedback: ratingFeedback })
+                    setShowRatingDrawer(false)
+                    setCurrentRating(0)
+                    setRatingFeedback("")
+                  }}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                >
+                  Submit Rating
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* All Insights Modal */}
+      {showAllInsightsModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className={`absolute inset-0 bg-black transition-opacity duration-300 ease-out ${
+              showAllInsightsModal ? "bg-opacity-50" : "bg-opacity-0"
+            }`}
+            onClick={() => setShowAllInsightsModal(false)}
+          ></div>
+          <div className="absolute inset-0 flex items-center justify-center p-8">
+            <div
+              className={`bg-white rounded-lg shadow-xl overflow-hidden w-[70%] h-[70%] max-w-5xl max-h-[800px] min-w-[600px] min-h-[500px] transform transition-all duration-300 ease-out ${
+                showAllInsightsModal ? "scale-100 opacity-100" : "scale-95 opacity-0"
+              }`}
+            >
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white sticky top-0 z-10">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faRobot} className="h-5 w-5 text-blue-600" />
+                    All Custom Insights Data
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Comprehensive view of all generated custom insights with detailed metrics and analysis
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowAllInsightsModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-md"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto h-[calc(100%-120px)]">
+                <div className="space-y-6">
+                  {/* Summary Statistics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{savedCustomInsights.length}</div>
+                        <div className="text-sm text-gray-600">Total Custom Insights</div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          $
+                          {Math.round(
+                            savedCustomInsights.reduce(
+                              (sum, insight) => sum + (insight.insight?.keyMetrics?.totalSMV || 0),
+                              0,
+                            ) / Math.max(savedCustomInsights.length, 1),
+                          ).toLocaleString()}
+                          k
+                        </div>
+                        <div className="text-sm text-gray-600">Average Total SMV</div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {Math.round(
+                            savedCustomInsights.reduce(
+                              (sum, insight) => sum + (insight.insight?.keyMetrics?.roi || 0),
+                              0,
+                            ) / Math.max(savedCustomInsights.length, 1),
+                          )}
+                          %
+                        </div>
+                        <div className="text-sm text-gray-600">Average ROI</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overall Top Performers Summary */}
+                  {savedCustomInsights.length > 0 && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-orange-600" />
+                        Overall Top Performers
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <div className="text-xs text-gray-600 mb-1">Most Common Top Sponsor</div>
+                          <div className="font-semibold text-blue-700">
+                            {(() => {
+                              const sponsors = savedCustomInsights
+                                .map((insight) => insight.insight?.topPerformers?.sponsor)
+                                .filter(Boolean)
+                              if (sponsors.length === 0) return "N/A"
+                              return sponsors.reduce((a, b, i, arr) =>
+                                arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+                              )
+                            })()}
+                          </div>
+                        </div>
+                        <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                          <div className="text-xs text-gray-600 mb-1">Most Common Top Platform</div>
+                          <div className="font-semibold text-green-700">
+                            {(() => {
+                              const platforms = savedCustomInsights
+                                .map((insight) => insight.insight?.topPerformers?.platform)
+                                .filter(Boolean)
+                              if (platforms.length === 0) return "N/A"
+                              return platforms.reduce((a, b, i, arr) =>
+                                arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+                              )
+                            })()}
+                          </div>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                          <div className="text-xs text-gray-600 mb-1">Date Range</div>
+                          <div className="font-semibold text-gray-700">
+                            {(() => {
+                              if (savedCustomInsights.length === 0) return "N/A"
+                              const dates = savedCustomInsights
+                                .map((insight) => insight.dateGenerated)
+                                .sort((a, b) => a.getTime() - b.getTime())
+                              const firstDate = dates[0].toLocaleDateString()
+                              const lastDate = dates[dates.length - 1].toLocaleDateString()
+                              return firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Individual Custom Insights Details */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-purple-600" />
+                      Individual Custom Insights Details
+                    </h3>
+
+                    {savedCustomInsights.length === 0 ? (
+                      <div className="text-center py-12 text-gray-500">
+                        <div className="flex flex-col items-center">
+                          <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-300" />
+                          <h4 className="font-medium text-gray-600 mb-2">No Custom Insights Saved Yet</h4>
+                          <p className="text-sm text-gray-500">Generate and save custom insights to see them here</p>
+                        </div>
+                      </div>
+                    ) : (
+                      savedCustomInsights.map((insight) => (
+                        <div key={insight.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-purple-100 rounded-lg">
+                                <FontAwesomeIcon icon={faRobot} className="h-4 w-4 text-purple-600" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-gray-900">
+                                  {insight.dateGenerated.toLocaleString("en-US", {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                  })}
+                                </div>
+                                <div className="text-sm text-gray-500">{insight.insightType}</div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => toggleGeneratedInsightExpansion(insight.id)}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                            >
+                              <FontAwesomeIcon
+                                icon={expandedGeneratedInsightId === insight.id ? faCompress : faExpand}
+                                className="h-4 w-4"
+                              />
+                              {expandedGeneratedInsightId === insight.id ? "Collapse" : "Expand"}
+                            </button>
+                          </div>
+
+                          {/* Basic Info */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <div className="text-xs text-gray-600 mb-1">Query</div>
+                              <div className="font-medium text-gray-900 text-sm">{insight.query}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-600 mb-1">Created By</div>
+                              <div className="font-medium text-gray-900">{insight.createdBy}</div>
+                            </div>
+                          </div>
+
+                          {/* Expanded Details */}
+                          {expandedGeneratedInsightId === insight.id && insight.insight && (
+                            <div className="space-y-6 border-t pt-4">
+                              {/* Trending Metrics */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
+                                  Trending Metrics
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">SMV</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.smv || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">Impressions</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.impressions || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">Engagement</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.engagement || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Top Performers */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
+                                  Top Performers
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Sponsor</div>
+                                    <div className="font-semibold text-blue-700">
+                                      {insight.insight.topPerformers?.sponsor || "N/A"}
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Platform</div>
+                                    <div className="font-semibold text-purple-700">
+                                      {insight.insight.topPerformers?.platform || "N/A"}
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Placement</div>
+                                    <div className="font-semibold text-orange-700">
+                                      {insight.insight.topPerformers?.placement || "N/A"}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Key Metrics */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                                  Key Metrics
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">Total SMV</div>
+                                    <div className="font-semibold text-gray-700">
+                                      ${(insight.insight.keyMetrics?.totalSMV || 0).toLocaleString()}k
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">ROI</div>
+                                    <div className="font-semibold text-gray-700">
+                                      {insight.insight.keyMetrics?.roi || 0}%
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">Reach</div>
+                                    <div className="font-semibold text-gray-700">
+                                      {insight.insight.keyMetrics?.reach || 0}M
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex items-center gap-2 pt-4 border-t">
+                                <button
+                                  onClick={() => {
+                                    setShowAllInsightsModal(false)
+                                    // You could add logic here to view the insight in the main interface
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                  <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
+                                  View in Main Interface
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSavedCustomInsights((prev) => prev.filter((i) => i.id !== insight.id))
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-md hover:bg-red-50 hover:border-red-300 transition-colors"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
