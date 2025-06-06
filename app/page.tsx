@@ -888,7 +888,7 @@ export default function Page() {
 
   const handleUseTemplate = (template: (typeof templateData)[0]) => {
     setChatInput(template.prompt)
-    setMainTab("insights")
+    setMainTab("automated-insights")
     setActiveTab("generate")
 
     // Focus the input after a brief delay to ensure tab switch completes
@@ -976,11 +976,11 @@ export default function Page() {
                 Analytics
               </TabsTrigger>
               <TabsTrigger
-                value="insights"
+                value="automated-insights"
                 className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
               >
                 <FontAwesomeIcon icon={faMagicWandSparkles} className="h-5 w-5 mr-2" />
-                Insights
+                Automated Insights
               </TabsTrigger>
             </TabsList>
 
@@ -1890,8 +1890,8 @@ export default function Page() {
               </Tabs>
             </TabsContent>
 
-            {/* Insights Tab Content */}
-            <TabsContent value="insights" className="mt-6 mb-0">
+            {/* Automated Insights Tab Content */}
+            <TabsContent value="automated-insights" className="mt-6 mb-0">
               <div className="w-full">
                 <div className="space-y-8">
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
