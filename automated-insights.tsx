@@ -88,7 +88,6 @@ interface SpeechRecognitionResultList {
   length: number
   item(index: number): SpeechRecognitionResult
   [index: number]: SpeechRecognitionResult
-  [index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
@@ -3126,5 +3125,5 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
         )}
       </Card>
     </TooltipProvider>
-  );
+  )
 }
