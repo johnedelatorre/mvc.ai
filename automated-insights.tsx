@@ -88,6 +88,7 @@ interface SpeechRecognitionResultList {
   length: number
   item(index: number): SpeechRecognitionResult
   [index: number]: SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
