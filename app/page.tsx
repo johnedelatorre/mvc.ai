@@ -648,7 +648,6 @@ export default function Page() {
                         {selectedRightsholders.length > 0 && (
                           <Badge className="bg-blue-100 text-blue-700 border-blue-300">
                             {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}
-                            Selected
                           </Badge>
                         )}
 
@@ -880,11 +879,12 @@ export default function Page() {
                         </p>
                         <div className="mt-2 p-3 bg-gray-50 rounded-md">
                           <p className="text-xs text-gray-600">
-                            Please note that engagement is the un-duplicated number of people who have done 1 or more of the actions listed below
+                            Please note that engagement is the un-duplicated number of people who have done 1 or more of
+                            the actions listed below
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-3">
                         <button onClick={openScorecardDrawer} className="btn-primary flex items-center gap-2">
                           <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
@@ -899,17 +899,21 @@ export default function Page() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FontAwesomeIcon icon={faTable} className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-700">Watched live broadcast games on ESPN+</span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Watched live broadcast games on ESPN+
+                            </span>
                           </div>
                           <span className="text-lg font-bold text-blue-600">34%</span>
                         </div>
                       </div>
-                      
+
                       <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-green-600" />
-                            <span className="text-sm font-medium text-gray-700">Recommended games to others to watch</span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Recommended games to others to watch
+                            </span>
                           </div>
                           <span className="text-lg font-bold text-green-600">32%</span>
                         </div>
@@ -929,7 +933,9 @@ export default function Page() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-red-600" />
-                            <span className="text-sm font-medium text-gray-700">Purchased or wore Spurs merchandise</span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Purchased or wore Spurs merchandise
+                            </span>
                           </div>
                           <span className="text-lg font-bold text-red-600">60%</span>
                         </div>
@@ -949,7 +955,9 @@ export default function Page() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-yellow-600" />
-                            <span className="text-sm font-medium text-gray-700">Played Fantasy Basketball or got on a game</span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Played Fantasy Basketball or got on a game
+                            </span>
                           </div>
                           <span className="text-lg font-bold text-yellow-600">31%</span>
                         </div>
@@ -959,7 +967,9 @@ export default function Page() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FontAwesomeIcon icon={faSearch} className="h-5 w-5 text-gray-600" />
-                            <span className="text-sm font-medium text-gray-700">Followed games through social media</span>
+                            <span className="text-sm font-medium text-gray-700">
+                              Followed games through social media
+                            </span>
                           </div>
                           <span className="text-lg font-bold text-gray-600">55%</span>
                         </div>
@@ -981,13 +991,13 @@ export default function Page() {
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-6">
-                        <button 
+                        <button
                           onClick={() => setOutcomesActiveTab("table")}
                           className={`pb-2 font-medium ${outcomesActiveTab === "table" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
                         >
                           RESULTS TABLE
                         </button>
-                        <button 
+                        <button
                           onClick={() => setOutcomesActiveTab("chart")}
                           className={`pb-2 font-medium ${outcomesActiveTab === "chart" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
                         >
@@ -1040,13 +1050,17 @@ export default function Page() {
                             </tr>
                             <tr className="border-b border-gray-100 hover:bg-gray-50">
                               <td className="py-3 px-4 font-medium text-gray-900">$ SMV / Fan</td>
-                              <td className="py-3 px-4 text-sm text-gray-700 flex items-center gap-2">
-                                $1.64
-                                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                              <td className="py-3 px-4 text-sm text-gray-700">
+                                <div className="flex items-center gap-2">
+                                  <span>$1.64</span>
+                                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                </div>
                               </td>
-                              <td className="py-3 px-4 text-sm text-gray-900 flex items-center gap-2">
-                                $1.50
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <td className="py-3 px-4 text-sm text-gray-900">
+                                <div className="flex items-center gap-2">
+                                  <span>$1.50</span>
+                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                </div>
                               </td>
                             </tr>
                             <tr className="border-b border-gray-100 hover:bg-gray-50">
@@ -1057,19 +1071,25 @@ export default function Page() {
                             </tr>
                             <tr className="border-b border-gray-100 hover:bg-gray-50">
                               <td className="py-3 px-4 font-medium text-gray-900"># Fans Impacted</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">Fans impacted by T-Mobile's sponsorship</td>
+                              <td className="py-3 px-4 text-sm text-gray-700">
+                                Fans impacted by T-Mobile's sponsorship
+                              </td>
                               <td className="py-3 px-4 text-sm text-gray-900">873,000</td>
                               <td className="py-3 px-4 text-sm text-gray-900">750,000</td>
                             </tr>
                             <tr className="border-b border-gray-100 hover:bg-gray-50">
                               <td className="py-3 px-4 font-medium text-gray-900">$ SMV / Fan Impacted</td>
-                              <td className="py-3 px-4 text-sm text-gray-700 flex items-center gap-2">
-                                $7.45
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <td className="py-3 px-4 text-sm text-gray-700">
+                                <div className="flex items-center gap-2">
+                                  <span>$7.45</span>
+                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                </div>
                               </td>
-                              <td className="py-3 px-4 text-sm text-gray-900 flex items-center gap-2">
-                                $6.50
-                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <td className="py-3 px-4 text-sm text-gray-900">
+                                <div className="flex items-center gap-2">
+                                  <span>$6.50</span>
+                                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                </div>
                               </td>
                             </tr>
                           </tbody>
@@ -1079,7 +1099,9 @@ export default function Page() {
                       /* Comparison Chart */
                       <div className="space-y-6">
                         <div className="bg-white rounded-lg border border-gray-200 p-6">
-                          <h4 className="font-semibold text-lg text-gray-900 mb-4">San Antonio Spurs vs League Average Comparison</h4>
+                          <h4 className="font-semibold text-lg text-gray-900 mb-4">
+                            San Antonio Spurs vs League Average Comparison
+                          </h4>
                           <div className="h-96">
                             <ChartContainer
                               config={{
@@ -1101,24 +1123,24 @@ export default function Page() {
                                     { metric: "% Telco Switchers", spurs: 70, league: 60 },
                                     { metric: "% T-Mobile Customers", spurs: 52, league: 45 },
                                     { metric: "SMV (in thousands)", spurs: 6505, league: 5000 },
-                                    { metric: "SMV per Fan", spurs: 1.64, league: 1.50 },
+                                    { metric: "SMV per Fan", spurs: 1.64, league: 1.5 },
                                     { metric: "Fans Aware", spurs: 1857700, league: 1500000 },
                                     { metric: "Fans Impacted", spurs: 873000, league: 750000 },
-                                    { metric: "SMV per Fan Impacted", spurs: 7.45, league: 6.50 },
+                                    { metric: "SMV per Fan Impacted", spurs: 7.45, league: 6.5 },
                                   ]}
                                   margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
                                   barCategoryGap="20%"
                                 >
                                   <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis 
-                                    dataKey="metric" 
+                                  <XAxis
+                                    dataKey="metric"
                                     tick={{ fontSize: 11 }}
                                     interval={0}
                                     angle={-45}
                                     textAnchor="end"
                                     height={80}
                                   />
-                                  <YAxis 
+                                  <YAxis
                                     tick={{ fontSize: 12 }}
                                     label={{
                                       value: "Values",
@@ -1126,9 +1148,9 @@ export default function Page() {
                                       position: "insideLeft",
                                     }}
                                   />
-                                  <Tooltip 
+                                  <Tooltip
                                     formatter={(value, name) => {
-                                      if (typeof value === 'number') {
+                                      if (typeof value === "number") {
                                         if (value > 1000000) {
                                           return [`${(value / 1000000).toFixed(1)}M`, name]
                                         } else if (value > 1000) {
@@ -1188,6 +1210,7 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
+                  </div>
 
                   {/* Insights Section */}
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -1195,7 +1218,7 @@ export default function Page() {
                       <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-yellow-600" />
                       Insights:
                     </h3>
-                    
+
                     <div className="space-y-6">
                       {/* Summary */}
                       <div>
@@ -1204,7 +1227,10 @@ export default function Page() {
                           Summary:
                         </h4>
                         <ul className="list-disc list-inside text-gray-700 space-y-2 ml-6">
-                          <li>SMV for T-Mobile is 10% above average for its placement mix and is leading to higher than average recall among fans.</li>
+                          <li>
+                            SMV for T-Mobile is 10% above average for its placement mix and is leading to higher than
+                            average recall among fans.
+                          </li>
                         </ul>
                       </div>
 
@@ -1215,9 +1241,18 @@ export default function Page() {
                           Insights:
                         </h4>
                         <ul className="list-disc list-inside text-gray-700 space-y-3 ml-6">
-                          <li>Both sponsorships offer an opportunity for T-Mobile to win with category buyers, a mix of current and competitive customers</li>
-                          <li>The Rangers sponsorship is generating half as much $ media value per fan, but is delivering almost 2x the impact</li>
-                          <li>Increased media value with the Rangers with partnership messaging will continue to drive awareness and impact</li>
+                          <li>
+                            Both sponsorships offer an opportunity for T-Mobile to win with category buyers, a mix of
+                            current and competitive customers
+                          </li>
+                          <li>
+                            The Rangers sponsorship is generating half as much $ media value per fan, but is delivering
+                            almost 2x the impact
+                          </li>
+                          <li>
+                            Increased media value with the Rangers with partnership messaging will continue to drive
+                            awareness and impact
+                          </li>
                           <li>Consider optimizing the asset mix for the Phillies to drive greater efficiency</li>
                         </ul>
                       </div>
@@ -1474,5 +1509,5 @@ export default function Page() {
         </div>
       )}
     </div>
-  );
+  )
 }
