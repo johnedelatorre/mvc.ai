@@ -35,6 +35,9 @@ import {
   faSearch,
   faUsers,
   faStar,
+  faTrash,
+  faCompress,
+  faExpand,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
@@ -220,8 +223,8 @@ const generateBaseData = () => {
   return Array.from({ length: 200 }, (_, index) => ({
     id: index + 1,
     dateObj: generateRandomDate(),
-    rightsholders: ALL_RIGHTSHOLDERS[index % ALL_RIGHTSHOLDERS.length],
-    sponsors: ALL_SPONSORS[index % ALL_SPONSORS.length],
+    rightsholders: ALL_RIGHTSHOLDERS[index % ALL_RIGHTSHOLDERS.length], // Add rightsholders to data
+    sponsors: ALL_SPONSORS[index % ALL_SPONSORS.length], // Add sponsors to data
     placements: PLACEMENT_OPTIONS[index % PLACEMENT_OPTIONS.length],
     placementTypes: ALL_PLACEMENT_TYPES[index % ALL_PLACEMENT_TYPES.length],
     platforms: ["TikTok", "Instagram", "YouTube", "Twitter"][index % 4],
@@ -237,57 +240,6 @@ const generateBaseData = () => {
 const FILTER_CATEGORIES = ["General", "Performance", "Engagement", "Sponsors", "RightsHolders"]
 
 export default function Page() {
-  const [showScorecardDrawer, setShowScorecardDrawer] = useState(false)
-  const [scorecardDrawerAnimating, setScorecardDrawerAnimating] = useState(false)
-  const [showSurveyScoresDrawer, setShowSurveyScoresDrawer] = useState(false)
-  const [surveyScoresDrawerAnimating, setSurveyScoresDrawerAnimating] = useState(false)
-
-  // Scorecard drawer data
-  const scorecardData = {
-    teamName: "San Antonio Spurs",
-    sampleSurveyed: 202,
-    opportunityRank: 6,
-    opportunityScore: 40,
-    opportunityValue: 22,
-    totalFansSurveyed: {
-      engagement: 58
-    },
-    behaviorAndInterest: {
-      intensity: 70,
-      momentum: 30
-    },
-    potentialSponsorImpact: {
-      consideration: 70,
-      favorability: 30
-    },
-    teamsData: [
-      { rightsholder: "New York Knicks", brand: "Chase", region: "New York", aidedSponsorshipAwareness: "44%", netMoreFavorable: "45%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Atlanta Hawks", brand: "Nike", region: "Atlanta", aidedSponsorshipAwareness: "54%", netMoreFavorable: "26%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Chicago Bulls", brand: "Citizens Bank", region: "Chicago", aidedSponsorshipAwareness: "64%", netMoreFavorable: "19%", netIncreaseConsideration: "35%" },
-      { rightsholder: "San Antonio Spurs", brand: "T-Mobile", region: "San Antonio", aidedSponsorshipAwareness: "55%", netMoreFavorable: "58%", netIncreaseConsideration: "45%" },
-      { rightsholder: "Houston Rockets", brand: "Xfinity", region: "Houston", aidedSponsorshipAwareness: "24%", netMoreFavorable: "23%", netIncreaseConsideration: "35%" }
-    ]
-  }
-
-  const openScorecardDrawer = () => {
-    setShowScorecardDrawer(true)
-    setTimeout(() => setScorecardDrawerAnimating(true), 0)
-  }
-
-  const closeScorecardDrawer = () => {
-    setScorecardDrawerAnimating(false)
-    setTimeout(() => setShowScorecardDrawer(false), 300)
-  }
-
-  const openSurveyScoresDrawer = () => {
-    setShowSurveyScoresDrawer(true)
-    setTimeout(() => setSurveyScoresDrawerAnimating(true), 0)
-  }
-
-  const closeSurveyScoresDrawer = () => {
-    setSurveyScoresDrawerAnimating(false)
-    setTimeout(() => setShowSurveyScoresDrawer(false), 300)
-  }
   const [filterType, setFilterType] = useState<"dateRange" | "years">("dateRange")
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
@@ -368,7 +320,6 @@ export default function Page() {
       }
     }>
   >([])
-  const [outcomesActiveTab, setOutcomesActiveTab] = useState("table")
 
   // Custom Insights state
   const [customInsightsCount, setCustomInsightsCount] = useState(0)
@@ -435,6 +386,87 @@ export default function Page() {
       sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Engagement+Chart",
       prompt:
         "Provide a comprehensive sponsor engagement analysis. Show me engagement rates, audience interaction patterns, and identify which sponsors are performing best in terms of audience connection.",
+    },
+    {
+      id: 4,
+      title: "Seasonal Performance Trends",
+      description: "Identify seasonal patterns and trends in your sponsorship performance data.",
+      category: "Trend Comparison",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Seasonal+Chart",
+      prompt:
+        "Analyze seasonal performance trends in the data. Show me how sponsorship performance varies by season, identify peak and low periods, and provide insights for seasonal strategy optimization.",
+    },
+    {
+      id: 5,
+      title: "Placement Effectiveness Analysis",
+      description: "Evaluate the effectiveness of different placement types and locations for maximum impact.",
+      category: "Custom Metrics",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Placement+Chart",
+      prompt:
+        "Analyze placement effectiveness across all selected placement types. Show me which placements generate the highest SMV, impressions, and engagement. Include recommendations for placement optimization.",
+    },
+    {
+      id: 6,
+      title: "Audience Demographics Breakdown",
+      description: "Deep dive into audience demographics and behavior patterns for targeted insights.",
+      category: "Audience Insights",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Demographics+Chart",
+      prompt:
+        "Provide a detailed audience demographics breakdown. Show me audience composition, behavior patterns, and engagement preferences. Include insights for targeted marketing strategies.",
+    },
+    {
+      id: 7,
+      title: "Competitive Benchmarking",
+      description: "Compare your performance against industry benchmarks and competitor analysis.",
+      category: "Trend Comparison",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Benchmark+Chart",
+      prompt:
+        "Perform competitive benchmarking analysis. Compare our performance metrics against industry standards and identify areas where we outperform or underperform compared to competitors.",
+    },
+    {
+      id: 8,
+      title: "Revenue Attribution Model",
+      description: "Track and attribute revenue to specific sponsorship activities and campaigns.",
+      category: "ROI Analysis",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Revenue+Chart",
+      prompt:
+        "Create a revenue attribution analysis. Show me how different sponsorship activities contribute to revenue generation and identify the highest value sponsorship investments.",
+    },
+    {
+      id: 9,
+      title: "Content Performance Matrix",
+      description: "Analyze content performance across different formats and platforms for optimization.",
+      category: "Platform Performance",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Content+Chart",
+      prompt:
+        "Analyze content performance across different formats and platforms. Show me which content types perform best, optimal posting times, and content strategy recommendations.",
+    },
+    {
+      id: 10,
+      title: "Brand Sentiment Analysis",
+      description: "Monitor and analyze brand sentiment trends across all sponsorship activities.",
+      category: "Audience Insights",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Sentiment+Chart",
+      prompt:
+        "Perform brand sentiment analysis across all sponsorship activities. Show me sentiment trends, identify positive and negative drivers, and provide recommendations for brand perception improvement.",
+    },
+    {
+      id: 11,
+      title: "Campaign Lifecycle Analysis",
+      description: "Track campaign performance from launch to completion with detailed lifecycle insights.",
+      category: "Custom Metrics",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Lifecycle+Chart",
+      prompt:
+        "Analyze campaign lifecycle performance. Show me how campaigns perform from launch through completion, identify optimal campaign durations, and provide insights for campaign timing optimization.",
+    },
+    {
+      id: 12,
+      title: "Cross-Platform Synergy",
+      description: "Identify synergies and cross-platform effects in your multi-channel sponsorship strategy.",
+      category: "Platform Performance",
+      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Synergy+Chart",
+      prompt:
+        "Analyze cross-platform synergy effects. Show me how different platforms work together, identify complementary platform combinations, and provide recommendations for integrated multi-platform strategies.",
     },
   ]
 
@@ -758,9 +790,6 @@ export default function Page() {
     setSelectedInsightsTypes([])
   }
 
-  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
-  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
-
   const openSaveFilterDrawer = () => {
     setShowSaveFilterDrawer(true)
     setTimeout(() => setSaveFilterDrawerAnimating(true), 0)
@@ -780,6 +809,9 @@ export default function Page() {
     setSavedFiltersDrawerAnimating(false)
     setTimeout(() => setShowSavedFiltersDrawer(false), 300)
   }
+
+  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
+  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
 
   const saveCurrentFilters = () => {
     if (!filterNameToSave.trim()) {
@@ -1041,7 +1073,7 @@ export default function Page() {
         <div className="p-6 pb-0">
           {/* Page Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Relo Edge</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">MVC Relo Edge AI</h1>
           </div>
 
           {/* Main Tabs Section */}
@@ -1067,13 +1099,6 @@ export default function Page() {
               >
                 <FontAwesomeIcon icon={faRobot} className="h-5 w-5 mr-2" />
                 Custom Insights
-              </TabsTrigger>
-              <TabsTrigger
-                value="outcomes"
-                className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
-              >
-                <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 mr-2" />
-                Outcomes
               </TabsTrigger>
             </TabsList>
 
@@ -1115,7 +1140,7 @@ export default function Page() {
                         {/* Rightsholders Tag */}
                         {selectedRightsholders.length > 0 && (
                           <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                            {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}
+                            {selectedRightsholders.length} Rightsholder{selectedRightsholders.length !== 1 ? "s" : ""}{" "}
                             Selected
                           </Badge>
                         )}
@@ -1506,7 +1531,8 @@ export default function Page() {
                                     </Badge>
                                   ))}
                                 </div>
-\
+                              )}
+
                               {/* Placement Options */}
                               <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
                                 {PLACEMENT_OPTIONS.map((placement) => (
@@ -2332,14 +2358,6 @@ export default function Page() {
                                     ></div>
                                     <div
                                       className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                      style={{ animationDelay: "0.1s" }}
-                                    ></div>
-                                    <div
-                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                                      style={{ animationDelay: "0.1s" }}
-                                    ></div>
-                                    <div
-                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
                                       style={{ animationDelay: "0.2s" }}
                                     ></div>
                                   </div>
@@ -2758,7 +2776,7 @@ export default function Page() {
 
                   {/* Saved Generated Insights Table */}
                   {savedCustomInsights.length > 0 && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Saved Generated Insights</h3>
                         <button
@@ -2815,372 +2833,6 @@ export default function Page() {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Outcomes Tab Content */}
-            <TabsContent value="outcomes" className="mt-6 mb-0">
-              <div className="w-full">
-                <div className="space-y-8 pb-6">
-                  {/* Survey Results Section */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <h2 className="text-xl font-semibold text-gray-900">Measuring Spurs Fan Engagement</h2>
-                          <div className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center">
-                            <span className="text-xs text-gray-600">i</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          For Spurs Games, have you done the following in the past year?
-                        </p>
-                        <div className="mt-2 p-3 bg-gray-50 rounded-md">
-                          <p className="text-xs text-gray-600">
-                            Please note that engagement is the un-duplicated number of people who have done 1 or more of the actions listed below
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <button onClick={openScorecardDrawer} className="btn-primary flex items-center gap-2">
-                          <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
-                          View Scorecard
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Engagement Metrics Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faTable} className="h-5 w-5 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-700">Watched live broadcast games on ESPN+</span>
-                          </div>
-                          <span className="text-lg font-bold text-blue-600">34%</span>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-green-600" />
-                            <span className="text-sm font-medium text-gray-700">Recommended games to others to watch</span>
-                          </div>
-                          <span className="text-lg font-bold text-green-600">32%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faChartLine} className="h-5 w-5 text-orange-600" />
-                            <span className="text-sm font-medium text-gray-700">Followed Events, Updates or News</span>
-                          </div>
-                          <span className="text-lg font-bold text-orange-600">44%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-red-600" />
-                            <span className="text-sm font-medium text-gray-700">Purchased or wore Spurs merchandise</span>
-                          </div>
-                          <span className="text-lg font-bold text-red-600">60%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faEye} className="h-5 w-5 text-indigo-600" />
-                            <span className="text-sm font-medium text-gray-700">Watched games live online</span>
-                          </div>
-                          <span className="text-lg font-bold text-indigo-600">30%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-yellow-600" />
-                            <span className="text-sm font-medium text-gray-700">Played Fantasy Basketball or got on a game</span>
-                          </div>
-                          <span className="text-lg font-bold text-yellow-600">31%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faSearch} className="h-5 w-5 text-gray-600" />
-                            <span className="text-sm font-medium text-gray-700">Followed games through social media</span>
-                          </div>
-                          <span className="text-lg font-bold text-gray-600">55%</span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-teal-50 rounded-lg border border-teal-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-teal-600" />
-                            <span className="text-sm font-medium text-gray-700">Attended live Spurs events</span>
-                          </div>
-                          <span className="text-lg font-bold text-teal-600">28%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Results Table Section */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-6">
-                        <button 
-                          onClick={() => setOutcomesActiveTab("table")}
-                          className={`pb-2 font-medium ${outcomesActiveTab === "table" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
-                        >
-                          RESULTS TABLE
-                        </button>
-                        <button 
-                          onClick={() => setOutcomesActiveTab("chart")}
-                          className={`pb-2 font-medium ${outcomesActiveTab === "chart" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"}`}
-                        >
-                          COMPARISON CHART
-                        </button>
-                      </div>
-                      <button className="btn-secondary flex items-center gap-2">
-                        <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
-                        Download CSV
-                      </button>
-                    </div>
-
-                    {/* Conditional Content Based on Active Tab */}
-                    {outcomesActiveTab === "table" ? (
-                      /* Data Table */
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b border-gray-200">
-                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Key Metric</th>
-                              <th className="text-left py-3 px-4 font-semibold text-gray-700">Metric Defined</th>
-                              <th className="text-left py-3 px-4 font-semibold text-gray-700">San Antonio Spurs</th>
-                              <th className="text-left py-3 px-4 font-semibold text-gray-700">League Average</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">Fan Base Size</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">Fan base reached in past 12 months</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">~3,952,000</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">~3,000,000</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">% Telco Switchers</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">% of category switchers who are fans</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">70%</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">60%</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">% T-Mobile Customers</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">% of T-Mobile customers who are fans</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">52%</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">45%</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">$ Sponsor Media Value</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">$ media value generated for T-Mobile</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">$6,505.47</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">$5,000,000</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">$ SMV / Fan</td>
-                              <td className="py-3 px-4 text-sm text-gray-700 flex items-center gap-2">
-                                $1.64
-                                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                              </td>
-                              <td className="py-3 px-4 text-sm text-gray-900 flex items-center gap-2">
-                                $1.50
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                              </td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900"># Fans Aware</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">Fans aware of T-Mobile's sponsorship</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">1,857,700</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">1,500,000</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900"># Fans Impacted</td>
-                              <td className="py-3 px-4 text-sm text-gray-700">Fans impacted by T-Mobile's sponsorship</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">873,000</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">750,000</td>
-                            </tr>
-                            <tr className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 font-medium text-gray-900">$ SMV / Fan Impacted</td>
-                              <td className="py-3 px-4 text-sm text-gray-700 flex items-center gap-2">
-                                $7.45
-                                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                              </td>
-                              <td className="py-3 px-4 text-sm text-gray-900 flex items-center gap-2">
-                                $6.50
-                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      /* Comparison Chart */
-                      <div className="space-y-6">
-                        <div className="bg-white rounded-lg border border-gray-200 p-6">
-                          <h4 className="font-semibold text-lg text-gray-900 mb-4">San Antonio Spurs vs League Average Comparison</h4>
-                          <div className="h-96">
-                            <ChartContainer
-                              config={{
-                                spurs: {
-                                  label: "San Antonio Spurs",
-                                  color: "#3B82F6",
-                                },
-                                league: {
-                                  label: "League Average",
-                                  color: "#6B7280",
-                                },
-                              }}
-                              className="h-full w-full"
-                            >
-                              <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                  data={[
-                                    { metric: "Fan Base Size", spurs: 3952000, league: 3000000 },
-                                    { metric: "% Telco Switchers", spurs: 70, league: 60 },
-                                    { metric: "% T-Mobile Customers", spurs: 52, league: 45 },
-                                    { metric: "SMV (in thousands)", spurs: 6505, league: 5000 },
-                                    { metric: "SMV per Fan", spurs: 1.64, league: 1.50 },
-                                    { metric: "Fans Aware", spurs: 1857700, league: 1500000 },
-                                    { metric: "Fans Impacted", spurs: 873000, league: 750000 },
-                                    { metric: "SMV per Fan Impacted", spurs: 7.45, league: 6.50 },
-                                  ]}
-                                  margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                                  barCategoryGap="20%"
-                                >
-                                  <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis 
-                                    dataKey="metric" 
-                                    tick={{ fontSize: 11 }}
-                                    interval={0}
-                                    angle={-45}
-                                    textAnchor="end"
-                                    height={80}
-                                  />
-                                  <YAxis 
-                                    tick={{ fontSize: 12 }}
-                                    label={{
-                                      value: "Values",
-                                      angle: -90,
-                                      position: "insideLeft",
-                                    }}
-                                  />
-                                  <Tooltip 
-                                    formatter={(value, name) => {
-                                      if (typeof value === 'number') {
-                                        if (value > 1000000) {
-                                          return [`${(value / 1000000).toFixed(1)}M`, name]
-                                        } else if (value > 1000) {
-                                          return [`${(value / 1000).toFixed(1)}K`, name]
-                                        }
-                                        return [value.toLocaleString(), name]
-                                      }
-                                      return [value, name]
-                                    }}
-                                  />
-                                  <Legend />
-                                  <Bar dataKey="spurs" fill="#3B82F6" name="San Antonio Spurs" radius={[4, 4, 0, 0]} />
-                                  <Bar dataKey="league" fill="#6B7280" name="League Average" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                              </ResponsiveContainer>
-                            </ChartContainer>
-                          </div>
-                          <div className="mt-4 text-xs text-gray-500">
-                            <div className="font-medium mb-1">Chart Information:</div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div>Blue bars represent San Antonio Spurs performance</div>
-                              <div>Gray bars represent League Average benchmarks</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Brand Recall Statement */}
-                    <div className="mt-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h3 className="font-semibold text-blue-900 mb-2">
-                        Brand recall excelling for T-Mobile. T-Mobile has higher brand recall than average.
-                      </h3>
-
-                      {/* Sports Team Benchmark */}
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm font-medium text-gray-700">Sports Team Benchmark:</span>
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                              <span className="text-xs text-gray-600">Top 10%</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                              <span className="text-xs text-gray-600">Top 25%</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                              <span className="text-xs text-gray-600">Top 50%</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                              <span className="text-xs text-gray-600">Bottom 50%</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  {/* Insights Section */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-yellow-600" />
-                      Insights:
-                    </h3>
-                    
-                    <div className="space-y-6">
-                      {/* Summary */}
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
-                          Summary:
-                        </h4>
-                        <ul className="list-disc list-inside text-gray-700 space-y-2 ml-6">
-                          <li>SMV for T-Mobile is 10% above average for its placement mix and is leading to higher than average recall among fans.</li>
-                        </ul>
-                      </div>
-
-                      {/* Detailed Insights */}
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
-                          Insights:
-                        </h4>
-                        <ul className="list-disc list-inside text-gray-700 space-y-3 ml-6">
-                          <li>Both sponsorships offer an opportunity for T-Mobile to win with category buyers, a mix of current and competitive customers</li>
-                          <li>The Rangers sponsorship is generating half as much $ media value per fan, but is delivering almost 2x the impact</li>
-                          <li>Increased media value with the Rangers with partnership messaging will continue to drive awareness and impact</li>
-                          <li>Consider optimizing the asset mix for the Phillies to drive greater efficiency</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -3366,236 +3018,390 @@ export default function Page() {
               </div>
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Scorecard Drawer */}
-          {showScorecardDrawer && (
-            <div className="fixed inset-0 z-50 overflow-hidden">
-              <div
-                className={`absolute inset-0 bg-black transition-opacity duration-300 ease-out ${scorecardDrawerAnimating ? "bg-opacity-50" : "bg-opacity-0"}`}
-                onClick={closeScorecardDrawer}
-              ></div>
-              <div
-                className={`absolute right-0 top-0 h-full w-[800px] bg-white shadow-xl transition-transform duration-300 ease-out ${scorecardDrawerAnimating ? "translate-x-0" : "translate-x-full"} overflow-y-auto`}
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Team Scorecard</h2>
-                    <button onClick={closeScorecardDrawer} className="text-gray-400 hover:text-gray-600">
-                      <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-                    </button>
+      {/* Rating Drawer */}
+      {showRatingDrawer && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowRatingDrawer(false)}></div>
+          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-lg shadow-xl transform transition-transform duration-300">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Rate This Insight</h3>
+                <button onClick={() => setShowRatingDrawer(false)} className="text-gray-400 hover:text-gray-600">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-700 mb-2">How helpful was this insight?</h4>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        onClick={() => setCurrentRating(rating)}
+                        className={`p-2 rounded-lg border ${
+                          currentRating >= rating
+                            ? "border-yellow-500 bg-yellow-50 text-yellow-600"
+                            : "border-gray-200 hover:border-gray-300 text-gray-400"
+                        }`}
+                      >
+                        <FontAwesomeIcon icon={faStar} className="h-5 w-5" />
+                      </button>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Header Buttons */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <button className="btn-secondary flex items-center gap-2">
-                      Create Report
-                    </button>
-                    <button className="btn-primary flex items-center gap-2">
-                      View More Info at Relo Outcomes
-                    </button>
-                  </div>
+                <div>
+                  <h4 className="font-semibold text-sm text-gray-700 mb-2">Additional Feedback</h4>
+                  <textarea
+                    value={ratingFeedback}
+                    onChange={(e) => setRatingFeedback(e.target.value)}
+                    placeholder="Share any additional feedback..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    rows={3}
+                  />
+                </div>
 
-                  {/* Team Header with Logo */}
-                  <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-bold text-gray-600">SPURS</span>
+                <button
+                  onClick={() => {
+                    console.log("Rating submitted:", { rating: currentRating, feedback: ratingFeedback })
+                    setShowRatingDrawer(false)
+                    setCurrentRating(0)
+                    setRatingFeedback("")
+                  }}
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                >
+                  Submit Rating
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* All Insights Modal */}
+      {showAllInsightsModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className={`absolute inset-0 bg-black transition-opacity duration-300 ease-out ${
+              showAllInsightsModal ? "bg-opacity-50" : "bg-opacity-0"
+            }`}
+            onClick={() => setShowAllInsightsModal(false)}
+          ></div>
+          <div className="absolute inset-0 flex items-center justify-center p-8">
+            <div
+              className={`bg-white rounded-lg shadow-xl overflow-hidden w-[70%] h-[70%] max-w-5xl max-h-[800px] min-w-[600px] min-h-[500px] transform transition-all duration-300 ease-out ${
+                showAllInsightsModal ? "scale-100 opacity-100" : "scale-95 opacity-0"
+              }`}
+            >
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white sticky top-0 z-10">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faRobot} className="h-5 w-5 text-blue-600" />
+                    All Custom Insights Data
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Comprehensive view of all generated custom insights with detailed metrics and analysis
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowAllInsightsModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-md"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto h-[calc(100%-120px)]">
+                <div className="space-y-6">
+                  {/* Summary Statistics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">{savedCustomInsights.length}</div>
+                        <div className="text-sm text-gray-600">Total Custom Insights</div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-blue-900">{scorecardData.teamName} - Sample Surveyed: {scorecardData.sampleSurveyed}</h3>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          $
+                          {Math.round(
+                            savedCustomInsights.reduce(
+                              (sum, insight) => sum + (insight.insight?.keyMetrics?.totalSMV || 0),
+                              0,
+                            ) / Math.max(savedCustomInsights.length, 1),
+                          ).toLocaleString()}
+                          k
+                        </div>
+                        <div className="text-sm text-gray-600">Average Total SMV</div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-purple-600">
+                          {Math.round(
+                            savedCustomInsights.reduce(
+                              (sum, insight) => sum + (insight.insight?.keyMetrics?.roi || 0),
+                              0,
+                            ) / Math.max(savedCustomInsights.length, 1),
+                          )}
+                          %
+                        </div>
+                        <div className="text-sm text-gray-600">Average ROI</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Main Metrics Row */}
-                  <div className="grid grid-cols-3 gap-6 mb-6">
-                    <div className="text-center">
-                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Rank</h4>
-                      <div className="text-3xl font-bold text-blue-600">#{scorecardData.opportunityRank}</div>
-                    </div>
-                    <div className="text-center">
-                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Score</h4>
-                      <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityScore}</div>
-                    </div>
-                    <div className="text-center">
-                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Value</h4>
-                      <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityValue}</div>
-                    </div>
-                  </div>
-
-                  {/* Total Annual Property Reach Label */}
-                  <div className="mb-4">
-                    <div className="inline-block bg-gray-600 text-white px-3 py-1 rounded text-sm font-medium">
-                      Total Annual Property Reach
-                    </div>
-                  </div>
-
-                  {/* Total Fans Surveyed */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                      <span className="flex items-center gap-2">
-                        Total Fans Surveyed
-                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs text-blue-600">i</span>
+                  {/* Overall Top Performers Summary */}
+                  {savedCustomInsights.length > 0 && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-orange-600" />
+                        Overall Top Performers
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <div className="text-xs text-gray-600 mb-1">Most Common Top Sponsor</div>
+                          <div className="font-semibold text-blue-700">
+                            {(() => {
+                              const sponsors = savedCustomInsights
+                                .map((insight) => insight.insight?.topPerformers?.sponsor)
+                                .filter(Boolean)
+                              if (sponsors.length === 0) return "N/A"
+                              return sponsors.reduce((a, b, i, arr) =>
+                                arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+                              )
+                            })()}
+                          </div>
                         </div>
-                      </span>
-                    </h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 mb-2">
-                        <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">Engagement</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-blue-700 text-lg">{scorecardData.totalFansSurveyed.engagement}%</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-4">
-                          <div 
-                            className="bg-blue-400 h-4 rounded-full" 
-                            style={{ width: `${scorecardData.totalFansSurveyed.engagement}%` }}
-                          ></div>
+                        <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                          <div className="text-xs text-gray-600 mb-1">Most Common Top Platform</div>
+                          <div className="font-semibold text-green-700">
+                            {(() => {
+                              const platforms = savedCustomInsights
+                                .map((insight) => insight.insight?.topPerformers?.platform)
+                                .filter(Boolean)
+                              if (platforms.length === 0) return "N/A"
+                              return platforms.reduce((a, b, i, arr) =>
+                                arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
+                              )
+                            })()}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Horizontal Divider */}
-                  <hr className="border-gray-300 mb-6" />
-
-                  {/* Behavior and Interest */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                      <span className="flex items-center gap-2">
-                        Behavior & Interest
-                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs text-blue-600">i</span>
-                        </div>
-                      </span>
-                    </h4>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <FontAwesomeIcon icon={faChartLine} className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-700">Intensity</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.intensity}%</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-4">
-                            <div 
-                              className="bg-blue-400 h-4 rounded-full" 
-                              style={{ width: `${scorecardData.behaviorAndInterest.intensity}%` }}
-                            ></div>
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                          <div className="text-xs text-gray-600 mb-1">Date Range</div>
+                          <div className="font-semibold text-gray-700">
+                            {(() => {
+                              if (savedCustomInsights.length === 0) return "N/A"
+                              const dates = savedCustomInsights
+                                .map((insight) => insight.dateGenerated)
+                                .sort((a, b) => a.getTime() - b.getTime())
+                              const firstDate = dates[0].toLocaleDateString()
+                              const lastDate = dates[dates.length - 1].toLocaleDateString()
+                              return firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`
+                            })()}
                           </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-700">Momentum</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.momentum}%</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-4">
-                            <div 
-                              className="bg-blue-400 h-4 rounded-full" 
-                              style={{ width: `${scorecardData.behaviorAndInterest.momentum}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Horizontal Divider */}
-                  <hr className="border-gray-300 mb-6" />
+                  {/* Individual Custom Insights Details */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-purple-600" />
+                      Individual Custom Insights Details
+                    </h3>
 
-                  {/* Potential Sponsor Impact */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                      <span className="flex items-center gap-2">
-                        Potential Sponsor Impact
-                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs text-blue-600">i</span>
-                        </div>
-                      </span>
-                    </h4>
-
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-700">Consideration</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.consideration}%</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-4">
-                            <div 
-                              className="bg-blue-400 h-4 rounded-full" 
-                              style={{ width: `${scorecardData.potentialSponsorImpact.consideration}%` }}
-                            ></div>
-                          </div>
+                    {savedCustomInsights.length === 0 ? (
+                      <div className="text-center py-12 text-gray-500">
+                        <div className="flex flex-col items-center">
+                          <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-300" />
+                          <h4 className="font-medium text-gray-600 mb-2">No Custom Insights Saved Yet</h4>
+                          <p className="text-sm text-gray-500">Generate and save custom insights to see them here</p>
                         </div>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-3 mb-2">
-                          <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-700">Favorability</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.favorability}%</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-4">
-                            <div 
-                              className="bg-blue-400 h-4 rounded-full" 
-                              style={{ width: `${scorecardData.potentialSponsorImpact.favorability}%` }}
-                            ></div>
+                    ) : (
+                      savedCustomInsights.map((insight) => (
+                        <div key={insight.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-purple-100 rounded-lg">
+                                <FontAwesomeIcon icon={faRobot} className="h-4 w-4 text-purple-600" />
+                              </div>
+                              <div>
+                                <div className="font-semibold text-gray-900">
+                                  {insight.dateGenerated.toLocaleString("en-US", {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                  })}
+                                </div>
+                                <div className="text-sm text-gray-500">{insight.insightType}</div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => toggleGeneratedInsightExpansion(insight.id)}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                            >
+                              <FontAwesomeIcon
+                                icon={expandedGeneratedInsightId === insight.id ? faCompress : faExpand}
+                                className="h-4 w-4"
+                              />
+                              {expandedGeneratedInsightId === insight.id ? "Collapse" : "Expand"}
+                            </button>
                           </div>
+
+                          {/* Basic Info */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <div className="text-xs text-gray-600 mb-1">Query</div>
+                              <div className="font-medium text-gray-900 text-sm">{insight.query}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-600 mb-1">Created By</div>
+                              <div className="font-medium text-gray-900">{insight.createdBy}</div>
+                            </div>
+                          </div>
+
+                          {/* Expanded Details */}
+                          {expandedGeneratedInsightId === insight.id && insight.insight && (
+                            <div className="space-y-6 border-t pt-4">
+                              {/* Trending Metrics */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
+                                  Trending Metrics
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">SMV</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.smv || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">Impressions</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.impressions || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">Engagement</span>
+                                      <Badge className="bg-green-100 text-green-700 border-green-300">
+                                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 mr-1" />+
+                                        {insight.insight.trending?.engagement || 0}%
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Top Performers */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
+                                  Top Performers
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Sponsor</div>
+                                    <div className="font-semibold text-blue-700">
+                                      {insight.insight.topPerformers?.sponsor || "N/A"}
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Platform</div>
+                                    <div className="font-semibold text-purple-700">
+                                      {insight.insight.topPerformers?.platform || "N/A"}
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                    <div className="text-xs text-gray-600 mb-1">Top Placement</div>
+                                    <div className="font-semibold text-orange-700">
+                                      {insight.insight.topPerformers?.placement || "N/A"}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Key Metrics */}
+                              <div>
+                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
+                                  Key Metrics
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">Total SMV</div>
+                                    <div className="font-semibold text-gray-700">
+                                      ${(insight.insight.keyMetrics?.totalSMV || 0).toLocaleString()}k
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">ROI</div>
+                                    <div className="font-semibold text-gray-700">
+                                      {insight.insight.keyMetrics?.roi || 0}%
+                                    </div>
+                                  </div>
+                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="text-xs text-gray-600 mb-1">Reach</div>
+                                    <div className="font-semibold text-gray-700">
+                                      {insight.insight.keyMetrics?.reach || 0}M
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex items-center gap-2 pt-4 border-t">
+                                <button
+                                  onClick={() => {
+                                    setShowAllInsightsModal(false)
+                                    // You could add logic here to view the insight in the main interface
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                  <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
+                                  View in Main Interface
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSavedCustomInsights((prev) => prev.filter((i) => i.id !== insight.id))
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-md hover:bg-red-50 hover:border-red-300 transition-colors"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </div>
+                      ))
+                    )}
                   </div>
-
-                  {/* Horizontal Divider */}
-                  <hr className="border-gray-300 mb-6" />
-
-                  {/* Survey Scores Button */}
-                  <div className="mb-6">
-                    <button onClick={openSurveyScoresDrawer} className="btn-primary flex items-center gap-2">
-                      View Survey Scores
-                    </button>
-                  </div>
-
-                  {/* Horizontal Divider */}
-                  <hr className="border-gray-300 mb-6" />
-
-                  {/* Teams Data Table */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                      <span className="flex items-center gap-2">
-                        Teams Data
-                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs text-blue-600">i</span>
-                        </div>
-                      </span>
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-gray-200">
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Rightsholder</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Brand</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Region</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Aided Sponsorship Awareness</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Net More Favorable</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Net Increase Consideration</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {scorecardData.teamsData.map((team, index) => (
-                            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.rightsholder}</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.brand}</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.region}</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.aidedSponsorshipAwareness}</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.netMoreFavorable}</td>
-                              <td className="py-3 px-4 text-sm text-gray-900">{team.netIncreaseConsideration}</td>
-                            </tr>
-                          ))}
-                        </tbody>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
