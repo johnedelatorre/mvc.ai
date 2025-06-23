@@ -2776,7 +2776,7 @@ export default function Page() {
 
                   {/* Saved Generated Insights Table */}
                   {savedCustomInsights.length > 0 && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                    <div className="bg-white border border-gray-200 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Saved Generated Insights</h3>
                         <button
