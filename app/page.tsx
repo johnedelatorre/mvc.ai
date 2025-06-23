@@ -1163,31 +1163,31 @@ export default function Page() {
                         Brand recall excelling for T-Mobile. T-Mobile has higher brand recall than average.
                       </h3>
 
-                    {/* Sports Team Benchmark */}
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-gray-700">Sports Team Benchmark:</span>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span className="text-xs text-gray-600">Top 10%</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span className="text-xs text-gray-600">Top 25%</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <span className="text-xs text-gray-600">Top 50%</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                            <span className="text-xs text-gray-600">Bottom 50%</span>
+                      {/* Sports Team Benchmark */}
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm font-medium text-gray-700">Sports Team Benchmark:</span>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <span className="text-xs text-gray-600">Top 10%</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                              <span className="text-xs text-gray-600">Top 25%</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                              <span className="text-xs text-gray-600">Top 50%</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <span className="text-xs text-gray-600">Bottom 50%</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
                   {/* Insights Section */}
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
