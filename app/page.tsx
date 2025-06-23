@@ -3383,219 +3383,507 @@ export default function Page() {
                     <button onClick={closeScorecardDrawer} className="text-gray-400 hover:text-gray-600">
                       <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
                     </button>
-                </div>
-
-                {/* Header Buttons */}
-                <div className="flex items-center gap-3 mb-6">
-                  <button className="btn-secondary flex items-center gap-2">
-                    Create Report
-                  </button>
-                  <button className="btn-primary flex items-center gap-2">
-                    View More Info at Relo Outcomes
-                  </button>
-                </div>
-
-                {/* Team Header with Logo */}
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-bold text-gray-600">SPURS</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-blue-900">{scorecardData.teamName} - Sample Surveyed: {scorecardData.sampleSurveyed}</h3>
-                    </div>
                   </div>
-                </div>
 
-                {/* Main Metrics Row */}
-                <div className="grid grid-cols-3 gap-6 mb-6">
-                  <div className="text-center">
-                    <h4 className="font-semibold text-blue-700 mb-2">Opportunity Rank</h4>
-                    <div className="text-3xl font-bold text-blue-600">#{scorecardData.opportunityRank}</div>
+                  {/* Header Buttons */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <button className="btn-secondary flex items-center gap-2">
+                      Create Report
+                    </button>
+                    <button className="btn-primary flex items-center gap-2">
+                      View More Info at Relo Outcomes
+                    </button>
                   </div>
-                  <div className="text-center">
-                    <h4 className="font-semibold text-blue-700 mb-2">Opportunity Score</h4>
-                    <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityScore}</div>
-                  </div>
-                  <div className="text-center">
-                    <h4 className="font-semibold text-blue-700 mb-2">Opportunity Value</h4>
-                    <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityValue}</div>
-                  </div>
-                </div>
 
-                {/* Total Annual Property Reach Label */}
-                <div className="mb-4">
-                  <div className="inline-block bg-gray-600 text-white px-3 py-1 rounded text-sm font-medium">
-                    Total Annual Property Reach
-                  </div>
-                </div>
-
-                {/* Total Fans Surveyed */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                    <span className="flex items-center gap-2">
-                      Total Fans Surveyed
-                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs text-blue-600">i</span>
+                  {/* Team Header with Logo */}
+                  <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-gray-600">SPURS</span>
                       </div>
-                    </span>
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 mb-2">
-                      <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-700">Engagement</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-blue-700 text-lg">{scorecardData.totalFansSurveyed.engagement}%</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-4">
-                        <div 
-                          className="bg-blue-400 h-4 rounded-full" 
-                          style={{ width: `${scorecardData.totalFansSurveyed.engagement}%` }}
-                        ></div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-blue-900">{scorecardData.teamName} - Sample Surveyed: {scorecardData.sampleSurveyed}</h3>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Horizontal Divider */}
-                <hr className="border-gray-300 mb-6" />
+                  {/* Main Metrics Row */}
+                  <div className="grid grid-cols-3 gap-6 mb-6">
+                    <div className="text-center">
+                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Rank</h4>
+                      <div className="text-3xl font-bold text-blue-600">#{scorecardData.opportunityRank}</div>
+                    </div>
+                    <div className="text-center">
+                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Score</h4>
+                      <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityScore}</div>
+                    </div>
+                    <div className="text-center">
+                      <h4 className="font-semibold text-blue-700 mb-2">Opportunity Value</h4>
+                      <div className="text-3xl font-bold text-blue-600">{scorecardData.opportunityValue}</div>
+                    </div>
+                  </div>
 
-                {/* Behavior and Interest */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                    <span className="flex items-center gap-2">
-                      Behavior & Interest
-                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs text-blue-600">i</span>
-                      </div>
-                    </span>
-                  </h4>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <FontAwesomeIcon icon={faChartLine} className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">Intensity</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.intensity}%</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-4">
-                          <div 
-                            className="bg-blue-400 h-4 rounded-full" 
-                            style={{ width: `${scorecardData.behaviorAndInterest.intensity}%` }}
-                          ></div>
+                  {/* Total Annual Property Reach Label */}
+                  <div className="mb-4">
+                    <div className="inline-block bg-gray-600 text-white px-3 py-1 rounded text-sm font-medium">
+                      Total Annual Property Reach
+                    </div>
+                  </div>
+
+                  {/* Total Fans Surveyed */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
+                      <span className="flex items-center gap-2">
+                        Total Fans Surveyed
+                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs text-blue-600">i</span>
                         </div>
-                      </div>
-                    </div>
-                    <div>
+                      </span>
+                    </h4>
+                    <div className="space-y-3">
                       <div className="flex items-center gap-3 mb-2">
-                        <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">Momentum</span>
+                        <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">Engagement</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.momentum}%</span>
+                        <span className="font-bold text-blue-700 text-lg">{scorecardData.totalFansSurveyed.engagement}%</span>
                         <div className="flex-1 bg-gray-200 rounded-full h-4">
                           <div 
                             className="bg-blue-400 h-4 rounded-full" 
-                            style={{ width: `${scorecardData.behaviorAndInterest.momentum}%` }}
+                            style={{ width: `${scorecardData.totalFansSurveyed.engagement}%` }}
                           ></div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Horizontal Divider */}
-                <hr className="border-gray-300 mb-6" />
+                  {/* Horizontal Divider */}
+                  <hr className="border-gray-300 mb-6" />
 
-                {/* Potential Sponsor Impact */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                    <span className="flex items-center gap-2">
-                      Potential Sponsor Impact
-                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs text-blue-600">i</span>
-                      </div>
-                    </span>
-                  </h4>
-
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">Consideration</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.consideration}%</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-4">
-                          <div 
-                            className="bg-blue-400 h-4 rounded-full" 
-                            style={{ width: `${scorecardData.potentialSponsorImpact.consideration}%` }}
-                          ></div>
+                  {/* Behavior and Interest */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
+                      <span className="flex items-center gap-2">
+                        Behavior & Interest
+                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs text-blue-600">i</span>
+                        </div>
+                      </span>
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <FontAwesomeIcon icon={faChartLine} className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-700">Intensity</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.intensity}%</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-4">
+                            <div 
+                              className="bg-blue-400 h-4 rounded-full" 
+                              style={{ width: `${scorecardData.behaviorAndInterest.intensity}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-700">Favorability</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.favorability}%</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-4">
-                          <div 
-                            className="bg-blue-400 h-4 rounded-full" 
-                            style={{ width: `${scorecardData.potentialSponsorImpact.favorability}%` }}
-                          ></div>
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-700">Momentum</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-blue-700 text-lg">{scorecardData.behaviorAndInterest.momentum}%</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-4">
+                            <div 
+                              className="bg-blue-400 h-4 rounded-full" 
+                              style={{ width: `${scorecardData.behaviorAndInterest.momentum}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Horizontal Divider */}
-                <hr className="border-gray-300 mb-6" />
+                  {/* Horizontal Divider */}
+                  <hr className="border-gray-300 mb-6" />
 
-                {/* Survey Scores Button */}
-                <div className="mb-6">
-                  <button onClick={openSurveyScoresDrawer} className="btn-primary flex items-center gap-2">
-                    View Survey Scores
-                  </button>
-                </div>
+                  {/* Potential Sponsor Impact */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
+                      <span className="flex items-center gap-2">
+                        Potential Sponsor Impact
+                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs text-blue-600">i</span>
+                        </div>
+                      </span>
+                    </h4>
 
-                {/* Horizontal Divider */}
-                <hr className="border-gray-300 mb-6" />
-
-                {/* Teams Data Table */}
-                <div className="mb-6">
-                  <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
-                    <span className="flex items-center gap-2">
-                      Teams Data
-                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs text-blue-600">i</span>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-700">Consideration</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.consideration}%</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-4">
+                            <div 
+                              className="bg-blue-400 h-4 rounded-full" 
+                              style={{ width: `${scorecardData.potentialSponsorImpact.consideration}%` }}
+                            ></div>
+                          </div>
+                        </div>
                       </div>
-                    </span>
-                  </h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Rightsholder</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Brand</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Region</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Aided Sponsorship Awareness</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Net More Favorable</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Net Increase Consideration</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {scorecardData.teamsData.map((team, index) => (
-                          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.rightsholder}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.brand}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.region}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.aidedSponsorshipAwareness}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.netMoreFavorable}</td>
-                            <td className="py-3 px-4 text-sm text-gray-900">{team.netIncreaseConsideration}</td>
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-700">Favorability</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.favorability}%</span>
+                          <div className="flex-1 bg-gray-200 rounded-full h-4">
+                            <div 
+                              className="bg-blue-400 h-4 rounded-full" 
+                              style={{ width: `${scorecardData.potentialSponsorImpact.favorability}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Horizontal Divider */}
+                  <hr className="border-gray-300 mb-6" />
+
+                  {/* Survey Scores Button */}
+                  <div className="mb-6">
+                    <button onClick={openSurveyScoresDrawer} className="btn-primary flex items-center gap-2">
+                      View Survey Scores
+                    </button>
+                  </div>
+
+                  {/* Horizontal Divider */}
+                  <hr className="border-gray-300 mb-6" />
+
+                  {/* Teams Data Table */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
+                      <span className="flex items-center gap-2">
+                        Teams Data
+                        <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-xs text-blue-600">i</span>
+                        </div>
+                      </span>
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Rightsholder</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Brand</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Region</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Aided Sponsorship Awareness</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Net More Favorable</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Net Increase Consideration</th>
                           </tr>
+                        </thead>
+                        <tbody>
+                          {scorecardData.teamsData.map((team, index) => (
+                            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.rightsholder}</td>
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.brand}</td>
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.region}</td>
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.aidedSponsorshipAwareness}</td>
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.netMoreFavorable}</td>
+                              <td className="py-3 px-4 text-sm text-gray-900">{team.netIncreaseConsideration}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Survey Scores Drawer */}
+          {showSurveyScoresDrawer && (
+            <div className="fixed inset-0 z-50 overflow-hidden">
+              <div
+                className={`absolute inset-0 bg-black transition-opacity duration-300 ease-out ${surveyScoresDrawerAnimating ? "bg-opacity-50" : "bg-opacity-0"}`}
+                onClick={closeSurveyScoresDrawer}
+              ></div>
+              <div
+                className={`absolute right-0 top-0 h-full w-[600px] bg-white shadow-xl transition-transform duration-300 ease-out ${surveyScoresDrawerAnimating ? "translate-x-0" : "translate-x-full"} overflow-y-auto`}
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">Survey Scores</h2>
+                    <button onClick={closeSurveyScoresDrawer} className="text-gray-400 hover:text-gray-600">
+                      <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  {/* Survey Scores Content */}
+                  <div className="space-y-6">
+                    {/* Engagement Metrics */}
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <h3 className="font-semibold text-blue-900 mb-4">Fan Engagement Metrics</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-sm text-blue-700 mb-1">Overall Engagement</div>
+                          <div className="text-2xl font-bold text-blue-600">58%</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-blue-700 mb-1">Active Participation</div>
+                          <div className="text-2xl font-bold text-blue-600">42%</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-blue-700 mb-1">Social Media Interaction</div>
+                          <div className="text-2xl font-bold text-blue-600">65%</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-blue-700 mb-1">Brand Loyalty</div>
+                          <div className="text-2xl font-bold text-blue-600">73%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Behavior Analysis */}
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <h3 className="font-semibold text-green-900 mb-4">Behavior Analysis</h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-700">Game Attendance</span>
+                          <span className="font-semibold text-green-600">28%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-700">Merchandise Purchase</span>
+                          <span className="font-semibold text-green-600">60%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-700">Online Streaming</span>
+                          <span className="font-semibold text-green-600">34%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-700">Social Media Following</span>
+                          <span className="font-semibold text-green-600">55%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interest Levels */}
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <h3 className="font-semibold text-yellow-900 mb-4">Interest Intensity</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-yellow-700">High Interest</span>
+                            <span className="font-semibold text-yellow-600">70%</span>
+                          </div>
+                          <div className="w-full bg-yellow-200 rounded-full h-2">
+                            <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-yellow-700">Medium Interest</span>
+                            <span className="font-semibold text-yellow-600">20%</span>
+                          </div>
+                          <div className="w-full bg-yellow-200 rounded-full h-2">
+                            <div className="bg-yellow-400 h-2 rounded-full" style={{ width: '20%' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-yellow-700">Low Interest</span>
+                            <span className="font-semibold text-yellow-600">10%</span>
+                          </div>
+                          <div className="w-full bg-yellow-200 rounded-full h-2">
+                            <div className="bg-yellow-300 h-2 rounded-full" style={{ width: '10%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sponsor Impact */}
+                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                      <h3 className="font-semibold text-purple-900 mb-4">Sponsor Impact Scores</h3>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="flex justify-between items-center p-3 bg-white rounded border">
+                          <span className="text-sm text-purple-700">Brand Awareness</span>
+                          <span className="font-semibold text-purple-600">85%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded border">
+                          <span className="text-sm text-purple-700">Purchase Consideration</span>
+                          <span className="font-semibold text-purple-600">70%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded border">
+                          <span className="text-sm text-purple-700">Brand Favorability</span>
+                          <span className="font-semibold text-purple-600">30%</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded border">
+                          <span className="text-sm text-purple-700">Recommendation Likelihood</span>
+                          <span className="font-semibold text-purple-600">45%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Rating Drawer */}
+          {showRatingDrawer && (
+            <div className="fixed inset-0 z-50 overflow-hidden">
+              <div
+                className="absolute inset-0 bg-black bg-opacity-50"
+                onClick={() => setShowRatingDrawer(false)}
+              ></div>
+              <div className="absolute right-0 top-0 h-full w-96 bg-white shadow-xl">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-semibold text-gray-900">Rate This Insight</h2>
+                    <button onClick={() => setShowRatingDrawer(false)} className="text-gray-400 hover:text-gray-600">
+                      <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">How helpful was this insight?</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setCurrentRating(star)}
+                            className={`text-2xl ${star <= currentRating ? "text-yellow-400" : "text-gray-300"} hover:text-yellow-400 transition-colors`}
+                          >
+                            <FontAwesomeIcon icon={faStar} />
+                          </button>
                         ))}
-                      </tbody>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Additional Feedback (Optional)</label>
+                      <textarea
+                        value={ratingFeedback}
+                        onChange={(e) => setRatingFeedback(e.target.value)}
+                        placeholder="Tell us what you liked or how we can improve..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowRatingDrawer(false)}
+                        className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Handle rating submission here
+                          console.log("Rating:", currentRating, "Feedback:", ratingFeedback)
+                          setShowRatingDrawer(false)
+                          setCurrentRating(0)
+                          setRatingFeedback("")
+                        }}
+                        className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                      >
+                        Submit Rating
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* All Insights Modal */}
+          {showAllInsightsModal && (
+            <div className="fixed inset-0 z-50 overflow-hidden">
+              <div
+                className="absolute inset-0 bg-black bg-opacity-50"
+                onClick={() => setShowAllInsightsModal(false)}
+              ></div>
+              <div className="absolute inset-4 bg-white rounded-lg shadow-xl overflow-hidden">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-900">All Generated Insights</h2>
+                    <button onClick={() => setShowAllInsightsModal(false)} className="text-gray-400 hover:text-gray-600">
+                      <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                    </button>
+                  </div>
+                </div>
+                <div className="p-6 overflow-y-auto max-h-[calc(100vh-200px)]">
+                  <div className="space-y-6">
+                    {savedCustomInsights.map((insight) => (
+                      <div key={insight.id} className="border border-gray-200 rounded-lg p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="font-semibold text-gray-900 mb-2">{insight.insightType}</h3>
+                            <p className="text-sm text-gray-600 mb-2">Query: {insight.query}</p>
+                            <p className="text-xs text-gray-500">
+                              Generated on {insight.dateGenerated.toLocaleDateString()} by {insight.createdBy}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => toggleGeneratedInsightExpansion(insight.id)}
+                            className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+                          >
+                            {expandedGeneratedInsightId === insight.id ? "Collapse" : "Expand"}
+                            <FontAwesomeIcon
+                              icon={expandedGeneratedInsightId === insight.id ? faChevronUp : faChevronDown}
+                              className="h-3 w-3"
+                            />
+                          </button>
+                        </div>
+
+                        {expandedGeneratedInsightId === insight.id && (
+                          <div className="border-t border-gray-200 pt-4">
+                            {/* Display the insight data similar to the current insight display */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                                <h5 className="font-semibold text-sm text-gray-700 mb-2">Trending Metrics</h5>
+                                <div className="text-xs space-y-1">
+                                  <div>SMV: +{insight.insight.trending?.smv || 25}%</div>
+                                  <div>Impressions: +{insight.insight.trending?.impressions || 18}%</div>
+                                  <div>Engagement: +{insight.insight.trending?.engagement || 32}%</div>
+                                </div>
+                              </div>
+                              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <h5 className="font-semibold text-sm text-gray-700 mb-2">Top Performers</h5>
+                                <div className="text-xs space-y-1">
+                                  <div>Sponsor: {insight.insight.topPerformers?.sponsor || "Nike"}</div>
+                                  <div>Platform: {insight.insight.topPerformers?.platform || "Instagram"}</div>
+                                  <div>Placement: {insight.insight.topPerformers?.placement || "Jersey"}</div>
+                                </div>
+                              </div>
+                              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                                <h5 className="font-semibold text-sm text-gray-700 mb-2">Key Metrics</h5>
+                                <div className="text-xs space-y-1">
+                                  <div>Total SMV: ${insight.insight.keyMetrics?.totalSMV || 850}k</div>
+                                  <div>ROI: {insight.insight.keyMetrics?.roi || 245}%</div>
+                                  <div>Reach: {insight.insight.keyMetrics?.reach || 2.4}M</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
