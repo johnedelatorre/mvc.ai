@@ -1069,7 +1069,7 @@ export default function Page() {
                               </td>
                               <td className="py-3 px-4 text-sm text-gray-900 flex items-center gap-2">
                                 $6.50
-                                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                               </td>
                             </tr>
                           </tbody>
