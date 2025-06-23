@@ -24,7 +24,6 @@ import {
   faTrash,
   faChartColumn,
   faHistory,
-  faStar,
   faThumbsUp,
   faDownload,
   faSync,
@@ -42,8 +41,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Dialog,
   DialogContent,
@@ -88,7 +85,6 @@ interface SpeechRecognitionResultList {
   length: number
   item(index: number): SpeechRecognitionResult
   [index: number]: SpeechRecognitionResult
-  [index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
@@ -105,7 +101,6 @@ interface SpeechRecognitionAlternative {
 
 declare var SpeechRecognition: {
   prototype: SpeechRecognition
-  new (): SpeechRecognition
   new (): SpeechRecognition
 }
 
@@ -2255,7 +2250,7 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                       {/* Evaluation Searches */}
                       <div className="border rounded-lg p-4 bg-white">
                         <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-500" />
+                          <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-gray-500" />
                           Evaluation Searches
                         </h4>
                         <div className="flex flex-wrap gap-2">
@@ -2326,28 +2321,54 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
 
                 {/* Generated Insights Preview Area */}
                 {!generatedInsights && !isGenerating && (
-                  <div className="mt-6 p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px] flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-                        <FontAwesomeIcon icon={faLightbulb} className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <h4 className="text-lg font-medium text-gray-700 mb-2">Generated Insights Will Appear Here</h4>
-                      <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
-                        Ask a question about your data using the chat interface above, and AI-powered insights with
-                        visualizations and recommendations will be displayed in this area.
-                      </p>
-                      <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                          <span>Trending Metrics</span>
+                  <div className="mt-6">
+                    {/* Action Buttons - Always Visible */}
+                    <div className="flex items-center justify-end gap-2 mb-4">
+                      <Button
+                        onClick={handleBookmarkInsights}
+                        variant="outline"
+                        size="sm"
+                        disabled={!generatedInsights}
+                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
+                      >
+                        <FontAwesomeIcon icon={faBookmarkRegular} className="h-4 w-4" />
+                        Save Generated Insight
+                      </Button>
+                      <Button
+                        onClick={() => handleRateInsights("generated")}
+                        variant="outline"
+                        size="sm"
+                        disabled={!generatedInsights}
+                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
+                      >
+                        <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                        Rate This Insight
+                      </Button>
+                    </div>
+
+                    <div className="p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px] flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                          <FontAwesomeIcon icon={faLightbulb} className="h-8 w-8 text-gray-400" />
                         </div>
-                        <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                          <span>Top Performers</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3" />
-                          <span>Recommendations</span>
+                        <h4 className="text-lg font-medium text-gray-700 mb-2">Generated Insights Will Appear Here</h4>
+                        <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
+                          Ask a question about your data using the chat interface above, and AI-powered insights with
+                          visualizations and recommendations will be displayed in this area.
+                        </p>
+                        <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+                          <div className="flex items-center gap-1">
+                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
+                            <span>Trending Metrics</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
+                            <span>Top Performers</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3" />
+                            <span>Recommendations</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2355,149 +2376,52 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                 )}
 
                 {isGenerating && (
-                  <div className="mt-6 p-12 border-2 border-blue-300 rounded-xl bg-blue-50 min-h-[400px] flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                      </div>
-                      <h4 className="text-lg font-medium text-blue-700 mb-2">Generating Your Insights...</h4>
-                      <p className="text-sm text-blue-600 mb-4">
-                        Our AI is analyzing your data and preparing personalized insights with actionable
-                        recommendations.
-                      </p>
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                        <div
-                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.1s" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
-                      </div>
+                  <div className="mt-6">
+                    {/* Action Buttons - Always Visible */}
+                    <div className="flex items-center justify-end gap-2 mb-4">
+                      <Button
+                        onClick={handleBookmarkInsights}
+                        variant="outline"
+                        size="sm"
+                        disabled={!generatedInsights}
+                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
+                      >
+                        <FontAwesomeIcon icon={faBookmarkRegular} className="h-4 w-4" />
+                        Save Generated Insight
+                      </Button>
+                      <Button
+                        onClick={() => handleRateInsights("generated")}
+                        variant="outline"
+                        size="sm"
+                        disabled={!generatedInsights}
+                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
+                      >
+                        <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
+                        Rate This Insight
+                      </Button>
                     </div>
-                  </div>
-                )}
 
-                {/* Generated Insights Display */}
-                {generatedInsights && (
-                  <div className="mt-4">
-                    <div
-                      id="generated-insights-display"
-                      className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200 shadow-sm"
-                    >
-                      <div className="flex items-center justify-between mb-6">
-                        <h4 className="font-semibold text-xl text-gray-800 flex items-center gap-3">
-                          <div className="p-2 bg-yellow-100 rounded-lg">
-                            <FontAwesomeIcon icon={faLightbulb} className="h-6 w-6 text-yellow-600" />
-                          </div>
-                          Generated Insights
-                        </h4>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={() => handleRateInsights("generated")}
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-2"
-                          >
-                            <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                            Rate Insights
-                          </Button>
+                    <div className="p-12 border-2 border-blue-300 rounded-xl bg-blue-50 min-h-[400px] flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                         </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Trending Metrics */}
-                        <div className="space-y-3">
-                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-green-600" />
-                            Trending Metrics
-                          </h5>
-                          <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-gray-600">SMV</span>
-                              <span className="font-medium text-green-700">+{generatedInsights.trending.smv}%</span>
-                            </div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-gray-600">Impressions</span>
-                              <span className="font-medium text-green-700">
-                                +{generatedInsights.trending.impressions}%
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Views</span>
-                              <span className="font-medium text-green-700">+{generatedInsights.trending.views}%</span>
-                            </div>
-                          </div>
+                        <h4 className="text-lg font-medium text-blue-700 mb-2">Generating Your Insights...</h4>
+                        <p className="text-sm text-blue-600 mb-4">
+                          Our AI is analyzing your data and preparing personalized insights with actionable
+                          recommendations.
+                        </p>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                          <div
+                            className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                            style={{ animationDelay: "0.1s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
                         </div>
-
-                        {/* Top Performers */}
-                        <div className="space-y-3">
-                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 text-blue-600" />
-                            Top Performers
-                          </h5>
-                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="mb-2">
-                              <span className="text-xs text-gray-600">Placement</span>
-                              <div className="font-medium text-blue-700">
-                                {generatedInsights.topPerformers.placement}
-                              </div>
-                            </div>
-                            <div className="mb-2">
-                              <span className="text-xs text-gray-600">Platform</span>
-                              <div className="font-medium text-blue-700">
-                                {generatedInsights.topPerformers.platform}
-                              </div>
-                            </div>
-                            <div>
-                              <span className="text-xs text-gray-600">Sponsor</span>
-                              <div className="font-medium text-blue-700">{generatedInsights.topPerformers.sponsor}</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Key Metrics */}
-                        <div className="space-y-3">
-                          <h5 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                            Key Metrics
-                          </h5>
-                          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-gray-600">Total SMV</span>
-                              <span className="font-medium text-yellow-700">
-                                ${generatedInsights.keyMetrics.totalSMV}k
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs text-gray-600">Avg Engagement</span>
-                              <span className="font-medium text-yellow-700">
-                                {generatedInsights.keyMetrics.avgEngagement}%
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-600">Growth Rate</span>
-                              <span className="font-medium text-yellow-700">
-                                {generatedInsights.keyMetrics.growthRate}%
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Actionable Recommendations */}
-                      <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                        <h5 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-4 w-4 text-yellow-600" />
-                          Actionable Recommendations
-                        </h5>
-                        <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                          <li>Focus on {generatedInsights.topPerformers.platform} for higher engagement</li>
-                          <li>Increase investment in {generatedInsights.topPerformers.sponsor} sponsorships</li>
-                          <li>Optimize placement strategy based on {generatedInsights.topPerformers.placement}</li>
-                        </ul>
                       </div>
                     </div>
                   </div>
@@ -2515,328 +2439,6 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                           <FontAwesomeIcon icon={faHistory} className="h-5 w-5 text-gray-600" />
                           Generated Insights History
                         </CardTitle>
-                        <div className="flex items-center gap-2">
-                          <Dialog open={showAllGeneratedInsights} onOpenChange={setShowAllGeneratedInsights}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleViewAllGeneratedInsights}
-                                className="flex items-center gap-2"
-                              >
-                                <FontAwesomeIcon icon={faDatabase} className="h-4 w-4" />
-                                View All Data
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2">
-                                  <FontAwesomeIcon icon={faDatabase} className="h-5 w-5 text-gray-600" />
-                                  All Generated Insights Data
-                                </DialogTitle>
-                                <DialogDescription>
-                                  Comprehensive view of all generated insights with detailed metrics and analysis
-                                </DialogDescription>
-                              </DialogHeader>
-
-                              <ScrollArea className="h-[calc(90vh-120px)] w-full">
-                                <div className="space-y-6 p-4">
-                                  {/* Summary Statistics */}
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <Card className="p-4">
-                                      <div className="text-center">
-                                        <div className="text-2xl font-bold text-purple-600">
-                                          {generatedInsightsSummary.totalInsights}
-                                        </div>
-                                        <div className="text-sm text-gray-600">Total Generated Insights</div>
-                                      </div>
-                                    </Card>
-                                    <Card className="p-4">
-                                      <div className="text-center">
-                                        <div className="text-2xl font-bold text-green-600">
-                                          ${generatedInsightsSummary.avgTotalSMV.toLocaleString()}k
-                                        </div>
-                                        <div className="text-sm text-gray-600">Average Total SMV</div>
-                                      </div>
-                                    </Card>
-                                    <Card className="p-4">
-                                      <div className="text-center">
-                                        <div className="text-2xl font-bold text-blue-600">
-                                          {generatedInsightsSummary.avgEngagement}%
-                                        </div>
-                                        <div className="text-sm text-gray-600">Average Engagement</div>
-                                      </div>
-                                    </Card>
-                                  </div>
-
-                                  {/* Top Performers Summary */}
-                                  <Card className="p-4">
-                                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faChartColumn} className="h-5 w-5 text-purple-600" />
-                                      Overall Generated Insights Summary
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                      <div className="p-3 bg-purple-50 rounded-lg">
-                                        <div className="text-xs text-gray-600 mb-1">Most Common Top Placement</div>
-                                        <div className="font-semibold text-purple-700">
-                                          {generatedInsightsSummary.topPlacement}
-                                        </div>
-                                      </div>
-                                      <div className="p-3 bg-blue-50 rounded-lg">
-                                        <div className="text-xs text-gray-600 mb-1">Most Common Top Platform</div>
-                                        <div className="font-semibold text-blue-700 flex items-center gap-2">
-                                          {generatedInsightsSummary.topPlatform !== "N/A" && (
-                                            <PlatformIcon platform={generatedInsightsSummary.topPlatform} />
-                                          )}
-                                          <span>{generatedInsightsSummary.topPlatform}</span>
-                                        </div>
-                                      </div>
-                                      <div className="p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-xs text-gray-600 mb-1">Date Range</div>
-                                        <div className="font-semibold text-gray-700">
-                                          {generatedInsightsSummary.dateRange}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </Card>
-
-                                  {/* Individual Generated Insights Details */}
-                                  <div className="space-y-4">
-                                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                                      <FontAwesomeIcon icon={faRobot} className="h-5 w-5 text-purple-600" />
-                                      Individual Generated Insights Details
-                                    </h3>
-
-                                    {sortedGeneratedInsights.map((generatedInsight) => (
-                                      <Card key={generatedInsight.id} className="p-4">
-                                        <div className="flex items-center justify-between mb-4">
-                                          <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-purple-100 rounded-lg">
-                                              <FontAwesomeIcon icon={faRobot} className="h-4 w-4 text-purple-600" />
-                                            </div>
-                                            <div>
-                                              <div className="font-semibold text-gray-900">
-                                                {generatedInsight.timestamp.toLocaleString("en-US", {
-                                                  weekday: "long",
-                                                  year: "numeric",
-                                                  month: "long",
-                                                  day: "numeric",
-                                                  hour: "2-digit",
-                                                  minute: "2-digit",
-                                                  second: "2-digit",
-                                                })}
-                                              </div>
-                                              <div className="text-sm text-gray-500">Custom Analysis</div>
-                                            </div>
-                                          </div>
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => toggleGeneratedInsightExpansion(generatedInsight.id)}
-                                            className="flex items-center gap-2"
-                                          >
-                                            <FontAwesomeIcon
-                                              icon={
-                                                expandedGeneratedInsightId === generatedInsight.id
-                                                  ? faCompress
-                                                  : faExpand
-                                              }
-                                              className="h-4 w-4"
-                                            />
-                                            {expandedGeneratedInsightId === generatedInsight.id ? "Collapse" : "Expand"}
-                                          </Button>
-                                        </div>
-
-                                        {/* Basic Info */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                          <div className="p-3 bg-gray-50 rounded-lg">
-                                            <div className="text-xs text-gray-600 mb-1">Query</div>
-                                            <div className="font-medium text-gray-900 text-sm">
-                                              {generatedInsight.query}
-                                            </div>
-                                          </div>
-                                          <div className="p-3 bg-gray-50 rounded-lg">
-                                            <div className="text-xs text-gray-600 mb-1">Created By</div>
-                                            <div className="font-medium text-gray-900">AI Assistant</div>
-                                          </div>
-                                        </div>
-
-                                        {/* Expanded Details */}
-                                        {expandedGeneratedInsightId === generatedInsight.id &&
-                                          generatedInsight.content && (
-                                            <div className="space-y-6 border-t pt-4">
-                                              {/* Trending Metrics */}
-                                              <div>
-                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                                                  <FontAwesomeIcon
-                                                    icon={faArrowTrendUp}
-                                                    className="h-4 w-4 text-green-600"
-                                                  />
-                                                  Trending Metrics
-                                                </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                                                    <div className="flex items-center justify-between">
-                                                      <span className="text-sm font-medium text-gray-700">SMV</span>
-                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
-                                                        <FontAwesomeIcon
-                                                          icon={faArrowTrendUp}
-                                                          className="h-3 w-3 mr-1"
-                                                        />
-                                                        +{generatedInsight.content.trending?.smv || 0}%
-                                                      </Badge>
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                                                    <div className="flex items-center justify-between">
-                                                      <span className="text-sm font-medium text-gray-700">
-                                                        Impressions
-                                                      </span>
-                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
-                                                        <FontAwesomeIcon
-                                                          icon={faArrowTrendUp}
-                                                          className="h-3 w-3 mr-1"
-                                                        />
-                                                        +{generatedInsight.content.trending?.impressions || 0}%
-                                                      </Badge>
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                                                    <div className="flex items-center justify-between">
-                                                      <span className="text-sm font-medium text-gray-700">Views</span>
-                                                      <Badge className="bg-green-100 text-green-700 border-green-300">
-                                                        <FontAwesomeIcon
-                                                          icon={faArrowTrendUp}
-                                                          className="h-3 w-3 mr-1"
-                                                        />
-                                                        +{generatedInsight.content.trending?.views || 0}%
-                                                      </Badge>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              {/* Top Performers */}
-                                              <div>
-                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                                                  <FontAwesomeIcon
-                                                    icon={faChartColumn}
-                                                    className="h-4 w-4 text-blue-600"
-                                                  />
-                                                  Top Performers
-                                                </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Top Placement</div>
-                                                    <div className="font-semibold text-blue-700">
-                                                      {generatedInsight.content.topPerformers?.placement || "N/A"}
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Top Platform</div>
-                                                    <div className="font-semibold text-purple-700 flex items-center gap-2">
-                                                      {generatedInsight.content.topPerformers?.platform !== "N/A" && (
-                                                        <PlatformIcon
-                                                          platform={generatedInsight.content.topPerformers?.platform}
-                                                        />
-                                                      )}
-                                                      <span>
-                                                        {generatedInsight.content.topPerformers?.platform || "N/A"}
-                                                      </span>
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Top Sponsor</div>
-                                                    <div className="font-semibold text-orange-700">
-                                                      {generatedInsight.content.topPerformers?.sponsor || "N/A"}
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              {/* Key Metrics */}
-                                              <div>
-                                                <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                                                  <FontAwesomeIcon
-                                                    icon={faLightbulb}
-                                                    className="h-4 w-4 text-yellow-600"
-                                                  />
-                                                  Key Metrics
-                                                </h4>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Total SMV</div>
-                                                    <div className="font-semibold text-gray-700">
-                                                      $
-                                                      {(
-                                                        generatedInsight.content.keyMetrics?.totalSMV || 0
-                                                      ).toLocaleString()}
-                                                      k
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Average Engagement</div>
-                                                    <div className="font-semibold text-gray-700">
-                                                      {generatedInsight.content.keyMetrics?.avgEngagement || 0}%
-                                                    </div>
-                                                  </div>
-                                                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                                    <div className="text-xs text-gray-600 mb-1">Growth Rate</div>
-                                                    <div className="font-semibold text-gray-700">
-                                                      {generatedInsight.content.keyMetrics?.growthRate || 0}%
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              {/* Action Buttons */}
-                                              <div className="flex items-center gap-2 pt-4 border-t">
-                                                <Button
-                                                  variant="outline"
-                                                  size="sm"
-                                                  onClick={() => {
-                                                    setShowAllGeneratedInsights(false)
-                                                    handleViewInsight(generatedInsight)
-                                                  }}
-                                                  className="flex items-center gap-2"
-                                                >
-                                                  <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
-                                                  View in Main Interface
-                                                </Button>
-                                                <Button
-                                                  variant="outline"
-                                                  size="sm"
-                                                  onClick={() => {
-                                                    setShowAllGeneratedInsights(false)
-                                                    handleEditPrompt(generatedInsight)
-                                                  }}
-                                                  className="flex items-center gap-2"
-                                                >
-                                                  <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
-                                                  Edit Prompt
-                                                </Button>
-                                                <Button
-                                                  variant="outline"
-                                                  size="sm"
-                                                  onClick={() => {
-                                                    handleDeleteInsight(generatedInsight.id)
-                                                  }}
-                                                  className="flex items-center gap-2 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
-                                                >
-                                                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
-                                                  Delete
-                                                </Button>
-                                              </div>
-                                            </div>
-                                          )}
-                                      </Card>
-                                    ))}
-                                  </div>
-                                </div>
-                              </ScrollArea>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -2944,59 +2546,6 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                 </div>
               </TabsContent>
             </Tabs>
-
-            {/* Rating Drawer */}
-            <Drawer open={showRatingDrawer} onOpenChange={setShowRatingDrawer}>
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>
-                    Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
-                  </DrawerTitle>
-                  <DrawerDescription>Your feedback helps us improve the quality of our insights.</DrawerDescription>
-                </DrawerHeader>
-                <div className="p-4 space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Impactfulness</h4>
-                    <div className="flex items-center gap-4">
-                      {[1, 2, 3, 4].map((rating) => (
-                        <button
-                          key={rating}
-                          onClick={() => handleRatingChange(rating)}
-                          className={`p-3 rounded-lg border ${
-                            (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-500" />
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Feedback</h4>
-                    <Textarea
-                      placeholder="Share any additional feedback..."
-                      value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
-                      onChange={(e) => handleFeedbackChange(e.target.value)}
-                      className="text-sm"
-                    />
-                  </div>
-
-                  <Button onClick={handleSubmitRating} disabled={isSubmittingRating} className="w-full">
-                    {isSubmittingRating ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      "Submit Rating"
-                    )}
-                  </Button>
-                </div>
-              </DrawerContent>
-            </Drawer>
           </CardContent>
         )}
       </Card>
