@@ -42,6 +42,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Dialog,
@@ -53,7 +54,6 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import html2canvas from "html2canvas"
-import { motion, AnimatePresence } from "framer-motion"
 
 // Web Speech API type declarations
 declare global {
@@ -533,7 +533,7 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
         impressions: Math.round(baseValue * trendMultiplier * 2 + generatedInsights.trending.impressions * index),
         views: Math.round(baseValue * trendMultiplier * 1.5 + generatedInsights.trending.views * index),
         originalImpressions: Math.round(
-          (baseValue * trendMultiplier * 2 + generatedInsights.trending.impressions * index) * 10
+          (baseValue * trendMultiplier * 2 + generatedInsights.trending.impressions * index) * 10,
         ),
         originalViews: Math.round((baseValue * trendMultiplier * 1.5 + generatedInsights.trending.views * index) * 100),
         platform: generatedInsights.topPerformers.platform,
@@ -624,8 +624,8 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
         activeTab === "generate"
           ? "Generated Insight"
           : generatedTemplateId
-          ? "Template Insight"
-          : "Automated Insights",
+            ? "Template Insight"
+            : "Automated Insights",
       sponsor:
         activeTab === "generate" && generatedInsights
           ? generatedInsights.topPerformers.sponsor
@@ -1235,14 +1235,14 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
     const topPlacement =
       placements.length > 0
         ? placements.reduce((a, b, i, arr) =>
-            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
           )
         : "N/A"
 
     const topPlatform =
       platforms.length > 0
         ? platforms.reduce((a, b, i, arr) =>
-            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
           )
         : "N/A"
 
@@ -1305,14 +1305,14 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
     const topPlacement =
       placements.length > 0
         ? placements.reduce((a, b, i, arr) =>
-            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
           )
         : "N/A"
 
     const topPlatform =
       platforms.length > 0
         ? platforms.reduce((a, b, i, arr) =>
-            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b
+            arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length ? a : b,
           )
         : "N/A"
 
@@ -2326,54 +2326,28 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
 
                 {/* Generated Insights Preview Area */}
                 {!generatedInsights && !isGenerating && (
-                  <div className="mt-6">
-                    {/* Action Buttons - Always Visible */}
-                    <div className="flex items-center justify-end gap-2 mb-4">
-                      <Button
-                        onClick={handleBookmarkInsights}
-                        variant="outline"
-                        size="sm"
-                        disabled={!generatedInsights}
-                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
-                      >
-                        <FontAwesomeIcon icon={faBookmarkRegular} className="h-4 w-4" />
-                        Save Generated Insight
-                      </Button>
-                      <Button
-                        onClick={() => handleRateInsights("generated")}
-                        variant="outline"
-                        size="sm"
-                        disabled={!generatedInsights}
-                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
-                      >
-                        <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                        Rate This Insight
-                      </Button>
-                    </div>
-                    
-                    <div className="p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px] flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-                          <FontAwesomeIcon icon={faLightbulb} className="h-8 w-8 text-gray-400" />
+                  <div className="mt-6 p-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 min-h-[400px] flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                        <FontAwesomeIcon icon={faLightbulb} className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <h4 className="text-lg font-medium text-gray-700 mb-2">Generated Insights Will Appear Here</h4>
+                      <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
+                        Ask a question about your data using the chat interface above, and AI-powered insights with
+                        visualizations and recommendations will be displayed in this area.
+                      </p>
+                      <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
+                          <span>Trending Metrics</span>
                         </div>
-                        <h4 className="text-lg font-medium text-gray-700 mb-2">Generated Insights Will Appear Here</h4>
-                        <p className="text-sm text-gray-500 mb-4 max-w-md mx-auto">
-                          Ask a question about your data using the chat interface above, and AI-powered insights with
-                          visualizations and recommendations will be displayed in this area.
-                        </p>
-                        <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                            <span>Trending Metrics</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
-                            <span>Top Performers</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3" />
-                            <span>Recommendations</span>
-                          </div>
+                        <div className="flex items-center gap-1">
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" />
+                          <span>Top Performers</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <FontAwesomeIcon icon={faLightbulb} className="h-3 w-3" />
+                          <span>Recommendations</span>
                         </div>
                       </div>
                     </div>
@@ -2381,52 +2355,26 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                 )}
 
                 {isGenerating && (
-                  <div className="mt-6">
-                    {/* Action Buttons - Always Visible */}
-                    <div className="flex items-center justify-end gap-2 mb-4">
-                      <Button
-                        onClick={handleBookmarkInsights}
-                        variant="outline"
-                        size="sm"
-                        disabled={!generatedInsights}
-                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
-                      >
-                        <FontAwesomeIcon icon={faBookmarkRegular} className="h-4 w-4" />
-                        Save Generated Insight
-                      </Button>
-                      <Button
-                        onClick={() => handleRateInsights("generated")}
-                        variant="outline"
-                        size="sm"
-                        disabled={!generatedInsights}
-                        className={`flex items-center gap-2 opacity-50 cursor-not-allowed`}
-                      >
-                        <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                        Rate This Insight
-                      </Button>
-                    </div>
-                    
-                    <div className="p-12 border-2 border-blue-300 rounded-xl bg-blue-50 min-h-[400px] flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        </div>
-                        <h4 className="text-lg font-medium text-blue-700 mb-2">Generating Your Insights...</h4>
-                        <p className="text-sm text-blue-600 mb-4">
-                          Our AI is analyzing your data and preparing personalized insights with actionable
-                          recommendations.
-                        </p>
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                          <div
-                            className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                          ></div>
-                        </div>
+                  <div className="mt-6 p-12 border-2 border-blue-300 rounded-xl bg-blue-50 min-h-[400px] flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-blue-200 rounded-full flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      </div>
+                      <h4 className="text-lg font-medium text-blue-700 mb-2">Generating Your Insights...</h4>
+                      <p className="text-sm text-blue-600 mb-4">
+                        Our AI is analyzing your data and preparing personalized insights with actionable
+                        recommendations.
+                      </p>
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                        <div
+                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.1s" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -2448,28 +2396,13 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                         </h4>
                         <div className="flex items-center gap-2">
                           <Button
-                            onClick={handleBookmarkInsights}
-                            variant={isBookmarked ? "default" : "outline"}
-                            size="sm"
-                            disabled={!generatedInsights}
-                            className={`flex items-center gap-2 ${isBookmarked ? "bg-blue-600 text-white" : ""} ${
-                              !generatedInsights ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
-                          >
-                            <FontAwesomeIcon icon={isBookmarked ? faBookmark : faBookmarkRegular} className="h-4 w-4" />
-                            Save Generated Insight
-                          </Button>
-                          <Button
                             onClick={() => handleRateInsights("generated")}
                             variant="outline"
                             size="sm"
-                            disabled={!generatedInsights}
-                            className={`flex items-center gap-2 ${
-                              !generatedInsights ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
+                            className="flex items-center gap-2"
                           >
                             <FontAwesomeIcon icon={faThumbsUp} className="h-4 w-4" />
-                            Rate This Insight
+                            Rate Insights
                           </Button>
                         </div>
                       </div>
@@ -2899,12 +2832,13 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
                                       </Card>
                                     ))}
                                   </div>
-                                </ScrollArea>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
+                                </div>
+                              </ScrollArea>
+                            </DialogContent>
+                          </Dialog>
                         </div>
-                      </CardHeader>
+                      </div>
+                    </CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
@@ -3011,120 +2945,61 @@ export default function AutomatedInsights({ data = [], generatedTemplateId }: Au
               </TabsContent>
             </Tabs>
 
-            {/* Rating Drawer with smooth animations */}
-            <AnimatePresence>
-              {showRatingDrawer && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="fixed inset-0 z-50 bg-black/50"
-                  onClick={() => setShowRatingDrawer(false)}
-                >
-                  <motion.div
-                    initial={{ y: "100%", opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: "100%", opacity: 0 }}
-                    transition={{
-                      type: "spring",
-                      damping: 25,
-                      stiffness: 300,
-                      duration: 0.3
-                    }}
-                    className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-2xl max-h-[80vh] overflow-hidden"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="p-6 border-b border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
-                          </h3>
-                          <p className="text-sm text-gray-500 mt-1">
-                            Your feedback helps us improve the quality of our insights.
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setShowRatingDrawer(false)}
-                          className="p-2"
+            {/* Rating Drawer */}
+            <Drawer open={showRatingDrawer} onOpenChange={setShowRatingDrawer}>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>
+                    Rate {currentRatingType === "automated" ? "Automated" : "Generated"} Insights
+                  </DrawerTitle>
+                  <DrawerDescription>Your feedback helps us improve the quality of our insights.</DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Impactfulness</h4>
+                    <div className="flex items-center gap-4">
+                      {[1, 2, 3, 4].map((rating) => (
+                        <button
+                          key={rating}
+                          onClick={() => handleRatingChange(rating)}
+                          className={`p-3 rounded-lg border ${
+                            (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
                         >
-                          <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
-                        </Button>
-                      </div>
+                          <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-500" />
+                        </button>
+                      ))}
                     </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
+                    </p>
+                  </div>
 
-                    <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(80vh-120px)]">
-                      <div>
-                        <h4 className="font-semibold text-sm text-gray-700 mb-3">Impactfulness</h4>
-                        <div className="flex items-center gap-4">
-                          {[1, 2, 3, 4].map((rating) => (
-                            <motion.button
-                              key={rating}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleRatingChange(rating)}
-                              className={`p-3 rounded-lg border transition-all duration-200 ${
-                                (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
-                                  ? "border-blue-500 bg-blue-50 shadow-md"
-                                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                              }`}
-                            >
-                              <FontAwesomeIcon
-                                icon={faStar}
-                                className={`h-5 w-5 transition-colors duration-200 ${
-                                  (currentRatingType === "automated" ? automatedRating : generatedRating) === rating
-                                    ? "text-yellow-500"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            </motion.button>
-                          ))}
-                        </div>
-                        <p className="text-sm text-gray-500 mt-2">
-                          {getRatingLabel(currentRatingType === "automated" ? automatedRating : generatedRating)}
-                        </p>
-                      </div>
+                  <div>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-2">Feedback</h4>
+                    <Textarea
+                      placeholder="Share any additional feedback..."
+                      value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
+                      onChange={(e) => handleFeedbackChange(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
 
-                      <div>
-                        <h4 className="font-semibold text-sm text-gray-700 mb-3">Feedback</h4>
-                        <Textarea
-                          placeholder="Share any additional feedback..."
-                          value={currentRatingType === "automated" ? automatedFeedback : generatedFeedback}
-                          onChange={(e) => handleFeedbackChange(e.target.value)}
-                          className="text-sm min-h-[100px] resize-none"
-                        />
-                      </div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button
-                          onClick={handleSubmitRating}
-                          disabled={isSubmittingRating}
-                          className="w-full py-3 text-base font-medium"
-                        >
-                          {isSubmittingRating ? (
-                            <div className="flex items-center gap-2">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                              <span>Submitting...</span>
-                            </div>
-                          ) : (
-                            "Submit Rating"
-                          )}
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <Button onClick={handleSubmitRating} disabled={isSubmittingRating} className="w-full">
+                    {isSubmittingRating ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      "Submit Rating"
+                    )}
+                  </Button>
+                </div>
+              </DrawerContent>
+            </Drawer>
           </CardContent>
         )}
       </Card>
     </TooltipProvider>
-  );
+  )
 }
