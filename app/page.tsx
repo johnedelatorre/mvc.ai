@@ -2,7 +2,6 @@
 import { useState, useMemo } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { format } from "date-fns"
 import DataTable from "../data-table"
@@ -18,10 +17,7 @@ import {
   faMagicWandSparkles,
   faChevronUp,
   faSliders,
-  faRobot,
   faArrowTrendUp,
-  faPaperPlane,
-  faClock,
   faUsers,
   faStar,
   faEye,
@@ -594,13 +590,6 @@ export default function Page() {
                 Automated Insights
               </TabsTrigger>
               <TabsTrigger
-                value="custom-insights"
-                className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
-              >
-                <FontAwesomeIcon icon={faRobot} className="h-5 w-5 mr-2" />
-                Custom Insights
-              </TabsTrigger>
-              <TabsTrigger
                 value="outcomes"
                 className="relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-gray-600 bg-transparent border-b-2 border-transparent hover:text-gray-900 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent rounded-none shadow-none"
               >
@@ -778,83 +767,6 @@ export default function Page() {
 
                   <div id="automated-insights-metrics">
                     <AutomatedInsights data={filteredData} savedTemplateInsights={savedTemplateInsights} />
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Custom Insights Tab Content */}
-            <TabsContent value="custom-insights" className="mt-6 mb-0">
-              <div className="w-full">
-                <div className="space-y-8">
-                  <div className="bg-white border-2 border-blue-300 rounded-lg p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <FontAwesomeIcon icon={faRobot} className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-semibold text-gray-900">
-                            Custom Insights ({customInsightsCount})
-                          </h2>
-                          <p className="text-sm text-gray-600">
-                            Generate personalized insights using AI-powered analysis
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      <div className="lg:col-span-2">
-                        <div className="flex gap-2 mb-4">
-                          <Input
-                            value={chatInput}
-                            onChange={(e) => setChatInput(e.target.value)}
-                            placeholder="Ask about your data insights..."
-                            className="flex-1 py-3 text-sm"
-                          />
-                          <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            <FontAwesomeIcon icon={faPaperPlane} className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        <div className="min-h-[400px] max-h-[600px] overflow-y-auto border rounded-lg bg-gray-50 p-4">
-                          <div className="flex items-center justify-center h-full text-gray-500">
-                            <div className="text-center">
-                              <FontAwesomeIcon icon={faRobot} className="h-12 w-12 mb-4 text-gray-400" />
-                              <h4 className="font-medium text-gray-700 mb-2">AI-Powered Custom Insights</h4>
-                              <p className="text-sm text-gray-500 mb-4 max-w-md">
-                                Ask questions about your data and get instant, personalized insights with
-                                visualizations.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <div className="border rounded-lg p-4 bg-white">
-                          <h4 className="font-semibold text-sm text-gray-700 mb-3 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-500" />
-                            Recent Queries
-                          </h4>
-                          <div className="space-y-2">
-                            {[
-                              "Show me Nike performance in Q4",
-                              "Compare Instagram vs TikTok engagement",
-                              "Top performing placements this month",
-                            ].map((query, index) => (
-                              <button
-                                key={index}
-                                className="w-full text-left p-3 text-sm bg-gray-50 hover:bg-gray-100 rounded-md transition-colors border border-transparent hover:border-gray-200"
-                              >
-                                {query}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
