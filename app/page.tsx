@@ -220,8 +220,8 @@ const generateBaseData = () => {
   return Array.from({ length: 200 }, (_, index) => ({
     id: index + 1,
     dateObj: generateRandomDate(),
-    rightsholders: ALL_RIGHTSHOLDERS[index % ALL_RIGHTSHOLDERS.length], // Add rightsholders to data
-    sponsors: ALL_SPONSORS[index % ALL_SPONSORS.length], // Add sponsors to data
+    rightsholders: ALL_RIGHTSHOLDERS[index % ALL_RIGHTSHOLDERS.length],
+    sponsors: ALL_SPONSORS[index % ALL_SPONSORS.length],
     placements: PLACEMENT_OPTIONS[index % PLACEMENT_OPTIONS.length],
     placementTypes: ALL_PLACEMENT_TYPES[index % ALL_PLACEMENT_TYPES.length],
     platforms: ["TikTok", "Instagram", "YouTube", "Twitter"][index % 4],
@@ -237,6 +237,57 @@ const generateBaseData = () => {
 const FILTER_CATEGORIES = ["General", "Performance", "Engagement", "Sponsors", "RightsHolders"]
 
 export default function Page() {
+  const [showScorecardDrawer, setShowScorecardDrawer] = useState(false)
+  const [scorecardDrawerAnimating, setScorecardDrawerAnimating] = useState(false)
+  const [showSurveyScoresDrawer, setShowSurveyScoresDrawer] = useState(false)
+  const [surveyScoresDrawerAnimating, setSurveyScoresDrawerAnimating] = useState(false)
+
+  // Scorecard drawer data
+  const scorecardData = {
+    teamName: "San Antonio Spurs",
+    sampleSurveyed: 202,
+    opportunityRank: 6,
+    opportunityScore: 40,
+    opportunityValue: 22,
+    totalFansSurveyed: {
+      engagement: 58
+    },
+    behaviorAndInterest: {
+      intensity: 70,
+      momentum: 30
+    },
+    potentialSponsorImpact: {
+      consideration: 70,
+      favorability: 30
+    },
+    teamsData: [
+      { rightsholder: "New York Knicks", brand: "Chase", region: "New York", aidedSponsorshipAwareness: "44%", netMoreFavorable: "45%", netIncreaseConsideration: "35%" },
+      { rightsholder: "Atlanta Hawks", brand: "Nike", region: "Atlanta", aidedSponsorshipAwareness: "54%", netMoreFavorable: "26%", netIncreaseConsideration: "35%" },
+      { rightsholder: "Chicago Bulls", brand: "Citizens Bank", region: "Chicago", aidedSponsorshipAwareness: "64%", netMoreFavorable: "19%", netIncreaseConsideration: "35%" },
+      { rightsholder: "San Antonio Spurs", brand: "T-Mobile", region: "San Antonio", aidedSponsorshipAwareness: "55%", netMoreFavorable: "58%", netIncreaseConsideration: "45%" },
+      { rightsholder: "Houston Rockets", brand: "Xfinity", region: "Houston", aidedSponsorshipAwareness: "24%", netMoreFavorable: "23%", netIncreaseConsideration: "35%" }
+    ]
+  }
+
+  const openScorecardDrawer = () => {
+    setShowScorecardDrawer(true)
+    setTimeout(() => setScorecardDrawerAnimating(true), 0)
+  }
+
+  const closeScorecardDrawer = () => {
+    setScorecardDrawerAnimating(false)
+    setTimeout(() => setShowScorecardDrawer(false), 300)
+  }
+
+  const openSurveyScoresDrawer = () => {
+    setShowSurveyScoresDrawer(true)
+    setTimeout(() => setSurveyScoresDrawerAnimating(true), 0)
+  }
+
+  const closeSurveyScoresDrawer = () => {
+    setSurveyScoresDrawerAnimating(false)
+    setTimeout(() => setShowSurveyScoresDrawer(false), 300)
+  }
   const [filterType, setFilterType] = useState<"dateRange" | "years">("dateRange")
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
@@ -384,87 +435,6 @@ export default function Page() {
       sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Engagement+Chart",
       prompt:
         "Provide a comprehensive sponsor engagement analysis. Show me engagement rates, audience interaction patterns, and identify which sponsors are performing best in terms of audience connection.",
-    },
-    {
-      id: 4,
-      title: "Seasonal Performance Trends",
-      description: "Identify seasonal patterns and trends in your sponsorship performance data.",
-      category: "Trend Comparison",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Seasonal+Chart",
-      prompt:
-        "Analyze seasonal performance trends in the data. Show me how sponsorship performance varies by season, identify peak and low periods, and provide insights for seasonal strategy optimization.",
-    },
-    {
-      id: 5,
-      title: "Placement Effectiveness Analysis",
-      description: "Evaluate the effectiveness of different placement types and locations for maximum impact.",
-      category: "Custom Metrics",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Placement+Chart",
-      prompt:
-        "Analyze placement effectiveness across all selected placement types. Show me which placements generate the highest SMV, impressions, and engagement. Include recommendations for placement optimization.",
-    },
-    {
-      id: 6,
-      title: "Audience Demographics Breakdown",
-      description: "Deep dive into audience demographics and behavior patterns for targeted insights.",
-      category: "Audience Insights",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Demographics+Chart",
-      prompt:
-        "Provide a detailed audience demographics breakdown. Show me audience composition, behavior patterns, and engagement preferences. Include insights for targeted marketing strategies.",
-    },
-    {
-      id: 7,
-      title: "Competitive Benchmarking",
-      description: "Compare your performance against industry benchmarks and competitor analysis.",
-      category: "Trend Comparison",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Benchmark+Chart",
-      prompt:
-        "Perform competitive benchmarking analysis. Compare our performance metrics against industry standards and identify areas where we outperform or underperform compared to competitors.",
-    },
-    {
-      id: 8,
-      title: "Revenue Attribution Model",
-      description: "Track and attribute revenue to specific sponsorship activities and campaigns.",
-      category: "ROI Analysis",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Revenue+Chart",
-      prompt:
-        "Create a revenue attribution analysis. Show me how different sponsorship activities contribute to revenue generation and identify the highest value sponsorship investments.",
-    },
-    {
-      id: 9,
-      title: "Content Performance Matrix",
-      description: "Analyze content performance across different formats and platforms for optimization.",
-      category: "Platform Performance",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Content+Chart",
-      prompt:
-        "Analyze content performance across different formats and platforms. Show me which content types perform best, optimal posting times, and content strategy recommendations.",
-    },
-    {
-      id: 10,
-      title: "Brand Sentiment Analysis",
-      description: "Monitor and analyze brand sentiment trends across all sponsorship activities.",
-      category: "Audience Insights",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Sentiment+Chart",
-      prompt:
-        "Perform brand sentiment analysis across all sponsorship activities. Show me sentiment trends, identify positive and negative drivers, and provide recommendations for brand perception improvement.",
-    },
-    {
-      id: 11,
-      title: "Campaign Lifecycle Analysis",
-      description: "Track campaign performance from launch to completion with detailed lifecycle insights.",
-      category: "Custom Metrics",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Lifecycle+Chart",
-      prompt:
-        "Analyze campaign lifecycle performance. Show me how campaigns perform from launch through completion, identify optimal campaign durations, and provide insights for campaign timing optimization.",
-    },
-    {
-      id: 12,
-      title: "Cross-Platform Synergy",
-      description: "Identify synergies and cross-platform effects in your multi-channel sponsorship strategy.",
-      category: "Platform Performance",
-      sampleChartUrl: "/placeholder.svg?height=120&width=200&text=Synergy+Chart",
-      prompt:
-        "Analyze cross-platform synergy effects. Show me how different platforms work together, identify complementary platform combinations, and provide recommendations for integrated multi-platform strategies.",
     },
   ]
 
@@ -788,6 +758,9 @@ export default function Page() {
     setSelectedInsightsTypes([])
   }
 
+  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
+  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
+
   const openSaveFilterDrawer = () => {
     setShowSaveFilterDrawer(true)
     setTimeout(() => setSaveFilterDrawerAnimating(true), 0)
@@ -807,9 +780,6 @@ export default function Page() {
     setSavedFiltersDrawerAnimating(false)
     setTimeout(() => setShowSavedFiltersDrawer(false), 300)
   }
-
-  const [saveFilterDrawerAnimating, setSaveFilterDrawerAnimating] = useState(false)
-  const [savedFiltersDrawerAnimating, setSavedFiltersDrawerAnimating] = useState(false)
 
   const saveCurrentFilters = () => {
     if (!filterNameToSave.trim()) {
@@ -1062,64 +1032,6 @@ export default function Page() {
   // Function to toggle expanded view for individual generated insights
   const toggleGeneratedInsightExpansion = (insightId: string) => {
     setExpandedGeneratedInsightId(expandedGeneratedInsightId === insightId ? null : insightId)
-  }
-
-  const [showScorecardDrawer, setShowScorecardDrawer] = useState(false)
-  const [scorecardDrawerAnimating, setScorecardDrawerAnimating] = useState(false)
-
-  // Scorecard drawer data
-  const scorecardData = {
-    teamName: "San Antonio Spurs",
-    sampleSurveyed: 202,
-    opportunityRank: 6,
-    opportunityScore: 40,
-    opportunityValue: 22,
-    totalFansSurveyed: {
-      engagement: 58
-    },
-    behaviorAndInterest: {
-      intensity: 70,
-      momentum: 30
-    },
-    potentialSponsorImpact: {
-      consideration: 70,
-      favorability: 30
-    },
-    teamsData: [
-      { rightsholder: "New York Knicks", brand: "Chase", region: "New York", aidedSponsorshipAwareness: "44%", netMoreFavorable: "45%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Atlanta Hawks", brand: "Nike", region: "Atlanta", aidedSponsorshipAwareness: "54%", netMoreFavorable: "26%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Chicago Bulls", brand: "Citizens Bank", region: "Chicago", aidedSponsorshipAwareness: "64%", netMoreFavorable: "19%", netIncreaseConsideration: "35%" },
-      { rightsholder: "San Antonio Spurs", brand: "T-Mobile", region: "San Antonio", aidedSponsorshipAwareness: "55%", netMoreFavorable: "58%", netIncreaseConsideration: "45%" },
-      { rightsholder: "Houston Rockets", brand: "Xfinity", region: "Houston", aidedSponsorshipAwareness: "24%", netMoreFavorable: "23%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Toronto Raptors", brand: "Blue Cross", region: "Toronto", aidedSponsorshipAwareness: "24%", netMoreFavorable: "28%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Miami Heat", brand: "State Farm", region: "Miami", aidedSponsorshipAwareness: "24%", netMoreFavorable: "34%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Los Angeles Lakers", brand: "Chevrolet", region: "Los Angeles", aidedSponsorshipAwareness: "24%", netMoreFavorable: "24%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Boston Celtics", brand: "Remax", region: "Boston", aidedSponsorshipAwareness: "24%", netMoreFavorable: "33%", netIncreaseConsideration: "35%" },
-      { rightsholder: "Philadelphia Phillies", brand: "SmartWater", region: "Pennsylvania", aidedSponsorshipAwareness: "24%", netMoreFavorable: "53%", netIncreaseConsideration: "35%" }
-    ]
-  }
-
-  const openScorecardDrawer = () => {
-    setShowScorecardDrawer(true)
-    setTimeout(() => setScorecardDrawerAnimating(true), 0)
-  }
-
-  const closeScorecardDrawer = () => {
-    setScorecardDrawerAnimating(false)
-    setTimeout(() => setShowScorecardDrawer(false), 300)
-  }
-
-  const [showSurveyScoresDrawer, setShowSurveyScoresDrawer] = useState(false)
-  const [surveyScoresDrawerAnimating, setSurveyScoresDrawerAnimating] = useState(false)
-
-  const openSurveyScoresDrawer = () => {
-    setShowSurveyScoresDrawer(true)
-    setTimeout(() => setSurveyScoresDrawerAnimating(true), 0)
-  }
-
-  const closeSurveyScoresDrawer = () => {
-    setSurveyScoresDrawerAnimating(false)
-    setTimeout(() => setShowSurveyScoresDrawer(false), 300)
   }
 
   return (
@@ -2420,6 +2332,14 @@ export default function Page() {
                                     ></div>
                                     <div
                                       className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                      style={{ animationDelay: "0.1s" }}
+                                    ></div>
+                                    <div
+                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                                      style={{ animationDelay: "0.1s" }}
+                                    ></div>
+                                    <div
+                                      className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
                                       style={{ animationDelay: "0.2s" }}
                                     ></div>
                                   </div>
@@ -3597,3 +3517,85 @@ export default function Page() {
                       </div>
                     </span>
                   </h4>
+
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <FontAwesomeIcon icon={faLightbulb} className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">Consideration</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.consideration}%</span>
+                        <div className="flex-1 bg-gray-200 rounded-full h-4">
+                          <div 
+                            className="bg-blue-400 h-4 rounded-full" 
+                            style={{ width: `${scorecardData.potentialSponsorImpact.consideration}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">Favorability</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-blue-700 text-lg">{scorecardData.potentialSponsorImpact.favorability}%</span>
+                        <div className="flex-1 bg-gray-200 rounded-full h-4">
+                          <div 
+                            className="bg-blue-400 h-4 rounded-full" 
+                            style={{ width: `${scorecardData.potentialSponsorImpact.favorability}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Horizontal Divider */}
+                <hr className="border-gray-300 mb-6" />
+
+                {/* Survey Scores Button */}
+                <div className="mb-6">
+                  <button onClick={openSurveyScoresDrawer} className="btn-primary flex items-center gap-2">
+                    View Survey Scores
+                  </button>
+                </div>
+
+                {/* Horizontal Divider */}
+                <hr className="border-gray-300 mb-6" />
+
+                {/* Teams Data Table */}
+                <div className="mb-6">
+                  <h4 className="font-semibold text-blue-700 mb-3 pb-2 border-b-2 border-blue-600">
+                    <span className="flex items-center gap-2">
+                      Teams Data
+                      <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-xs text-blue-600">i</span>
+                      </div>
+                    </span>
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Rightsholder</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Brand</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Region</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Aided Sponsorship Awareness</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Net More Favorable</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Net Increase Consideration</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {scorecardData.teamsData.map((team, index) => (
+                          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.rightsholder}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.brand}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.region}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.aidedSponsorshipAwareness}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.netMoreFavorable}</td>
+                            <td className="py-3 px-4 text-sm text-gray-900">{team.netIncreaseConsideration}</td>
+                          </tr>
+                        ))}
+                      </tbody>
