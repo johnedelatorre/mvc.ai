@@ -1564,7 +1564,7 @@ export default function Page() {
                               )}
 
                               {/* Hierarchical Placement Types */}
-                              <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                              <div className="space-y-3">
                                 {Object.entries(PLACEMENT_TYPES_STRUCTURE).map(([mainCategory, categories]) => (
                                   <div key={mainCategory} className="space-y-2">
                                     <div className="font-semibold text-sm text-gray-800 border-b pb-1">
@@ -3133,7 +3133,7 @@ export default function Page() {
                         <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-64">
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
                       <div className="p-3">
                         <Input
                           type="text"
@@ -3142,7 +3142,7 @@ export default function Page() {
                           onChange={(e) => setFilterCategorySearch(e.target.value)}
                           className="mb-3"
                         />
-                        <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                        <div className="space-y-2">
                           {FILTER_CATEGORIES.filter((category) =>
                             category.toLowerCase().includes(filterCategorySearch.toLowerCase()),
                           ).map((category) => (
