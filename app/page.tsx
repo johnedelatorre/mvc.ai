@@ -2862,139 +2862,160 @@ export default function Page() {
       </div>
 
       {/* Save Filter Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ${
-          showSaveFilterDrawer ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {editingFilterId ? "Edit Saved Filter" : "Save Current Filters"}
-            </h2>
-            <button onClick={closeSaveFilterDrawer} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-            </button>
-          </div>
+      {showSaveFilterDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Semi-transparent overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closeSaveFilterDrawer}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              saveFilterDrawerAnimating ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {editingFilterId ? "Edit Saved Filter" : "Save Current Filters"}
+                </h2>
+                <button onClick={closeSaveFilterDrawer} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="filterName" className="block text-sm font-medium text-gray-700">
-                Filter Name
-              </label>
-              <Input
-                type="text"
-                id="filterName"
-                placeholder="Enter filter name"
-                value={filterNameToSave}
-                onChange={(e) => setFilterNameToSave(e.target.value)}
-                className="mt-1"
-              />
-            </div>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="filterName" className="block text-sm font-medium text-gray-700">
+                    Filter Name
+                  </label>
+                  <Input
+                    type="text"
+                    id="filterName"
+                    placeholder="Enter filter name"
+                    value={filterNameToSave}
+                    onChange={(e) => setFilterNameToSave(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="filterDescription" className="block text-sm font-medium text-gray-700">
-                Filter Description (Optional)
-              </label>
-              <Input
-                type="text"
-                id="filterDescription"
-                placeholder="Enter filter description"
-                value={filterDescriptionToSave}
-                onChange={(e) => setFilterDescriptionToSave(e.target.value)}
-                className="mt-1"
-              />
-            </div>
+                <div>
+                  <label htmlFor="filterDescription" className="block text-sm font-medium text-gray-700">
+                    Filter Description (Optional)
+                  </label>
+                  <Input
+                    type="text"
+                    id="filterDescription"
+                    placeholder="Enter filter description"
+                    value={filterDescriptionToSave}
+                    onChange={(e) => setFilterDescriptionToSave(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
 
-            <div>
-              <label htmlFor="filterCategory" className="block text-sm font-medium text-gray-700">
-                Filter Category
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                    <span className="text-gray-700">{filterCategoryToSave}</span>
-                    <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
-                  <div className="space-y-1">
-                    {FILTER_CATEGORIES.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setFilterCategoryToSave(category)
-                          // Close the popover
-                          document.body.click()
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                          filterCategoryToSave === category
-                            ? "bg-blue-100 text-blue-900"
-                            : "hover:bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {category}
+                <div>
+                  <label htmlFor="filterCategory" className="block text-sm font-medium text-gray-700">
+                    Filter Category
+                  </label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                        <span className="text-gray-700">{filterCategoryToSave}</span>
+                        <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                       </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
+                      <div className="space-y-1">
+                        {FILTER_CATEGORIES.map((category) => (
+                          <button
+                            key={category}
+                            onClick={() => {
+                              setFilterCategoryToSave(category)
+                              // Close the popover
+                              document.body.click()
+                            }}
+                            className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                              filterCategoryToSave === category
+                                ? "bg-blue-100 text-blue-900"
+                                : "hover:bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
-            <div className="flex items-center justify-end gap-3">
-              <button onClick={closeSaveFilterDrawer} className="btn-utility">
-                Cancel
-              </button>
-              <button onClick={saveCurrentFilters} className="btn-primary">
-                {editingFilterId ? "Update Filter" : "Save Filter"}
-              </button>
+                <div className="flex items-center justify-end gap-3">
+                  <button onClick={closeSaveFilterDrawer} className="btn-utility">
+                    Cancel
+                  </button>
+                  <button onClick={saveCurrentFilters} className="btn-primary">
+                    {editingFilterId ? "Update Filter" : "Save Filter"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Saved Filters Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ${
-          showSavedFiltersDrawer ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Saved Filters</h2>
-            <button onClick={closeSavedFiltersDrawer} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="mb-4">
-            <Input
-              type="text"
-              placeholder="Search filters..."
-              value={filterCategorySearch}
-              onChange={(e) => setFilterCategorySearch(e.target.value)}
-            />
-          </div>
-
-          {filteredSavedFilters.length === 0 ? (
-            <div className="flex items-center justify-center h-48 text-gray-500">
-              <div className="text-center">
-                <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
-                <h4 className="font-medium text-gray-700 mb-2">No Saved Filters Yet</h4>
-                <p className="text-sm text-gray-500">Save filters to access them later and streamline your analysis.</p>
+      {showSavedFiltersDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Semi-transparent overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closeSavedFiltersDrawer}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              savedFiltersDrawerAnimating ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Saved Filters</h2>
+                <button onClick={closeSavedFiltersDrawer} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredSavedFilters.map((filter) => (
-                <div key={filter.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h5 className="font-semibold text-gray-900">{filter.name}</h5>
-                      <p className="text-xs text-gray-500">
-                        Created on {filter.createdAt.toLocaleDateString()} | Category: {filter.category}
+
+              <div className="mb-4">
+                <Input
+                  type="text"
+                  placeholder="Search filters..."
+                  value={filterCategorySearch}
+                  onChange={(e) => setFilterCategorySearch(e.target.value)}
+                />
+              </div>
+
+              {filteredSavedFilters.length === 0 ? (
+                <div className="flex items-center justify-center h-48 text-gray-500">
+                  <div className="text-center">
+                    <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
+                    <h4 className="font-medium text-gray-700 mb-2">No Saved Filters Yet</h4>
+                    <p className="text-sm text-gray-500">Save filters to access them later and streamline your analysis.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredSavedFilters.map((filter) => (
+                    <div key={filter.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h5 className="font-semibold text-gray-900">{filter.name}</h5>
+                          <p className="text-xs text-gray-500">
+                            Created on {filter.createdAt.toLocaleDateString()} | Category: {filter.category}
                       </p>
                       {filter.description && <p className="text-sm text-gray-600 mt-1">{filter.description}</p>}
+                    </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button onClick={() => applySavedFilter(filter)} className="btn-secondary btn-sm">
@@ -3008,81 +3029,93 @@ export default function Page() {
                       </button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center justify-end gap-3 mt-6">
-            <button onClick={closeSavedFiltersDrawer} className="btn-utility">
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Rating Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300 ${
-          showRatingDrawer ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Rate This Insight</h2>
-            <button onClick={() => setShowRatingDrawer(false)} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Your Rating</label>
-              <div className="flex items-center mt-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setCurrentRating(star)}
-                    className={`text-2xl ${star <= currentRating ? "text-yellow-500" : "text-gray-300"}`}
-                  >
-                    <FontAwesomeIcon icon={faStar} />
-                  </button>
                 ))}
               </div>
-            </div>
+            )}
 
-            <div>
-              <label htmlFor="ratingFeedback" className="block text-sm font-medium text-gray-700">
-                Feedback (Optional)
-              </label>
-              <Input
-                type="text"
-                id="ratingFeedback"
-                placeholder="Enter your feedback"
-                value={ratingFeedback}
-                onChange={(e) => setRatingFeedback(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-3">
-              <button onClick={() => setShowRatingDrawer(false)} className="btn-utility">
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // Placeholder for submitting rating
-                  console.log("Rating submitted:", currentRating, ratingFeedback)
-                  setShowRatingDrawer(false)
-                }}
-                className="btn-primary"
-              >
-                Submit Rating
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button onClick={closeSavedFiltersDrawer} className="btn-utility">
+                Close
               </button>
             </div>
           </div>
         </div>
       </div>
+    )}
+
+      {/* Rating Drawer */}
+      {showRatingDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Semi-transparent overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={() => setShowRatingDrawer(false)}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              showRatingDrawer ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Rate This Insight</h2>
+                <button onClick={() => setShowRatingDrawer(false)} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Your Rating</label>
+                  <div className="flex items-center mt-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setCurrentRating(star)}
+                        className={`text-2xl ${star <= currentRating ? "text-yellow-500" : "text-gray-300"}`}
+                      >
+                        <FontAwesomeIcon icon={faStar} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="ratingFeedback" className="block text-sm font-medium text-gray-700">
+                    Feedback (Optional)
+                  </label>
+                  <Input
+                    type="text"
+                    id="ratingFeedback"
+                    placeholder="Enter your feedback"
+                    value={ratingFeedback}
+                    onChange={(e) => setRatingFeedback(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3">
+                  <button onClick={() => setShowRatingDrawer(false)} className="btn-utility">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Placeholder for submitting rating
+                      console.log("Rating submitted:", currentRating, ratingFeedback)
+                      setShowRatingDrawer(false)
+                    }}
+                    className="btn-primary"
+                  >
+                    Submit Rating
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* All Insights Modal */}
       {showAllInsightsModal && (
@@ -3149,224 +3182,246 @@ export default function Page() {
       )}
 
       {/* Scorecard Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl z-50 transform transition-transform duration-300 ${
-          showScorecardDrawer ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">{scorecardData.teamName} Scorecard</h2>
-            <button onClick={closeScorecardDrawer} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="space-y-6">
-            {/* Top Metrics Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <h5 className="font-semibold text-gray-900 mb-2">Sample Surveyed</h5>
-                <div className="text-3xl font-bold text-blue-600">{scorecardData.sampleSurveyed}</div>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <h5 className="font-semibold text-gray-900 mb-2">Opportunity Rank</h5>
-                <div className="text-3xl font-bold text-green-600">{scorecardData.opportunityRank}</div>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <h5 className="font-semibold text-gray-900 mb-2">Opportunity Score</h5>
-                <div className="text-3xl font-bold text-purple-600">{scorecardData.opportunityScore}</div>
-              </div>
-            </div>
-
-            {/* Opportunity Value Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h5 className="font-semibold text-gray-900 mb-2">Opportunity Value</h5>
-              <div className="text-2xl font-bold text-orange-600">${scorecardData.opportunityValue}M</div>
-            </div>
-
-            {/* Total Fans Surveyed Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h5 className="font-semibold text-gray-900 mb-2">Total Fans Surveyed</h5>
-              <div className="text-2xl font-bold text-blue-600">{scorecardData.totalFansSurveyed.engagement}%</div>
-            </div>
-
-            {/* Behavior and Interest Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h5 className="font-semibold text-gray-900 mb-2">Behavior and Interest</h5>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-500">Intensity</div>
-                  <div className="text-xl font-bold text-green-600">{scorecardData.behaviorAndInterest.intensity}%</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">Momentum</div>
-                  <div className="text-xl font-bold text-purple-600">{scorecardData.behaviorAndInterest.momentum}%</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Potential Sponsor Impact Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h5 className="font-semibold text-gray-900 mb-2">Potential Sponsor Impact</h5>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm text-gray-500">Consideration</div>
-                  <div className="text-xl font-bold text-green-600">
-                    {scorecardData.potentialSponsorImpact.consideration}%
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">Favorability</div>
-                  <div className="text-xl font-bold text-purple-600">
-                    {scorecardData.potentialSponsorImpact.favorability}%
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Horizontal Divider */}
-            <hr className="border-gray-300 mb-6" />
-
-            {/* Teams Comparison Table */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-semibold text-blue-700 text-lg">Teams Comparison</h4>
-                <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                  EXPORT TO CSV
+      {showScorecardDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Semi-transparent overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closeScorecardDrawer}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              scorecardDrawerAnimating ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">{scorecardData.teamName} Scorecard</h2>
+                <button onClick={closeScorecardDrawer} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="overflow-x-auto -mx-6 px-6">
-                <div className="min-w-full">
-                  <table className="w-full border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[120px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Rightsholder</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Brand</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Region</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Aided Awareness</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[90px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Net Favorable</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
-                          <div className="flex items-center gap-1">
-                            <span className="truncate">Net Consideration</span>
-                            <div className="flex flex-col">
-                              <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                              <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                            </div>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {scorecardData.teamsData.map((team, index) => (
-                        <tr
-                          key={team.rightsholder}
-                          className={`${
-                            team.rightsholder === "San Antonio Spurs"
-                              ? "bg-blue-50 font-semibold"
-                              : index % 2 === 0
-                                ? "bg-gray-50"
-                                : "bg-white"
-                          } hover:bg-gray-100 transition-colors`}
-                        >
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                            <div className="truncate" title={team.rightsholder}>
-                              {team.rightsholder}
-                            </div>
-                          </td>
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                            <div className="truncate" title={team.brand}>
-                              {team.brand}
-                            </div>
-                          </td>
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                            <div className="truncate" title={team.region}>
-                              {team.region}
-                            </div>
-                          </td>
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                            {team.aidedSponsorshipAwareness}
-                          </td>
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                            {team.netMoreFavorable}
-                          </td>
-                          <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                            {team.netIncreaseConsideration}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div className="space-y-6">
+                {/* Top Metrics Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <h5 className="font-semibold text-gray-900 mb-2">Sample Surveyed</h5>
+                    <div className="text-3xl font-bold text-blue-600">{scorecardData.sampleSurveyed}</div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <h5 className="font-semibold text-gray-900 mb-2">Opportunity Rank</h5>
+                    <div className="text-3xl font-bold text-green-600">{scorecardData.opportunityRank}</div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <h5 className="font-semibold text-gray-900 mb-2">Opportunity Score</h5>
+                    <div className="text-3xl font-bold text-purple-600">{scorecardData.opportunityScore}</div>
+                  </div>
+                </div>
+
+                {/* Opportunity Value Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <h5 className="font-semibold text-gray-900 mb-2">Opportunity Value</h5>
+                  <div className="text-2xl font-bold text-orange-600">${scorecardData.opportunityValue}M</div>
+                </div>
+
+                {/* Total Fans Surveyed Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <h5 className="font-semibold text-gray-900 mb-2">Total Fans Surveyed</h5>
+                  <div className="text-2xl font-bold text-blue-600">{scorecardData.totalFansSurveyed.engagement}%</div>
+                </div>
+
+                {/* Behavior and Interest Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <h5 className="font-semibold text-gray-900 mb-2">Behavior and Interest</h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Intensity</div>
+                      <div className="text-xl font-bold text-green-600">{scorecardData.behaviorAndInterest.intensity}%</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500">Momentum</div>
+                      <div className="text-xl font-bold text-purple-600">{scorecardData.behaviorAndInterest.momentum}%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Potential Sponsor Impact Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <h5 className="font-semibold text-gray-900 mb-2">Potential Sponsor Impact</h5>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Consideration</div>
+                      <div className="text-xl font-bold text-green-600">
+                        {scorecardData.potentialSponsorImpact.consideration}%
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500">Favorability</div>
+                      <div className="text-xl font-bold text-purple-600">
+                        {scorecardData.potentialSponsorImpact.favorability}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Horizontal Divider */}
+                <hr className="border-gray-300 mb-6" />
+
+                {/* Teams Comparison Table */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-blue-700 text-lg">Teams Comparison</h4>
+                    <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                      EXPORT TO CSV
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto -mx-6 px-6">
+                    <div className="min-w-full">
+                      <table className="w-full border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[120px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Rightsholder</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Brand</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Region</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Aided Awareness</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[90px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Net Favorable</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
+                              <div className="flex items-center gap-1">
+                                <span className="truncate">Net Consideration</span>
+                                <div className="flex flex-col">
+                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
+                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
+                                </div>
+                              </div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {scorecardData.teamsData.map((team, index) => (
+                            <tr
+                              key={team.rightsholder}
+                              className={`${
+                                team.rightsholder === "San Antonio Spurs"
+                                  ? "bg-blue-50 font-semibold"
+                                  : index % 2 === 0
+                                    ? "bg-gray-50"
+                                    : "bg-white"
+                              } hover:bg-gray-100 transition-colors`}
+                            >
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
+                                <div className="truncate" title={team.rightsholder}>
+                                  {team.rightsholder}
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
+                                <div className="truncate" title={team.brand}>
+                                  {team.brand}
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
+                                <div className="truncate" title={team.region}>
+                                  {team.region}
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
+                                {team.aidedSponsorshipAwareness}
+                              </td>
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
+                                {team.netMoreFavorable}
+                              </td>
+                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
+                                {team.netIncreaseConsideration}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Survey Scores Drawer */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl z-50 transform transition-transform duration-300 ${
-          showSurveyScoresDrawer ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Survey Scores</h2>
-            <button onClick={closeSurveyScoresDrawer} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-            </button>
-          </div>
+      {showSurveyScoresDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Semi-transparent overlay */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closeSurveyScoresDrawer}
+          />
+          
+          {/* Drawer */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              surveyScoresDrawerAnimating ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Survey Scores</h2>
+                <button onClick={closeSurveyScoresDrawer} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
 
-          <div className="space-y-6">
-            {/* Placeholder Content */}
-            <p className="text-gray-600">Survey scores content will be displayed here.</p>
+              <div className="space-y-6">
+                {/* Placeholder Content */}
+                <p className="text-gray-600">Survey scores content will be displayed here.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
