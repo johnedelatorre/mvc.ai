@@ -2813,9 +2813,10 @@ export default function Page() {
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h2 className="text-xl font-semibold text-gray-900">Sponsorship Outcomes</h2>
+                        <h2 className="text-xl font-semibold text-gray-900">Survey Outcomes & Scorecard Results</h2>
                         <p className="text-sm text-gray-600">
-                          Analyze and visualize the impact of your sponsorships on key business outcomes
+                          Analyze survey data and scorecard metrics to measure fan engagement and sponsorship
+                          effectiveness
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -3462,6 +3463,64 @@ export default function Page() {
                   <div className="bg-orange-50 p-4 rounded-lg">
                     <div className="text-sm text-orange-600 font-medium">Opportunity Score</div>
                     <div className="text-lg font-bold text-orange-900">{scorecardData.opportunityScore}</div>
+                  </div>
+                </div>
+
+                {/* Snapshot Metrics */}
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Fans Surveyed</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Engagement</span>
+                        <span className="text-lg font-bold text-blue-600">
+                          {scorecardData.totalFansSurveyed.engagement}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Opportunity Value</h3>
+                    <div className="text-2xl font-bold text-green-600">{scorecardData.opportunityValue}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Behavior and Interest</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Intensity</span>
+                        <span className="text-lg font-bold text-purple-600">
+                          {scorecardData.behaviorAndInterest.intensity}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Momentum</span>
+                        <span className="text-lg font-bold text-orange-600">
+                          {scorecardData.behaviorAndInterest.momentum}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Potential Sponsor Impact</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Consideration</span>
+                        <span className="text-lg font-bold text-teal-600">
+                          {scorecardData.potentialSponsorImpact.consideration}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Favorability</span>
+                        <span className="text-lg font-bold text-red-600">
+                          {scorecardData.potentialSponsorImpact.favorability}%
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
