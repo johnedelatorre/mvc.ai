@@ -33,6 +33,7 @@ import {
   faStar,
   faChevronLeft,
   faChevronRight,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
@@ -2820,6 +2821,18 @@ export default function Page() {
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
+                        <button
+                          onClick={() =>
+                            window.open(
+                              "https://johnericdelatorre.com/outcomessampledelivrablefullreport.pdf",
+                              "_blank",
+                            )
+                          }
+                          className="btn-secondary flex items-center gap-2"
+                        >
+                          <FontAwesomeIcon icon={faDownload} className="h-4 w-4" />
+                          Download Full Report
+                        </button>
                         <button onClick={openScorecardDrawer} className="btn-primary flex items-center gap-2">
                           <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
                           View Scorecard
