@@ -25,9 +25,20 @@ interface DataBarChartProps {
 }
 
 export default function DataBarChart({ data }: DataBarChartProps) {
-  // Format the data for chart display
-  const chartData = useMemo(() => {
-    return data
+  const [isExpanded, setIsExpanded] = useState(true)
+  const chartRef = useRef<HTMLDivElement>(null)
+  const [chartData, setChartData] = useState<any[]>([])
+
+  useMemo(() => {
+    // Safety check for data
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      setChartData([])
+      return
+    }
+
+    // Format the data for chart display
+    const formattedData = data
+      .filter((item) => item.dateObj && item.dateObj instanceof Date) // Filter out items without valid dates
       .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
       .map((item) => ({
         ...item,
@@ -45,10 +56,26 @@ export default function DataBarChart({ data }: DataBarChartProps) {
         placementType: item.placementTypes,
         platform: item.platforms,
       }))
+    setChartData(formattedData)
   }, [data])
 
-  const [isExpanded, setIsExpanded] = useState(true)
-  const chartRef = useRef<HTMLDivElement>(null)
+  if (chartData.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Media Analytics - SMV by Date</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-64 text-gray-500">
+            <div className="text-center">
+              <p className="text-lg font-medium">No data available</p>
+              <p className="text-sm">Please adjust your filters to view chart data.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
