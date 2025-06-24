@@ -31,9 +31,12 @@ import {
   faArrowTrendUp,
   faPaperPlane,
   faStar,
+  faChevronLeft,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons"
 import { faBookmark as faBookmarkRegular } from "@fortawesome/free-regular-svg-icons"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
+import SponsorshipOutcomeTable from "../sponsorship-outcome-table"
 
 // Available placement options
 const PLACEMENT_OPTIONS = [
@@ -1328,6 +1331,7 @@ export default function Page() {
                         <Popover>
                           <PopoverTrigger asChild>
                             <button className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left text-sm hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              {" "}
                               <span className="text-gray-500">Select Rightsholders</span>
                               <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                             </button>
@@ -2844,13 +2848,202 @@ export default function Page() {
                       </TabsList>
 
                       <TabsContent value="table" className="space-y-6">
-                        <DataTable data={filteredData} />
+                        <SponsorshipOutcomeTable data={filteredData} />
                       </TabsContent>
 
                       <TabsContent value="visualization" className="space-y-6">
-                        <DataBarChart data={filteredData} />
-                        <MultiMetricChart data={filteredData} />
-                        <ComparisonLineChart data={filteredData} />
+                        {/* Comparing Properties by Favourability Chart */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Comparing Properties by Favourability
+                            </h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <button className="text-blue-600 hover:text-blue-800">Copy link to this report</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Download CSV</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Save as PNG</button>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="flex items-center gap-2">
+                              <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                              <span className="text-sm text-gray-700">Show Average</span>
+                            </label>
+                          </div>
+
+                          <div className="relative">
+                            <div className="flex items-center justify-between mb-2">
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
+                              </button>
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            <div className="space-y-3">
+                              {[
+                                { name: "Ferrari", value: 17, logo: "🏎️" },
+                                { name: "Renault", value: 16, logo: "🏎️" },
+                                { name: "Los Angeles Lakers", value: 13, logo: "🏀" },
+                                { name: "McLaren", value: 13, logo: "🏎️" },
+                                { name: "Mercedes Formula One", value: 13, logo: "🏎️" },
+                                { name: "Red Bull Racing", value: 11, logo: "🏎️" },
+                                { name: "Alfa Romeo Racing", value: 9, logo: "🏎️" },
+                                { name: "AlphaTauri", value: 9, logo: "🏎️" },
+                                { name: "Aston Martin (F1 Team)", value: 9, logo: "🏎️" },
+                              ].map((item, index) => (
+                                <div key={index} className="flex items-center gap-3">
+                                  <div className="w-32 text-sm text-gray-700 flex items-center gap-2">
+                                    <span>{item.logo}</span>
+                                    <span className="truncate">{item.name}</span>
+                                  </div>
+                                  <div className="flex-1 relative">
+                                    <div className="h-8 bg-gray-100 rounded">
+                                      <div
+                                        className="h-full bg-teal-500 rounded flex items-center justify-end pr-2"
+                                        style={{ width: `${(item.value / 20) * 100}%` }}
+                                      >
+                                        <span className="text-white text-xs font-medium">{item.value}%</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Comparing Properties by Opportunity Score Chart */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Comparing Properties by Opportunity Score
+                            </h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <button className="text-blue-600 hover:text-blue-800">Copy link to this report</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Download CSV</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Save as PNG</button>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="flex items-center gap-2">
+                              <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                              <span className="text-sm text-gray-700">Show Average</span>
+                            </label>
+                          </div>
+
+                          <div className="relative">
+                            <div className="flex items-center justify-between mb-2">
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
+                              </button>
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            <div className="space-y-3">
+                              {[
+                                { name: "Ferrari", value: 34, logo: "🏎️" },
+                                { name: "Renault", value: 28, logo: "🏎️" },
+                                { name: "McLaren", value: 26, logo: "🏎️" },
+                                { name: "Los Angeles Lakers", value: 26, logo: "🏀" },
+                                { name: "Mercedes Formula One", value: 25, logo: "🏎️" },
+                                { name: "Red Bull Racing", value: 22, logo: "🏎️" },
+                                { name: "Williams F1 Racing", value: 17, logo: "🏎️" },
+                                { name: "Aston Martin F1 Team", value: 16, logo: "🏎️" },
+                                { name: "Alfa Romeo Racing", value: 14, logo: "🏎️" },
+                              ].map((item, index) => (
+                                <div key={index} className="flex items-center gap-3">
+                                  <div className="w-32 text-sm text-gray-700 flex items-center gap-2">
+                                    <span>{item.logo}</span>
+                                    <span className="truncate">{item.name}</span>
+                                  </div>
+                                  <div className="flex-1 relative">
+                                    <div className="h-8 bg-gray-100 rounded">
+                                      <div
+                                        className="h-full bg-blue-600 rounded flex items-center justify-end pr-2"
+                                        style={{ width: `${(item.value / 40) * 100}%` }}
+                                      >
+                                        <span className="text-white text-xs font-medium">{item.value}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Comparing Properties by Intensity Chart */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Comparing Properties by Intensity</h3>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <button className="text-blue-600 hover:text-blue-800">Copy link to this report</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Download CSV</button>
+                              <span>|</span>
+                              <button className="text-blue-600 hover:text-blue-800">Save as PNG</button>
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="flex items-center gap-2">
+                              <input type="checkbox" defaultChecked className="rounded border-gray-300" />
+                              <span className="text-sm text-gray-700">Show Average</span>
+                            </label>
+                          </div>
+
+                          <div className="relative">
+                            <div className="flex items-center justify-between mb-2">
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
+                              </button>
+                              <button className="p-2 text-gray-400 hover:text-gray-600">
+                                <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            <div className="space-y-3">
+                              {[
+                                { name: "Ferrari", value: 35, logo: "🏎️" },
+                                { name: "Los Angeles Lakers", value: 35, logo: "🏀" },
+                                { name: "Alpine (F1 Team)", value: 34, logo: "🏎️" },
+                                { name: "Golden State Warriors", value: 33, logo: "🏀" },
+                                { name: "McLaren", value: 33, logo: "🏎️" },
+                                { name: "Mercedes Formula One", value: 33, logo: "🏎️" },
+                                { name: "Miami Dolphins", value: 33, logo: "🏈" },
+                                { name: "Red Bull Racing", value: 33, logo: "🏎️" },
+                                { name: "Boston Celtics", value: 32, logo: "🏀" },
+                              ].map((item, index) => (
+                                <div key={index} className="flex items-center gap-3">
+                                  <div className="w-32 text-sm text-gray-700 flex items-center gap-2">
+                                    <span>{item.logo}</span>
+                                    <span className="truncate">{item.name}</span>
+                                  </div>
+                                  <div className="flex-1 relative">
+                                    <div className="h-8 bg-gray-100 rounded">
+                                      <div
+                                        className="h-full bg-teal-500 rounded flex items-center justify-end pr-2"
+                                        style={{ width: `${(item.value / 40) * 100}%` }}
+                                      >
+                                        <span className="text-white text-xs font-medium">{item.value}%</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       </TabsContent>
                     </Tabs>
                   </div>
@@ -2865,11 +3058,11 @@ export default function Page() {
       {showSaveFilterDrawer && (
         <div className="fixed inset-0 z-50 flex">
           {/* Semi-transparent overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
             onClick={closeSaveFilterDrawer}
           />
-          
+
           {/* Drawer */}
           <div
             className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
@@ -2926,32 +3119,43 @@ export default function Page() {
                         <FontAwesomeIcon icon={faChevronDown} className="h-4 w-4 text-gray-400" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
-                      <div className="space-y-1">
-                        {FILTER_CATEGORIES.map((category) => (
-                          <button
-                            key={category}
-                            onClick={() => {
-                              setFilterCategoryToSave(category)
-                              // Close the popover
-                              document.body.click()
-                            }}
-                            className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                              filterCategoryToSave === category
-                                ? "bg-blue-100 text-blue-900"
-                                : "hover:bg-gray-100 text-gray-700"
-                            }`}
-                          >
-                            {category}
-                          </button>
-                        ))}
+                    <PopoverContent className="w-64">
+                      <div className="p-3">
+                        <Input
+                          type="text"
+                          placeholder="Search categories..."
+                          value={filterCategorySearch}
+                          onChange={(e) => setFilterCategorySearch(e.target.value)}
+                          className="mb-3"
+                        />
+                        <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                          {FILTER_CATEGORIES.filter((category) =>
+                            category.toLowerCase().includes(filterCategorySearch.toLowerCase()),
+                          ).map((category) => (
+                            <button
+                              key={category}
+                              onClick={() => {
+                                setFilterCategoryToSave(category)
+                                // Close the popover
+                                document.body.click()
+                              }}
+                              className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                                filterCategoryToSave === category
+                                  ? "bg-blue-100 text-blue-900"
+                                  : "hover:bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {category}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </PopoverContent>
                   </Popover>
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
-                  <button onClick={closeSaveFilterDrawer} className="btn-utility">
+                <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                  <button onClick={closeSaveFilterDrawer} className="btn-secondary">
                     Cancel
                   </button>
                   <button onClick={saveCurrentFilters} className="btn-primary">
@@ -2968,11 +3172,11 @@ export default function Page() {
       {showSavedFiltersDrawer && (
         <div className="fixed inset-0 z-50 flex">
           {/* Semi-transparent overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
             onClick={closeSavedFiltersDrawer}
           />
-          
+
           {/* Drawer */}
           <div
             className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
@@ -2987,77 +3191,175 @@ export default function Page() {
                 </button>
               </div>
 
-              <div className="mb-4">
+              <div className="space-y-4">
                 <Input
                   type="text"
-                  placeholder="Search filters..."
+                  placeholder="Search saved filters..."
                   value={filterCategorySearch}
                   onChange={(e) => setFilterCategorySearch(e.target.value)}
                 />
-              </div>
 
-              {filteredSavedFilters.length === 0 ? (
-                <div className="flex items-center justify-center h-48 text-gray-500">
-                  <div className="text-center">
-                    <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
-                    <h4 className="font-medium text-gray-700 mb-2">No Saved Filters Yet</h4>
-                    <p className="text-sm text-gray-500">Save filters to access them later and streamline your analysis.</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredSavedFilters.map((filter) => (
-                    <div key={filter.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <h5 className="font-semibold text-gray-900">{filter.name}</h5>
-                          <p className="text-xs text-gray-500">
-                            Created on {filter.createdAt.toLocaleDateString()} | Category: {filter.category}
+                {filteredSavedFilters.length === 0 ? (
+                  <div className="flex items-center justify-center h-48 text-gray-500">
+                    <div className="text-center">
+                      <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
+                      <h4 className="font-medium text-gray-700 mb-2">No Saved Filters Yet</h4>
+                      <p className="text-sm text-gray-500">
+                        Save your frequently used filters for quick access and streamlined analysis.
                       </p>
-                      {filter.description && <p className="text-sm text-gray-600 mt-1">{filter.description}</p>}
-                    </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => applySavedFilter(filter)} className="btn-secondary btn-sm">
-                        Apply
-                      </button>
-                      <button onClick={() => editSavedFilter(filter)} className="btn-secondary btn-sm">
-                        Edit
-                      </button>
-                      <button onClick={() => deleteSavedFilter(filter.id)} className="btn-tertiary btn-sm">
-                        Delete
-                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                ) : (
+                  <div className="space-y-3 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 hover:scrollbar-thumb-gray-500">
+                    {filteredSavedFilters.map((filter) => (
+                      <div key={filter.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-sm font-medium text-gray-900">{filter.name}</div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => applySavedFilter(filter)}
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                            >
+                              <FontAwesomeIcon icon={faEye} className="h-3 w-3 mr-1" />
+                              Apply
+                            </button>
+                            <button
+                              onClick={() => editSavedFilter(filter)}
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-600 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+                            >
+                              <FontAwesomeIcon icon={faSliders} className="h-3 w-3 mr-1" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => deleteSavedFilter(filter.id)}
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                            >
+                              <FontAwesomeIcon icon={faTimes} className="h-3 w-3 mr-1" />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Created: {filter.createdAt.toLocaleDateString()} • Category: {filter.category}
+                        </div>
+                        {filter.description && <div className="text-sm text-gray-700 mt-2">{filter.description}</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-            <div className="flex items-center justify-end gap-3 mt-6">
-              <button onClick={closeSavedFiltersDrawer} className="btn-utility">
-                Close
-              </button>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                  <button onClick={closeSavedFiltersDrawer} className="btn-secondary">
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
+
+      {/* All Insights Modal */}
+      {showAllInsightsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Semi-transparent overlay */}
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowAllInsightsModal(false)}></div>
+
+          {/* Modal Content */}
+          <div className="relative z-10 bg-white rounded-lg shadow-xl w-full max-w-4xl overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">All Saved Custom Insights</h2>
+                <button onClick={() => setShowAllInsightsModal(false)} className="text-gray-500 hover:text-gray-700">
+                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
+                </button>
+              </div>
+
+              {savedCustomInsights.length === 0 ? (
+                <div className="flex items-center justify-center h-48 text-gray-500">
+                  <div className="text-center">
+                    <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
+                    <h4 className="font-medium text-gray-700 mb-2">No Saved Insights Yet</h4>
+                    <p className="text-sm text-gray-500">
+                      Save generated insights to access them later and track your analysis.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Date Created</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Created By</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Insight Type</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 text-sm">Insight Title</th>
+                        <th className="text-center py-3 px-4 font-semibold text-gray-700 text-sm">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {savedCustomInsights.map((insight, index) => (
+                        <tr
+                          key={insight.id}
+                          className={`${
+                            index % 2 === 0 ? "bg-white" : "bg-purple-50"
+                          } border-b border-gray-100 hover:bg-gray-50 transition-colors`}
+                        >
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            {insight.dateGenerated.toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">{insight.createdBy}</td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {insight.insightType}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-900">
+                            <div className="max-w-xs truncate" title={insight.query}>
+                              {insight.query}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => toggleGeneratedInsightExpansion(insight.id)}
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                                title="View insight details"
+                              >
+                                <FontAwesomeIcon icon={faEye} className="h-3 w-3 mr-1" />
+                                View
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSavedCustomInsights((prev) => prev.filter((item) => item.id !== insight.id))
+                                }}
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                                title="Delete insight"
+                              >
+                                <FontAwesomeIcon icon={faTimes} className="h-3 w-3 mr-1" />
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rating Drawer */}
       {showRatingDrawer && (
-        <div className="fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Semi-transparent overlay */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
-            onClick={() => setShowRatingDrawer(false)}
-          />
-          
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowRatingDrawer(false)}></div>
+
           {/* Drawer */}
-          <div
-            className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
-              showRatingDrawer ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
+          <div className="relative z-10 bg-white rounded-lg shadow-xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Rate This Insight</h2>
@@ -3067,37 +3369,38 @@ export default function Page() {
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Your Rating</label>
-                  <div className="flex items-center mt-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setCurrentRating(star)}
-                        className={`text-2xl ${star <= currentRating ? "text-yellow-500" : "text-gray-300"}`}
-                      >
-                        <FontAwesomeIcon icon={faStar} />
-                      </button>
-                    ))}
-                  </div>
+                {/* Star Rating */}
+                <div className="flex items-center justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setCurrentRating(star)}
+                      className={`text-3xl transition-colors ${
+                        star <= currentRating ? "text-yellow-500" : "text-gray-300 hover:text-yellow-400"
+                      }`}
+                    >
+                      <FontAwesomeIcon icon={faStar} />
+                    </button>
+                  ))}
                 </div>
 
+                {/* Feedback Input */}
                 <div>
-                  <label htmlFor="ratingFeedback" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="ratingFeedback" className="block text-sm font-medium text-gray-700 mb-1">
                     Feedback (Optional)
                   </label>
                   <Input
                     type="text"
                     id="ratingFeedback"
-                    placeholder="Enter your feedback"
+                    placeholder="Share your thoughts..."
                     value={ratingFeedback}
                     onChange={(e) => setRatingFeedback(e.target.value)}
-                    className="mt-1"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
-                  <button onClick={() => setShowRatingDrawer(false)} className="btn-utility">
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                  <button onClick={() => setShowRatingDrawer(false)} className="btn-secondary">
                     Cancel
                   </button>
                   <button
@@ -3117,272 +3420,101 @@ export default function Page() {
         </div>
       )}
 
-      {/* All Insights Modal */}
-      {showAllInsightsModal && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">All Saved Custom Insights</h2>
-              <button onClick={() => setShowAllInsightsModal(false)} className="text-gray-500 hover:text-gray-700">
-                <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-              </button>
-            </div>
-
-            {savedCustomInsights.length === 0 ? (
-              <div className="flex items-center justify-center h-48 text-gray-500">
-                <div className="text-center">
-                  <FontAwesomeIcon icon={faBookmark} className="h-12 w-12 mb-4 text-gray-400" />
-                  <h4 className="font-medium text-gray-700 mb-2">No Saved Insights Yet</h4>
-                  <p className="text-sm text-gray-500">Save generated insights to access them later.</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {savedCustomInsights.map((insight) => (
-                  <div key={insight.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h5 className="font-semibold text-gray-900">{insight.insightType}</h5>
-                        <p className="text-xs text-gray-500">
-                          Generated on {insight.dateGenerated.toLocaleDateString()}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => toggleGeneratedInsightExpansion(insight.id)}
-                        className="text-gray-600 hover:text-gray-800"
-                      >
-                        <FontAwesomeIcon
-                          icon={expandedGeneratedInsightId === insight.id ? faChevronUp : faChevronDown}
-                          className="h-4 w-4"
-                        />
-                      </button>
-                    </div>
-                    {expandedGeneratedInsightId === insight.id && (
-                      <div className="space-y-3">
-                        <div className="text-sm text-gray-700">
-                          <span className="font-medium">Query:</span> {insight.query}
-                        </div>
-                        <div className="text-sm text-gray-700">
-                          <span className="font-medium">Insight:</span> {insight.insight.summary}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-center justify-end gap-3 mt-6">
-              <button onClick={() => setShowAllInsightsModal(false)} className="btn-utility">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Scorecard Drawer */}
       {showScorecardDrawer && (
         <div className="fixed inset-0 z-50 flex">
           {/* Semi-transparent overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
             onClick={closeScorecardDrawer}
           />
-          
+
           {/* Drawer */}
           <div
-            className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+            className={`fixed top-0 right-0 h-full w-full max-w-4xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-y-auto ${
               scorecardDrawerAnimating ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">{scorecardData.teamName} Scorecard</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Property Opportunity Scorecard</h2>
                 <button onClick={closeScorecardDrawer} className="text-gray-500 hover:text-gray-700">
                   <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
                 </button>
               </div>
 
+              {/* Scorecard Content */}
               <div className="space-y-6">
-                {/* Top Metrics Section */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <h5 className="font-semibold text-gray-900 mb-2">Sample Surveyed</h5>
-                    <div className="text-3xl font-bold text-blue-600">{scorecardData.sampleSurveyed}</div>
+                {/* Header Stats */}
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="text-sm text-blue-600 font-medium">Team</div>
+                    <div className="text-lg font-bold text-blue-900">{scorecardData.teamName}</div>
                   </div>
-
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <h5 className="font-semibold text-gray-900 mb-2">Opportunity Rank</h5>
-                    <div className="text-3xl font-bold text-green-600">{scorecardData.opportunityRank}</div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="text-sm text-green-600 font-medium">Sample Surveyed</div>
+                    <div className="text-lg font-bold text-green-900">{scorecardData.sampleSurveyed}</div>
                   </div>
-
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <h5 className="font-semibold text-gray-900 mb-2">Opportunity Score</h5>
-                    <div className="text-3xl font-bold text-purple-600">{scorecardData.opportunityScore}</div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <div className="text-sm text-purple-600 font-medium">Opportunity Rank</div>
+                    <div className="text-lg font-bold text-purple-900">#{scorecardData.opportunityRank}</div>
                   </div>
-                </div>
-
-                {/* Opportunity Value Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <h5 className="font-semibold text-gray-900 mb-2">Opportunity Value</h5>
-                  <div className="text-2xl font-bold text-orange-600">${scorecardData.opportunityValue}M</div>
-                </div>
-
-                {/* Total Fans Surveyed Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <h5 className="font-semibold text-gray-900 mb-2">Total Fans Surveyed</h5>
-                  <div className="text-2xl font-bold text-blue-600">{scorecardData.totalFansSurveyed.engagement}%</div>
-                </div>
-
-                {/* Behavior and Interest Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <h5 className="font-semibold text-gray-900 mb-2">Behavior and Interest</h5>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500">Intensity</div>
-                      <div className="text-xl font-bold text-green-600">{scorecardData.behaviorAndInterest.intensity}%</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500">Momentum</div>
-                      <div className="text-xl font-bold text-purple-600">{scorecardData.behaviorAndInterest.momentum}%</div>
-                    </div>
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                    <div className="text-sm text-orange-600 font-medium">Opportunity Score</div>
+                    <div className="text-lg font-bold text-orange-900">{scorecardData.opportunityScore}</div>
                   </div>
                 </div>
 
-                {/* Potential Sponsor Impact Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                  <h5 className="font-semibold text-gray-900 mb-2">Potential Sponsor Impact</h5>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500">Consideration</div>
-                      <div className="text-xl font-bold text-green-600">
-                        {scorecardData.potentialSponsorImpact.consideration}%
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500">Favorability</div>
-                      <div className="text-xl font-bold text-purple-600">
-                        {scorecardData.potentialSponsorImpact.favorability}%
-                      </div>
-                    </div>
+                {/* Teams Data Table */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Team Performance Data</h3>
                   </div>
-                </div>
-
-                {/* Horizontal Divider */}
-                <hr className="border-gray-300 mb-6" />
-
-                {/* Teams Comparison Table */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-blue-700 text-lg">Teams Comparison</h4>
-                    <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                      EXPORT TO CSV
-                    </button>
-                  </div>
-
-                  <div className="overflow-x-auto -mx-6 px-6">
-                    <div className="min-w-full">
-                      <table className="w-full border-collapse text-xs">
-                        <thead>
-                          <tr className="bg-gray-100">
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[120px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Rightsholder</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Brand</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[80px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Region</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Aided Awareness</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[90px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Net Favorable</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
-                            <th className="text-left py-2 px-2 font-semibold text-gray-700 border border-gray-300 min-w-[100px]">
-                              <div className="flex items-center gap-1">
-                                <span className="truncate">Net Consideration</span>
-                                <div className="flex flex-col">
-                                  <FontAwesomeIcon icon={faChevronUp} className="h-2 w-2 text-gray-400" />
-                                  <FontAwesomeIcon icon={faChevronDown} className="h-2 w-2 text-gray-400" />
-                                </div>
-                              </div>
-                            </th>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Rightsholder
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Brand
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Region
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Aided Sponsorship Awareness
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Net More Favorable
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Net Increase Consideration
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {scorecardData.teamsData.map((team, index) => (
+                          <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {team.rightsholder}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.brand}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.region}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {team.aidedSponsorshipAwareness}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {team.netMoreFavorable}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {team.netIncreaseConsideration}
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {scorecardData.teamsData.map((team, index) => (
-                            <tr
-                              key={team.rightsholder}
-                              className={`${
-                                team.rightsholder === "San Antonio Spurs"
-                                  ? "bg-blue-50 font-semibold"
-                                  : index % 2 === 0
-                                    ? "bg-gray-50"
-                                    : "bg-white"
-                              } hover:bg-gray-100 transition-colors`}
-                            >
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                                <div className="truncate" title={team.rightsholder}>
-                                  {team.rightsholder}
-                                </div>
-                              </td>
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                                <div className="truncate" title={team.brand}>
-                                  {team.brand}
-                                </div>
-                              </td>
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900">
-                                <div className="truncate" title={team.region}>
-                                  {team.region}
-                                </div>
-                              </td>
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                                {team.aidedSponsorshipAwareness}
-                              </td>
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                                {team.netMoreFavorable}
-                              </td>
-                              <td className="py-2 px-2 border border-gray-300 text-gray-900 text-center">
-                                {team.netIncreaseConsideration}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -3395,14 +3527,14 @@ export default function Page() {
       {showSurveyScoresDrawer && (
         <div className="fixed inset-0 z-50 flex">
           {/* Semi-transparent overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
             onClick={closeSurveyScoresDrawer}
           />
-          
+
           {/* Drawer */}
           <div
-            className={`fixed top-0 right-0 h-full w-full max-w-3xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+            className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-y-auto ${
               surveyScoresDrawerAnimating ? "translate-x-0" : "translate-x-full"
             }`}
           >
@@ -3415,8 +3547,10 @@ export default function Page() {
               </div>
 
               <div className="space-y-6">
-                {/* Placeholder Content */}
-                <p className="text-gray-600">Survey scores content will be displayed here.</p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-2">Survey Scores Content</h3>
+                  <p className="text-sm text-gray-600">Survey scores and detailed analytics would be displayed here.</p>
+                </div>
               </div>
             </div>
           </div>

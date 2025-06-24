@@ -17,50 +17,13 @@ import {
   faSortUp,
   faSortDown,
 } from "@fortawesome/free-solid-svg-icons"
-import { faTiktok, faInstagram, faYoutube, faTwitter } from "@fortawesome/free-brands-svg-icons"
-
-const PlatformIcon = ({ platform }: { platform: string }) => {
-  const getIcon = () => {
-    switch (platform) {
-      case "TikTok":
-        return faTiktok
-      case "Instagram":
-        return faInstagram
-      case "YouTube":
-        return faYoutube
-      case "Twitter":
-        return faTwitter
-      default:
-        return faTwitter
-    }
-  }
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
-            <FontAwesomeIcon icon={getIcon()} className="h-4 w-4" />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{platform}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
-}
 
 type SortConfig = {
   key: string
   direction: "asc" | "desc"
 } | null
 
-type SearchFilters = {
-  [key: string]: string
-}
-
-interface DataTableProps {
+interface SponsorshipOutcomeTableProps {
   data: Array<{
     id: number
     dateObj: Date
@@ -76,65 +39,45 @@ interface DataTableProps {
   }>
 }
 
-export default function DataTable({ data }: DataTableProps) {
+export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const [isExpanded, setIsExpanded] = useState(true)
   const [sortConfig, setSortConfig] = useState<SortConfig>(null)
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({})
-  const [activeSearchColumn, setActiveSearchColumn] = useState<string | null>(null)
   const itemsPerPage = 10
 
-  // Format the data for display
+  // Transform data for property opportunity scores
   const baseData = useMemo(() => {
     return data
       .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
-      .map((item) => ({
+      .map((item, index) => ({
         ...item,
-        date: item.dateObj.toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "numeric",
-        }),
-        sponsors: item.sponsors || "Brand Name",
-        exposures: item.impressions + item.views + item.videoViews,
-        duration: Math.floor(Math.random() * (600 - 300 + 1) + 300),
-        engagements: Math.floor(item.views * 0.1),
-        mvp: Math.floor(Math.random() * 100 + 1),
-        postCount: Math.floor(Math.random() * 5 + 1),
-        impressionsFormatted: `${Math.floor(item.impressions / 1000).toFixed(1)}k`,
-        videoViewsFormatted: `${Math.floor(item.videoViews / 1000).toFixed(1)}k`,
-        engagementsFormatted: `${Math.floor((item.views * 0.1) / 1000).toFixed(1)}k`,
+        property: `Property ${String.fromCharCode(65 + (index % 26))}`, // Property A, B, C, etc.
+        location: ["Downtown", "Midtown", "Uptown", "Suburbs", "Waterfront"][index % 5],
+        propertyType: ["Office", "Retail", "Mixed Use", "Residential", "Industrial"][index % 5],
+        size: `${Math.floor(Math.random() * 50 + 10)}k sq ft`,
+        currentOccupancy: `${Math.floor(Math.random() * 40 + 60)}%`,
+        marketRent: `$${Math.floor(Math.random() * 30 + 20)}/sq ft`,
+        opportunityScore: Math.floor(Math.random() * 40 + 60),
+        potentialROI: `${Math.floor(Math.random() * 15 + 8)}%`,
+        riskLevel: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
+        timeToMarket: `${Math.floor(Math.random() * 12 + 6)} months`,
       }))
   }, [data])
 
-  // Apply sorting and filtering
-  const filteredAndSortedData = useMemo(() => {
-    let processedData = [...baseData]
+  // Apply sorting
+  const sortedData = useMemo(() => {
+    const processedData = [...baseData]
 
-    // Apply search filters
-    Object.entries(searchFilters).forEach(([column, searchTerm]) => {
-      if (searchTerm) {
-        processedData = processedData.filter((item) => {
-          const value = item[column as keyof typeof item]
-          return value?.toString()?.toLowerCase().includes(searchTerm.toLowerCase())
-        })
-      }
-    })
-
-    // Apply sorting
     if (sortConfig) {
       processedData.sort((a, b) => {
         const aValue = a[sortConfig.key as keyof typeof a]
         const bValue = b[sortConfig.key as keyof typeof a]
 
-        // Handle different data types
         if (sortConfig.key === "date") {
           const aDate = new Date(aValue as string)
           const bDate = new Date(bValue as string)
           return sortConfig.direction === "asc" ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime()
         }
 
-        // Handle numeric values
         if (
           typeof aValue === "string" &&
           (aValue.includes("$") || aValue.includes("%") || !isNaN(Number(aValue.replace(/[,$%]/g, ""))))
@@ -144,7 +87,6 @@ export default function DataTable({ data }: DataTableProps) {
           return sortConfig.direction === "asc" ? aNum - bNum : bNum - aNum
         }
 
-        // Handle string values
         const aStr = aValue?.toString().toLowerCase() || ""
         const bStr = bValue?.toString().toLowerCase() || ""
 
@@ -155,23 +97,29 @@ export default function DataTable({ data }: DataTableProps) {
     }
 
     return processedData
-  }, [baseData, searchFilters, sortConfig])
+  }, [baseData, sortConfig])
 
   // Calculate totals
   const totals = useMemo(() => {
     return {
-      exposures: filteredAndSortedData.reduce((sum, item) => sum + (item.exposures || 0), 0),
-      impressions: filteredAndSortedData.reduce((sum, item) => sum + (item.impressions || 0), 0),
-      videoViews: filteredAndSortedData.reduce((sum, item) => sum + (item.videoViews || 0), 0),
-      engagements: filteredAndSortedData.reduce((sum, item) => sum + (item.engagements || 0), 0),
+      reach: sortedData.reduce((sum, item) => sum + (Math.floor(item.impressions * 0.8) || 0), 0),
+      impressions: sortedData.reduce((sum, item) => sum + (item.impressions || 0), 0),
+      engagement: sortedData.reduce((sum, item) => sum + (Math.floor(item.views * 0.15) || 0), 0),
+      clicks: sortedData.reduce((sum, item) => sum + (Math.floor(item.views * 0.05) || 0), 0),
+      conversions: sortedData.reduce((sum, item) => sum + (Math.floor(item.views * 0.02) || 0), 0),
+      revenue: sortedData.reduce((sum, item) => sum + (item.fmv * 1000 || 0), 0),
+      roi:
+        sortedData.length > 0
+          ? sortedData.reduce((sum, item) => sum + (Math.floor(Math.random() * 150 + 50) || 0), 0) / sortedData.length
+          : 0,
     }
-  }, [filteredAndSortedData])
+  }, [sortedData])
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage)
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentData = filteredAndSortedData.slice(startIndex, endIndex)
+  const currentData = sortedData.slice(startIndex, endIndex)
 
   const handleSort = (column: string) => {
     setSortConfig((prevConfig) => {
@@ -197,57 +145,56 @@ export default function DataTable({ data }: DataTableProps) {
   }
 
   const handleDownloadCSV = () => {
-    // Define CSV headers
     const headers = [
       "Date",
-      "Sponsors",
-      "Exposures",
-      "Duration (Sec)",
+      "Campaign",
+      "Brand",
+      "Platform",
+      "Content Type",
+      "Reach",
       "Impressions",
-      "Video Views",
-      "Engagements",
-      "FMV",
-      "MVP %",
-      "Post Count",
+      "Engagement",
+      "Clicks",
+      "Conversions",
+      "Revenue",
+      "ROI %",
     ]
 
-    // Convert data to CSV format
-    const csvData = filteredAndSortedData.map((row) => [
+    const csvData = sortedData.map((row) => [
       row.date,
-      row.sponsors,
-      row.exposures,
-      row.duration,
-      row.impressions,
-      row.videoViews,
-      row.engagements,
-      row.fmv,
-      row.mvp,
-      row.postCount,
+      row.campaign,
+      row.brand,
+      row.platform,
+      row.contentType,
+      row.reachFormatted,
+      row.impressionsFormatted,
+      row.engagementFormatted,
+      row.clicks,
+      row.conversions,
+      row.revenueFormatted,
+      row.roiFormatted,
     ])
 
-    // Add totals row
     const totalsRow = [
       "Total",
       "-",
-      totals.exposures,
-      "-",
-      totals.impressions,
-      totals.videoViews,
-      totals.engagements,
       "-",
       "-",
       "-",
+      (totals.reach / 1000).toFixed(1) + "k",
+      (totals.impressions / 1000).toFixed(1) + "k",
+      (totals.engagement / 1000).toFixed(1) + "k",
+      totals.clicks,
+      totals.conversions,
+      "$" + (totals.revenue / 1000).toFixed(1) + "k",
+      totals.roi.toFixed(1) + "%",
     ]
 
-    // Combine headers, data, and totals
     const allData = [headers, ...csvData, totalsRow]
-
-    // Convert to CSV string
     const csvContent = allData
       .map((row) =>
         row
           .map((cell) => {
-            // Handle cells that contain commas or quotes
             const cellStr = String(cell)
             if (cellStr.includes(",") || cellStr.includes('"') || cellStr.includes("\n")) {
               return `"${cellStr.replace(/"/g, '""')}"`
@@ -258,13 +205,12 @@ export default function DataTable({ data }: DataTableProps) {
       )
       .join("\n")
 
-    // Create and download the file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
 
     link.setAttribute("href", url)
-    link.setAttribute("download", `measures-breakdown-${new Date().toISOString().split("T")[0]}.csv`)
+    link.setAttribute("download", `sponsorship-outcome-data-${new Date().toISOString().split("T")[0]}.csv`)
     link.style.visibility = "hidden"
 
     document.body.appendChild(link)
@@ -275,16 +221,16 @@ export default function DataTable({ data }: DataTableProps) {
   }
 
   const columns = [
-    { key: "date", label: "Date" },
-    { key: "sponsors", label: "Sponsors" },
-    { key: "exposures", label: "Exposures" },
-    { key: "duration", label: "Duration (Sec)" },
-    { key: "impressions", label: "Impressions" },
-    { key: "videoViews", label: "Video Views" },
-    { key: "engagements", label: "Engagements" },
-    { key: "fmv", label: "FMV" },
-    { key: "mvp", label: "MVP %" },
-    { key: "postCount", label: "Post Count" },
+    { key: "property", label: "Property" },
+    { key: "location", label: "Location" },
+    { key: "propertyType", label: "Property Type" },
+    { key: "size", label: "Size" },
+    { key: "currentOccupancy", label: "Current Occupancy" },
+    { key: "marketRent", label: "Market Rent" },
+    { key: "opportunityScore", label: "Opportunity Score" },
+    { key: "potentialROI", label: "Potential ROI" },
+    { key: "riskLevel", label: "Risk Level" },
+    { key: "timeToMarket", label: "Time to Market" },
   ]
 
   return (
@@ -292,7 +238,9 @@ export default function DataTable({ data }: DataTableProps) {
       <Card className="w-full mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold text-gray-900">Measures Breakdown By Date</CardTitle>
+            <CardTitle className="text-xl font-semibold text-gray-900">
+              Comparing Properties by Opportunity Score
+            </CardTitle>
             <div className="flex items-center gap-3">
               <TooltipProvider>
                 <Tooltip>
@@ -345,34 +293,54 @@ export default function DataTable({ data }: DataTableProps) {
                     className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                   >
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.date}
+                      {row.property}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.sponsors}
+                      {row.location}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.exposures}
+                      {row.propertyType}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.duration}
+                      {row.size}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.impressions}
+                      {row.currentOccupancy}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.videoViews}
+                      {row.marketRent}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.engagements}
+                      <span
+                        className={`px-2 py-1 rounded text-sm font-medium ${
+                          row.opportunityScore >= 80
+                            ? "bg-green-100 text-green-800"
+                            : row.opportunityScore >= 60
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row.opportunityScore}
+                      </span>
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.fmv}
+                      {row.potentialROI}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.mvp}
+                      <span
+                        className={`px-2 py-1 rounded text-sm font-medium ${
+                          row.riskLevel === "Low"
+                            ? "bg-green-100 text-green-800"
+                            : row.riskLevel === "Medium"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row.riskLevel}
+                      </span>
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.postCount}
+                      {row.timeToMarket}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-center">
                       <DropdownMenu modal={false}>
@@ -399,21 +367,16 @@ export default function DataTable({ data }: DataTableProps) {
                 {/* Totals Row */}
                 <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    Total
+                    Total Properties: {sortedData.length}
                   </TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.exposures}
-                  </TableCell>
+                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
+                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
+                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.impressions}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.videoViews}
-                  </TableCell>
-                  <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    {totals.engagements}
+                    Avg:{" "}
+                    {Math.floor(sortedData.reduce((sum, item) => sum + item.opportunityScore, 0) / sortedData.length)}
                   </TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
