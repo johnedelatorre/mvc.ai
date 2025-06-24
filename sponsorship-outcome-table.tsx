@@ -46,21 +46,143 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
 
   // Transform data for property opportunity scores
   const baseData = useMemo(() => {
-    return data
-      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
-      .map((item, index) => ({
-        ...item,
-        property: `Property ${String.fromCharCode(65 + (index % 26))}`, // Property A, B, C, etc.
-        location: ["Downtown", "Midtown", "Uptown", "Suburbs", "Waterfront"][index % 5],
-        propertyType: ["Office", "Retail", "Mixed Use", "Residential", "Industrial"][index % 5],
-        size: `${Math.floor(Math.random() * 50 + 10)}k sq ft`,
-        currentOccupancy: `${Math.floor(Math.random() * 40 + 60)}%`,
-        marketRent: `$${Math.floor(Math.random() * 30 + 20)}/sq ft`,
-        opportunityScore: Math.floor(Math.random() * 40 + 60),
-        potentialROI: `${Math.floor(Math.random() * 15 + 8)}%`,
-        riskLevel: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
-        timeToMarket: `${Math.floor(Math.random() * 12 + 6)} months`,
-      }))
+    const sportsTeams = [
+      {
+        teamName: "Lakers",
+        league: "NBA",
+        sport: "Basketball",
+        marketSize: "Large",
+        currentPerformance: "85%",
+        revenuePotential: "$45M",
+        opportunityScore: 92,
+        potentialROI: "15%",
+        riskLevel: "Low",
+        timeToImpact: "3 months",
+      },
+      {
+        teamName: "Cowboys",
+        league: "NFL",
+        sport: "Football",
+        marketSize: "Large",
+        currentPerformance: "78%",
+        revenuePotential: "$52M",
+        opportunityScore: 88,
+        potentialROI: "18%",
+        riskLevel: "Low",
+        timeToImpact: "4 months",
+      },
+      {
+        teamName: "Yankees",
+        league: "MLB",
+        sport: "Baseball",
+        marketSize: "Large",
+        currentPerformance: "82%",
+        revenuePotential: "$38M",
+        opportunityScore: 85,
+        potentialROI: "12%",
+        riskLevel: "Medium",
+        timeToImpact: "5 months",
+      },
+      {
+        teamName: "Warriors",
+        league: "NBA",
+        sport: "Basketball",
+        marketSize: "Large",
+        currentPerformance: "90%",
+        revenuePotential: "$48M",
+        opportunityScore: 94,
+        potentialROI: "16%",
+        riskLevel: "Low",
+        timeToImpact: "2 months",
+      },
+      {
+        teamName: "Chiefs",
+        league: "NFL",
+        sport: "Football",
+        marketSize: "Medium",
+        currentPerformance: "88%",
+        revenuePotential: "$35M",
+        opportunityScore: 89,
+        potentialROI: "14%",
+        riskLevel: "Low",
+        timeToImpact: "3 months",
+      },
+      {
+        teamName: "Dodgers",
+        league: "MLB",
+        sport: "Baseball",
+        marketSize: "Large",
+        currentPerformance: "85%",
+        revenuePotential: "$42M",
+        opportunityScore: 87,
+        potentialROI: "13%",
+        riskLevel: "Medium",
+        timeToImpact: "4 months",
+      },
+      {
+        teamName: "Celtics",
+        league: "NBA",
+        sport: "Basketball",
+        marketSize: "Large",
+        currentPerformance: "83%",
+        revenuePotential: "$40M",
+        opportunityScore: 86,
+        potentialROI: "14%",
+        riskLevel: "Medium",
+        timeToImpact: "3 months",
+      },
+      {
+        teamName: "Packers",
+        league: "NFL",
+        sport: "Football",
+        marketSize: "Small",
+        currentPerformance: "80%",
+        revenuePotential: "$28M",
+        opportunityScore: 78,
+        potentialROI: "11%",
+        riskLevel: "Medium",
+        timeToImpact: "5 months",
+      },
+      {
+        teamName: "Red Sox",
+        league: "MLB",
+        sport: "Baseball",
+        marketSize: "Large",
+        currentPerformance: "75%",
+        revenuePotential: "$36M",
+        opportunityScore: 82,
+        potentialROI: "12%",
+        riskLevel: "Medium",
+        timeToImpact: "4 months",
+      },
+      {
+        teamName: "Heat",
+        league: "NBA",
+        sport: "Basketball",
+        marketSize: "Medium",
+        currentPerformance: "77%",
+        revenuePotential: "$32M",
+        opportunityScore: 80,
+        potentialROI: "13%",
+        riskLevel: "High",
+        timeToImpact: "6 months",
+      },
+    ]
+
+    return sportsTeams.map((team, index) => ({
+      ...(data[index] || data[0]), // Keep original structure for compatibility
+      id: index + 1,
+      teamName: team.teamName,
+      league: team.league,
+      sport: team.sport,
+      marketSize: team.marketSize,
+      currentPerformance: team.currentPerformance,
+      revenuePotential: team.revenuePotential,
+      opportunityScore: team.opportunityScore,
+      potentialROI: team.potentialROI,
+      riskLevel: team.riskLevel,
+      timeToImpact: team.timeToImpact,
+    }))
   }, [data])
 
   // Apply sorting
@@ -221,16 +343,16 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
   }
 
   const columns = [
-    { key: "property", label: "Property" },
-    { key: "location", label: "Location" },
-    { key: "propertyType", label: "Property Type" },
-    { key: "size", label: "Size" },
-    { key: "currentOccupancy", label: "Current Occupancy" },
-    { key: "marketRent", label: "Market Rent" },
+    { key: "teamName", label: "Team Name" },
+    { key: "league", label: "League" },
+    { key: "sport", label: "Sport" },
+    { key: "marketSize", label: "Market Size" },
+    { key: "currentPerformance", label: "Current Performance" },
+    { key: "revenuePotential", label: "Revenue Potential" },
     { key: "opportunityScore", label: "Opportunity Score" },
     { key: "potentialROI", label: "Potential ROI" },
     { key: "riskLevel", label: "Risk Level" },
-    { key: "timeToMarket", label: "Time to Market" },
+    { key: "timeToImpact", label: "Time to Impact" },
   ]
 
   return (
@@ -239,7 +361,7 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold text-gray-900">
-              Comparing Properties by Opportunity Score
+              Comparing Sports Teams By Opportunity Score
             </CardTitle>
             <div className="flex items-center gap-3">
               <TooltipProvider>
@@ -293,22 +415,22 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
                     className="bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                   >
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.property}
+                      {row.teamName}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.location}
+                      {row.league}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.propertyType}
+                      {row.sport}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.size}
+                      {row.marketSize}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.currentOccupancy}
+                      {row.currentPerformance}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.marketRent}
+                      {row.revenuePotential}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
                       <span
@@ -340,7 +462,7 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
                       </span>
                     </TableCell>
                     <TableCell className="py-3 px-4 text-sm text-gray-900 border-r border-gray-200">
-                      {row.timeToMarket}
+                      {row.timeToImpact}
                     </TableCell>
                     <TableCell className="py-3 px-4 text-center">
                       <DropdownMenu modal={false}>
@@ -367,7 +489,7 @@ export default function SponsorshipOutcomeTable({ data }: SponsorshipOutcomeTabl
                 {/* Totals Row */}
                 <TableRow className="bg-[#9BC5D9] hover:bg-[#9BC5D9] border-t-2 border-gray-400">
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">
-                    Total Properties: {sortedData.length}
+                    Total Teams: {sortedData.length}
                   </TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
                   <TableCell className="py-4 px-4 font-semibold text-gray-800 border-r border-gray-300">-</TableCell>
