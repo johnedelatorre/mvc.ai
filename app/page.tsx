@@ -3526,12 +3526,12 @@ export default function Page() {
                           <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
                           Engagement Optimization
                         </h4>
-                        <ul className="text-sm text-gray-700 space-y-1">
-                          <li>
-                            • Increase social media interaction campaigns to boost the current 58% engagement rate
+                        <ul className="text-sm text-gray-700 space-y-1 list-disc list-outside pl-5">
+                          <li className="">
+                            Increase social media interaction campaigns to boost the current 58% engagement rate
                           </li>
-                          <li>• Implement fan loyalty programs targeting the surveyed 202 sample base</li>
-                          <li>• Focus on digital touchpoints to improve overall fan connection</li>
+                          <li>Implement fan loyalty programs targeting the surveyed 202 sample base</li>
+                          <li>Focus on digital touchpoints to improve overall fan connection</li>
                         </ul>
                       </div>
 
@@ -3540,10 +3540,10 @@ export default function Page() {
                           <FontAwesomeIcon icon={faRobot} className="h-4 w-4" />
                           Intensity & Momentum Growth
                         </h4>
-                        <ul className="text-sm text-gray-700 space-y-1">
-                          <li>• Leverage the 70% intensity score with targeted content strategies</li>
-                          <li>• Address the 30% momentum gap through seasonal campaigns</li>
-                          <li>• Create exclusive fan experiences to drive emotional connection</li>
+                        <ul className="text-sm text-gray-700 space-y-1 list-disc list-outside pl-5">
+                          <li>Leverage the 70% intensity score with targeted content strategies</li>
+                          <li>Address the 30% momentum gap through seasonal campaigns</li>
+                          <li>Create exclusive fan experiences to drive emotional connection</li>
                         </ul>
                       </div>
                     </div>
@@ -3554,10 +3554,10 @@ export default function Page() {
                           <FontAwesomeIcon icon={faStar} className="h-4 w-4" />
                           Sponsor Impact Enhancement
                         </h4>
-                        <ul className="text-sm text-gray-700 space-y-1">
-                          <li>• Capitalize on 70% consideration rate with strategic sponsor partnerships</li>
-                          <li>• Improve 30% favorability through authentic brand integrations</li>
-                          <li>• Develop co-branded content to strengthen sponsor relationships</li>
+                        <ul className="text-sm text-gray-700 space-y-1 list-disc list-outside pl-5">
+                          <li>Capitalize on 70% consideration rate with strategic sponsor partnerships</li>
+                          <li>Improve 30% favorability through authentic brand integrations</li>
+                          <li>Develop co-branded content to strengthen sponsor relationships</li>
                         </ul>
                       </div>
 
@@ -3566,10 +3566,10 @@ export default function Page() {
                           <FontAwesomeIcon icon={faChartLine} className="h-4 w-4" />
                           Opportunity Score Advancement
                         </h4>
-                        <ul className="text-sm text-gray-700 space-y-1">
-                          <li>• Target moving from #6 to top 3 opportunity ranking</li>
-                          <li>• Increase opportunity score from 40 to 50+ through fan engagement</li>
-                          <li>• Focus on opportunity value growth beyond current 22 baseline</li>
+                        <ul className="text-sm text-gray-700 space-y-1 list-disc list-outside pl-5">
+                          <li>Target moving from #6 to top 3 opportunity ranking</li>
+                          <li>Increase opportunity score from 40 to 50+ through fan engagement</li>
+                          <li>Focus on opportunity value growth beyond current 22 baseline</li>
                         </ul>
                       </div>
                     </div>
