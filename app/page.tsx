@@ -3451,56 +3451,56 @@ export default function Page() {
                 </div>
 
                 {/* Snapshot Metrics */}
-                <div className="grid grid-cols-2 gap-6 mb-6">
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Fans Surveyed</h3>
-                    <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-blue-50 border border-gray-200 border-l-4 border-l-blue-500 rounded-md shadow-sm p-4 pl-4">
+                    <h3 className="text-xs uppercase text-gray-500 mb-2">Total Fans Surveyed</h3>
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Engagement</span>
-                        <span className="text-lg font-bold text-blue-600">
+                        <span className="text-xs uppercase text-gray-500">Engagement</span>
+                        <span className="text-2xl font-semibold text-gray-900">
                           {scorecardData.totalFansSurveyed.engagement}%
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Opportunity Value</h3>
-                    <div className="text-2xl font-bold text-green-600">{scorecardData.opportunityValue}</div>
+                  <div className="bg-green-50 border border-gray-200 border-l-4 border-l-green-500 rounded-md shadow-sm p-4 pl-4">
+                    <h3 className="text-xs uppercase text-gray-500 mb-2">Opportunity Value</h3>
+                    <div className="text-2xl font-semibold text-gray-900">{scorecardData.opportunityValue}</div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-6">
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Behavior and Interest</h3>
-                    <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-purple-50 border border-gray-200 border-l-4 border-l-purple-500 rounded-md shadow-sm p-4 pl-4">
+                    <h3 className="text-xs uppercase text-gray-500 mb-2">Behavior and Interest</h3>
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Intensity</span>
-                        <span className="text-lg font-bold text-purple-600">
+                        <span className="text-xs uppercase text-gray-500">Intensity</span>
+                        <span className="text-2xl font-semibold text-gray-900">
                           {scorecardData.behaviorAndInterest.intensity}%
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Momentum</span>
-                        <span className="text-lg font-bold text-orange-600">
+                        <span className="text-xs uppercase text-gray-500">Momentum</span>
+                        <span className="text-2xl font-semibold text-gray-900">
                           {scorecardData.behaviorAndInterest.momentum}%
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Potential Sponsor Impact</h3>
-                    <div className="space-y-3">
+                  <div className="bg-teal-50 border border-gray-200 border-l-4 border-l-teal-500 rounded-md shadow-sm p-4 pl-4">
+                    <h3 className="text-xs uppercase text-gray-500 mb-2">Potential Sponsor Impact</h3>
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Consideration</span>
-                        <span className="text-lg font-bold text-teal-600">
+                        <span className="text-xs uppercase text-gray-500">Consideration</span>
+                        <span className="text-2xl font-semibold text-gray-900">
                           {scorecardData.potentialSponsorImpact.consideration}%
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Favorability</span>
-                        <span className="text-lg font-bold text-red-600">
+                        <span className="text-xs uppercase text-gray-500">Favorability</span>
+                        <span className="text-2xl font-semibold text-gray-900">
                           {scorecardData.potentialSponsorImpact.favorability}%
                         </span>
                       </div>
@@ -3567,7 +3567,7 @@ export default function Page() {
                           Opportunity Score Advancement
                         </h4>
                         <ul className="text-sm text-gray-700 space-y-1 list-disc list-outside pl-5">
-                          <li>Target moving from #6 to top 3 opportunity ranking</li>
+                          <li>Target moving Opportunity Ranking from current #6 score to #3 to improve impact</li>
                           <li>Increase opportunity score from 40 to 50+ through fan engagement</li>
                           <li>Focus on opportunity value growth beyond current 22 baseline</li>
                         </ul>
