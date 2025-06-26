@@ -1085,88 +1085,6 @@ export default function Page() {
       consideration: 70,
       favorability: 30,
     },
-    teamsData: [
-      {
-        rightsholder: "New York Knicks",
-        brand: "Chase",
-        region: "New York",
-        aidedSponsorshipAwareness: "44%",
-        netMoreFavorable: "45%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Atlanta Hawks",
-        brand: "Nike",
-        region: "Atlanta",
-        aidedSponsorshipAwareness: "54%",
-        netMoreFavorable: "26%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Chicago Bulls",
-        brand: "Citizens Bank",
-        region: "Chicago",
-        aidedSponsorshipAwareness: "64%",
-        netMoreFavorable: "19%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "San Antonio Spurs",
-        brand: "T-Mobile",
-        region: "San Antonio",
-        aidedSponsorshipAwareness: "55%",
-        netMoreFavorable: "58%",
-        netIncreaseConsideration: "45%",
-      },
-      {
-        rightsholder: "Houston Rockets",
-        brand: "Xfinity",
-        region: "Houston",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "23%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Toronto Raptors",
-        brand: "Blue Cross",
-        region: "Toronto",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "28%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Miami Heat",
-        brand: "State Farm",
-        region: "Miami",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "34%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Los Angeles Lakers",
-        brand: "Chevrolet",
-        region: "Los Angeles",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "24%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Boston Celtics",
-        brand: "Remax",
-        region: "Boston",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "33%",
-        netIncreaseConsideration: "35%",
-      },
-      {
-        rightsholder: "Philadelphia Phillies",
-        brand: "SmartWater",
-        region: "Pennsylvania",
-        aidedSponsorshipAwareness: "24%",
-        netMoreFavorable: "53%",
-        netIncreaseConsideration: "35%",
-      },
-    ],
   }
 
   const openScorecardDrawer = () => {
@@ -2607,6 +2525,41 @@ export default function Page() {
                                 </div>
                               </div>
                             </div>
+                            {/* Actionable Recommendations */}
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                              <h5 className="font-semibold text-gray-900 mb-2">Actionable Recommendations</h5>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-blue-600 font-medium">•</span>
+                                  <span className="text-gray-700">
+                                    Focus marketing budget on {currentInsight.topPerformers.sponsor} as they show{" "}
+                                    {currentInsight.trending.smv}% SMV growth
+                                  </span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-green-600 font-medium">•</span>
+                                  <span className="text-gray-700">
+                                    Increase {currentInsight.topPerformers.platform} engagement strategies to capitalize
+                                    on {currentInsight.trending.engagement}% growth trend
+                                  </span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-purple-600 font-medium">•</span>
+                                  <span className="text-gray-700">
+                                    Optimize {currentInsight.topPerformers.placement} placements for maximum ROI based
+                                    on {currentInsight.keyMetrics.roi}% return rate
+                                  </span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-orange-600 font-medium">•</span>
+                                  <span className="text-gray-700">
+                                    Consider expanding reach to achieve{" "}
+                                    {Math.round(currentInsight.keyMetrics.reach * 1.5)}M target audience based on
+                                    current {currentInsight.keyMetrics.reach}M reach
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center h-full text-gray-500">
@@ -2673,27 +2626,45 @@ export default function Page() {
 
                       {/* Chart Insights Summary */}
                       <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <h6 className="font-medium text-blue-900 mb-2">Key Chart Insights</h6>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium text-blue-800">Peak Performance:</span>
-                            <span className="text-blue-700 ml-1">
-                              ${Math.max(...generateChartData(currentInsight).map((d) => d.smv))}K SMV
-                            </span>
+                        <h6 className="font-medium text-blue-900 mb-2">Key Chart Insights & Recommendations</h6>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div className="space-y-2">
+                            <div>
+                              <span className="font-medium text-blue-800">Peak Performance:</span>
+                              <span className="text-blue-700 ml-1">
+                                ${Math.max(...generateChartData(currentInsight).map((d) => d.smv))}K SMV
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-blue-800">Growth Trend:</span>
+                              <span className="text-blue-700 ml-1">+{currentInsight.trending.smv}% increase</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-blue-800">Best Month:</span>
+                              <span className="text-blue-700 ml-1">
+                                {
+                                  generateChartData(currentInsight).reduce((max, curr) =>
+                                    curr.smv > max.smv ? curr : max,
+                                  ).month
+                                }
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <span className="font-medium text-blue-800">Growth Trend:</span>
-                            <span className="text-blue-700 ml-1">+{currentInsight.trending.smv}% increase</span>
-                          </div>
-                          <div>
-                            <span className="font-medium text-blue-800">Best Month:</span>
-                            <span className="text-blue-700 ml-1">
-                              {
-                                generateChartData(currentInsight).reduce((max, curr) =>
-                                  curr.smv > max.smv ? curr : max,
-                                ).month
-                              }
-                            </span>
+                          <div className="space-y-2">
+                            <div className="text-blue-800 font-medium mb-1">Recommended Actions:</div>
+                            <div className="text-xs text-blue-700 space-y-1">
+                              <div>
+                                • Replicate{" "}
+                                {
+                                  generateChartData(currentInsight).reduce((max, curr) =>
+                                    curr.smv > max.smv ? curr : max,
+                                  ).month
+                                }{" "}
+                                strategy for consistent growth
+                              </div>
+                              <div>• Increase investment during peak performance periods</div>
+                              <div>• Monitor and adjust underperforming months</div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -3280,7 +3251,7 @@ export default function Page() {
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowAllInsightsModal(false)}></div>
 
           {/* Modal Content */}
-          <div className="relative z-10 bg-white rounded-lg shadow-xl w-full max-w-4xl overflow-hidden">
+          <div className="relative z-10 bg-white rounded-lg shadow-xl w-full max-w-6xl overflow-hidden">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">All Saved Custom Insights</h2>
@@ -3537,91 +3508,81 @@ export default function Page() {
                   </div>
                 </div>
 
-                {/* Teams Data Table */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Team Performance Data</h3>
+                {/* Recommendations Card */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <FontAwesomeIcon icon={faMagicWandSparkles} className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Recommendations for Improving Fan Base Metrics
+                    </h3>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Rightsholder
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Brand
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Region
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Aided Sponsorship Awareness
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Net More Favorable
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Net Increase Consideration
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {scorecardData.teamsData.map((team, index) => (
-                          <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {team.rightsholder}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.brand}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.region}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {team.aidedSponsorshipAwareness}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {team.netMoreFavorable}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {team.netIncreaseConsideration}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-lg border border-blue-100">
+                        <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
+                          Engagement Optimization
+                        </h4>
+                        <ul className="text-sm text-gray-700 space-y-1">
+                          <li>
+                            • Increase social media interaction campaigns to boost the current 58% engagement rate
+                          </li>
+                          <li>• Implement fan loyalty programs targeting the surveyed 202 sample base</li>
+                          <li>• Focus on digital touchpoints to improve overall fan connection</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded-lg border border-purple-100">
+                        <h4 className="font-medium text-purple-900 mb-2 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faRobot} className="h-4 w-4" />
+                          Intensity & Momentum Growth
+                        </h4>
+                        <ul className="text-sm text-gray-700 space-y-1">
+                          <li>• Leverage the 70% intensity score with targeted content strategies</li>
+                          <li>• Address the 30% momentum gap through seasonal campaigns</li>
+                          <li>• Create exclusive fan experiences to drive emotional connection</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="bg-white p-4 rounded-lg border border-green-100">
+                        <h4 className="font-medium text-green-900 mb-2 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faStar} className="h-4 w-4" />
+                          Sponsor Impact Enhancement
+                        </h4>
+                        <ul className="text-sm text-gray-700 space-y-1">
+                          <li>• Capitalize on 70% consideration rate with strategic sponsor partnerships</li>
+                          <li>• Improve 30% favorability through authentic brand integrations</li>
+                          <li>• Develop co-branded content to strengthen sponsor relationships</li>
+                        </ul>
+                      </div>
+
+                      <div className="bg-white p-4 rounded-lg border border-orange-100">
+                        <h4 className="font-medium text-orange-900 mb-2 flex items-center gap-2">
+                          <FontAwesomeIcon icon={faChartLine} className="h-4 w-4" />
+                          Opportunity Score Advancement
+                        </h4>
+                        <ul className="text-sm text-gray-700 space-y-1">
+                          <li>• Target moving from #6 to top 3 opportunity ranking</li>
+                          <li>• Increase opportunity score from 40 to 50+ through fan engagement</li>
+                          <li>• Focus on opportunity value growth beyond current 22 baseline</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Survey Scores Drawer */}
-      {showSurveyScoresDrawer && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Semi-transparent overlay */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
-            onClick={closeSurveyScoresDrawer}
-          />
-
-          {/* Drawer */}
-          <div
-            className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-y-auto ${
-              surveyScoresDrawerAnimating ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Survey Scores</h2>
-                <button onClick={closeSurveyScoresDrawer} className="text-gray-500 hover:text-gray-700">
-                  <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-2">Survey Scores Content</h3>
-                  <p className="text-sm text-gray-600">Survey scores and detailed analytics would be displayed here.</p>
+                  <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                    <div className="flex items-center gap-2 text-blue-800 text-sm font-medium">
+                      <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4" />
+                      <span>
+                        Priority Action: Focus on momentum building and sponsor favorability to maximize ROI potential
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
